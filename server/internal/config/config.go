@@ -9,6 +9,7 @@ import (
 )
 
 type Config struct {
+	SecretKey     string            `envconfig:"secret_key" required:"true"`
 	Debug         bool              `envconfig:"debug" default:"false"`
 	MySQLHost     string            `envconfig:"mysql_host" required:"true"`
 	MySQLPort     string            `envconfig:"mysql_port" default:"3306"`
