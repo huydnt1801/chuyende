@@ -17,11 +17,13 @@ func main() {
 		Usage: "",
 		Action: func(cCtx *cli.Context) error {
 			cfg := config.MustParseConfig()
-			_, err := dburl.Open(cfg.DatabaseURI())
+			db, err := dburl.Open(cfg.DatabaseURI())
 			if err != nil {
 				return fmt.Errorf("failed to open db: %w", err)
 			}
-			srv, err := server.NewServer()
+
+			accSrv := server.NewAccountServer(db)
+			srv, err := server.NewServer(accSrv)
 			if err != nil {
 				return err
 			}
