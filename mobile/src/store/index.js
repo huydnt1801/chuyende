@@ -1,7 +1,9 @@
 import { configureStore, applyMiddleware, compose } from "@reduxjs/toolkit";
 
-const reducer = {
+import accountReducer from "../slices/Account";
 
+const reducer = {
+    account: accountReducer
 }
 
 const logger = (_store) => (next) => (action) => {
