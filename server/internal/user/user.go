@@ -1,10 +1,10 @@
 package user
 
 type User struct {
-	ID          int    `json:"id,omitempty"`
-	PhoneNumber string `json:"phone_number,omitempty"`
-	FullName    string `json:"full_name,omitempty"`
-	Confirmed   bool   `json:"confirmed,omitempty"`
+	ID          int    `json:"id"`
+	PhoneNumber string `json:"phone_number"`
+	FullName    string `json:"full_name"`
+	Confirmed   bool   `json:"confirmed"`
 	Password    string `json:"-"`
 }
 

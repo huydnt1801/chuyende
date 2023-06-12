@@ -21,6 +21,35 @@ var (
 		Columns:    OtpsColumns,
 		PrimaryKey: []*schema.Column{OtpsColumns[0]},
 	}
+	// TripsColumns holds the columns for the "trips" table.
+	TripsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "drive_id", Type: field.TypeInt, Nullable: true},
+		{Name: "start_x", Type: field.TypeFloat64},
+		{Name: "start_y", Type: field.TypeFloat64},
+		{Name: "end_x", Type: field.TypeFloat64},
+		{Name: "end_y", Type: field.TypeFloat64},
+		{Name: "price", Type: field.TypeFloat64},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"pending", "accept", "done", "cancel"}, Default: "pending"},
+		{Name: "rate", Type: field.TypeInt, Nullable: true},
+		{Name: "user_id", Type: field.TypeInt},
+	}
+	// TripsTable holds the schema information for the "trips" table.
+	TripsTable = &schema.Table{
+		Name:       "trips",
+		Columns:    TripsColumns,
+		PrimaryKey: []*schema.Column{TripsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "trips_users_trips",
+				Columns:    []*schema.Column{TripsColumns[11]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -40,9 +69,11 @@ var (
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		OtpsTable,
+		TripsTable,
 		UsersTable,
 	}
 )
 
 func init() {
+	TripsTable.ForeignKeys[0].RefTable = UsersTable
 }

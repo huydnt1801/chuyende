@@ -1,10 +1,10 @@
 version: '3.7'
 services:
   db:
-    image: mysql:8.0
-    container_name: chuyende-mysql
+    image: mysql:8.0.23
+    container_name: cd-mysql
     volumes:
-      - docker-mysql-chuyende:/var/lib/mysql/
+      - docker-mysql-cd:/var/lib/mysql/
     command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8 --collation-server=utf8_general_ci --sql-mode=""
     ports:
       - 3306:3306
@@ -15,5 +15,5 @@ services:
       MYSQL_PASSWORD: password
 
 volumes:
-  docker-mysql-chuyende:
+  docker-mysql-cd:
     driver: local

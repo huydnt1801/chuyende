@@ -10,16 +10,18 @@ import (
 )
 
 type Server struct {
-	logger logr.Logger
-	accSrv *AccountServer
+	logger  logr.Logger
+	accSrv  *AccountServer
+	tripSrv *TripServer
 }
 
 type Option func(*Server)
 
-func NewServer(accSrv *AccountServer, opts ...Option) (*Server, error) {
+func NewServer(accSrv *AccountServer, tripSrv *TripServer, opts ...Option) (*Server, error) {
 	srv := &Server{
-		logger: log.ZapLogger(),
-		accSrv: accSrv,
+		logger:  log.ZapLogger(),
+		accSrv:  accSrv,
+		tripSrv: tripSrv,
 	}
 	for _, opt := range opts {
 		opt(srv)
@@ -38,8 +40,17 @@ func (s *Server) initRoutes() *echo.Echo {
 	healthG.GET("/liveness", liveness)
 
 	accountG := e.Group("/accounts")
-	accountG.POST("/register", s.accSrv.register)
-	accountG.POST("/register/confirm", s.accSrv.registerConfirm)
+	accountG.POST("/phone", s.accSrv.CheckPhone)
+	accountG.POST("/register", s.accSrv.Register)
+	accountG.POST("/register/confirm", s.accSrv.RegisterConfirm)
+	accountG.POST("/login", s.accSrv.Login)
+
+	tripG := e.Group("/trips")
+	tripG.GET("", s.tripSrv.ListTrip)
+	tripG.POST("", s.tripSrv.CreateTrip)
+	tripG.PATCH("/:tripId/status", s.tripSrv.UpdateStatusTrip)
+	tripG.PATCH("/:tripId/rate", s.tripSrv.RateTrip)
+	tripG.PATCH("/:tripId/accept", s.tripSrv.AcceptTrip)
 	return e
 }
 

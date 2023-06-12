@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/huydnt1801/chuyende/internal/ent/otp"
 	"github.com/huydnt1801/chuyende/internal/ent/predicate"
+	"github.com/huydnt1801/chuyende/internal/ent/trip"
 	"github.com/huydnt1801/chuyende/internal/ent/user"
 )
 
@@ -26,6 +27,7 @@ const (
 
 	// Node types.
 	TypeOtp  = "Otp"
+	TypeTrip = "Trip"
 	TypeUser = "User"
 )
 
@@ -463,6 +465,1202 @@ func (m *OtpMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown Otp edge %s", name)
 }
 
+// TripMutation represents an operation that mutates the Trip nodes in the graph.
+type TripMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *int
+	created_at    *time.Time
+	updated_at    *time.Time
+	drive_id      *int
+	adddrive_id   *int
+	start_x       *float64
+	addstart_x    *float64
+	start_y       *float64
+	addstart_y    *float64
+	end_x         *float64
+	addend_x      *float64
+	end_y         *float64
+	addend_y      *float64
+	price         *float64
+	addprice      *float64
+	status        *trip.Status
+	rate          *int
+	addrate       *int
+	clearedFields map[string]struct{}
+	user          *int
+	cleareduser   bool
+	done          bool
+	oldValue      func(context.Context) (*Trip, error)
+	predicates    []predicate.Trip
+}
+
+var _ ent.Mutation = (*TripMutation)(nil)
+
+// tripOption allows management of the mutation configuration using functional options.
+type tripOption func(*TripMutation)
+
+// newTripMutation creates new mutation for the Trip entity.
+func newTripMutation(c config, op Op, opts ...tripOption) *TripMutation {
+	m := &TripMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeTrip,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withTripID sets the ID field of the mutation.
+func withTripID(id int) tripOption {
+	return func(m *TripMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Trip
+		)
+		m.oldValue = func(ctx context.Context) (*Trip, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Trip.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withTrip sets the old Trip of the mutation.
+func withTrip(node *Trip) tripOption {
+	return func(m *TripMutation) {
+		m.oldValue = func(context.Context) (*Trip, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m TripMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m TripMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *TripMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *TripMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().Trip.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *TripMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *TripMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the Trip entity.
+// If the Trip object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TripMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *TripMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *TripMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *TripMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the Trip entity.
+// If the Trip object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TripMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *TripMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetUserID sets the "user_id" field.
+func (m *TripMutation) SetUserID(i int) {
+	m.user = &i
+}
+
+// UserID returns the value of the "user_id" field in the mutation.
+func (m *TripMutation) UserID() (r int, exists bool) {
+	v := m.user
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUserID returns the old "user_id" field's value of the Trip entity.
+// If the Trip object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TripMutation) OldUserID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUserID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUserID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUserID: %w", err)
+	}
+	return oldValue.UserID, nil
+}
+
+// ResetUserID resets all changes to the "user_id" field.
+func (m *TripMutation) ResetUserID() {
+	m.user = nil
+}
+
+// SetDriveID sets the "drive_id" field.
+func (m *TripMutation) SetDriveID(i int) {
+	m.drive_id = &i
+	m.adddrive_id = nil
+}
+
+// DriveID returns the value of the "drive_id" field in the mutation.
+func (m *TripMutation) DriveID() (r int, exists bool) {
+	v := m.drive_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDriveID returns the old "drive_id" field's value of the Trip entity.
+// If the Trip object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TripMutation) OldDriveID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDriveID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDriveID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDriveID: %w", err)
+	}
+	return oldValue.DriveID, nil
+}
+
+// AddDriveID adds i to the "drive_id" field.
+func (m *TripMutation) AddDriveID(i int) {
+	if m.adddrive_id != nil {
+		*m.adddrive_id += i
+	} else {
+		m.adddrive_id = &i
+	}
+}
+
+// AddedDriveID returns the value that was added to the "drive_id" field in this mutation.
+func (m *TripMutation) AddedDriveID() (r int, exists bool) {
+	v := m.adddrive_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearDriveID clears the value of the "drive_id" field.
+func (m *TripMutation) ClearDriveID() {
+	m.drive_id = nil
+	m.adddrive_id = nil
+	m.clearedFields[trip.FieldDriveID] = struct{}{}
+}
+
+// DriveIDCleared returns if the "drive_id" field was cleared in this mutation.
+func (m *TripMutation) DriveIDCleared() bool {
+	_, ok := m.clearedFields[trip.FieldDriveID]
+	return ok
+}
+
+// ResetDriveID resets all changes to the "drive_id" field.
+func (m *TripMutation) ResetDriveID() {
+	m.drive_id = nil
+	m.adddrive_id = nil
+	delete(m.clearedFields, trip.FieldDriveID)
+}
+
+// SetStartX sets the "start_x" field.
+func (m *TripMutation) SetStartX(f float64) {
+	m.start_x = &f
+	m.addstart_x = nil
+}
+
+// StartX returns the value of the "start_x" field in the mutation.
+func (m *TripMutation) StartX() (r float64, exists bool) {
+	v := m.start_x
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStartX returns the old "start_x" field's value of the Trip entity.
+// If the Trip object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TripMutation) OldStartX(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStartX is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStartX requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStartX: %w", err)
+	}
+	return oldValue.StartX, nil
+}
+
+// AddStartX adds f to the "start_x" field.
+func (m *TripMutation) AddStartX(f float64) {
+	if m.addstart_x != nil {
+		*m.addstart_x += f
+	} else {
+		m.addstart_x = &f
+	}
+}
+
+// AddedStartX returns the value that was added to the "start_x" field in this mutation.
+func (m *TripMutation) AddedStartX() (r float64, exists bool) {
+	v := m.addstart_x
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetStartX resets all changes to the "start_x" field.
+func (m *TripMutation) ResetStartX() {
+	m.start_x = nil
+	m.addstart_x = nil
+}
+
+// SetStartY sets the "start_y" field.
+func (m *TripMutation) SetStartY(f float64) {
+	m.start_y = &f
+	m.addstart_y = nil
+}
+
+// StartY returns the value of the "start_y" field in the mutation.
+func (m *TripMutation) StartY() (r float64, exists bool) {
+	v := m.start_y
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStartY returns the old "start_y" field's value of the Trip entity.
+// If the Trip object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TripMutation) OldStartY(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStartY is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStartY requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStartY: %w", err)
+	}
+	return oldValue.StartY, nil
+}
+
+// AddStartY adds f to the "start_y" field.
+func (m *TripMutation) AddStartY(f float64) {
+	if m.addstart_y != nil {
+		*m.addstart_y += f
+	} else {
+		m.addstart_y = &f
+	}
+}
+
+// AddedStartY returns the value that was added to the "start_y" field in this mutation.
+func (m *TripMutation) AddedStartY() (r float64, exists bool) {
+	v := m.addstart_y
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetStartY resets all changes to the "start_y" field.
+func (m *TripMutation) ResetStartY() {
+	m.start_y = nil
+	m.addstart_y = nil
+}
+
+// SetEndX sets the "end_x" field.
+func (m *TripMutation) SetEndX(f float64) {
+	m.end_x = &f
+	m.addend_x = nil
+}
+
+// EndX returns the value of the "end_x" field in the mutation.
+func (m *TripMutation) EndX() (r float64, exists bool) {
+	v := m.end_x
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEndX returns the old "end_x" field's value of the Trip entity.
+// If the Trip object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TripMutation) OldEndX(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEndX is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEndX requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEndX: %w", err)
+	}
+	return oldValue.EndX, nil
+}
+
+// AddEndX adds f to the "end_x" field.
+func (m *TripMutation) AddEndX(f float64) {
+	if m.addend_x != nil {
+		*m.addend_x += f
+	} else {
+		m.addend_x = &f
+	}
+}
+
+// AddedEndX returns the value that was added to the "end_x" field in this mutation.
+func (m *TripMutation) AddedEndX() (r float64, exists bool) {
+	v := m.addend_x
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetEndX resets all changes to the "end_x" field.
+func (m *TripMutation) ResetEndX() {
+	m.end_x = nil
+	m.addend_x = nil
+}
+
+// SetEndY sets the "end_y" field.
+func (m *TripMutation) SetEndY(f float64) {
+	m.end_y = &f
+	m.addend_y = nil
+}
+
+// EndY returns the value of the "end_y" field in the mutation.
+func (m *TripMutation) EndY() (r float64, exists bool) {
+	v := m.end_y
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEndY returns the old "end_y" field's value of the Trip entity.
+// If the Trip object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TripMutation) OldEndY(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEndY is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEndY requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEndY: %w", err)
+	}
+	return oldValue.EndY, nil
+}
+
+// AddEndY adds f to the "end_y" field.
+func (m *TripMutation) AddEndY(f float64) {
+	if m.addend_y != nil {
+		*m.addend_y += f
+	} else {
+		m.addend_y = &f
+	}
+}
+
+// AddedEndY returns the value that was added to the "end_y" field in this mutation.
+func (m *TripMutation) AddedEndY() (r float64, exists bool) {
+	v := m.addend_y
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetEndY resets all changes to the "end_y" field.
+func (m *TripMutation) ResetEndY() {
+	m.end_y = nil
+	m.addend_y = nil
+}
+
+// SetPrice sets the "price" field.
+func (m *TripMutation) SetPrice(f float64) {
+	m.price = &f
+	m.addprice = nil
+}
+
+// Price returns the value of the "price" field in the mutation.
+func (m *TripMutation) Price() (r float64, exists bool) {
+	v := m.price
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPrice returns the old "price" field's value of the Trip entity.
+// If the Trip object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TripMutation) OldPrice(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPrice is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPrice requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPrice: %w", err)
+	}
+	return oldValue.Price, nil
+}
+
+// AddPrice adds f to the "price" field.
+func (m *TripMutation) AddPrice(f float64) {
+	if m.addprice != nil {
+		*m.addprice += f
+	} else {
+		m.addprice = &f
+	}
+}
+
+// AddedPrice returns the value that was added to the "price" field in this mutation.
+func (m *TripMutation) AddedPrice() (r float64, exists bool) {
+	v := m.addprice
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetPrice resets all changes to the "price" field.
+func (m *TripMutation) ResetPrice() {
+	m.price = nil
+	m.addprice = nil
+}
+
+// SetStatus sets the "status" field.
+func (m *TripMutation) SetStatus(t trip.Status) {
+	m.status = &t
+}
+
+// Status returns the value of the "status" field in the mutation.
+func (m *TripMutation) Status() (r trip.Status, exists bool) {
+	v := m.status
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStatus returns the old "status" field's value of the Trip entity.
+// If the Trip object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TripMutation) OldStatus(ctx context.Context) (v trip.Status, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStatus requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStatus: %w", err)
+	}
+	return oldValue.Status, nil
+}
+
+// ResetStatus resets all changes to the "status" field.
+func (m *TripMutation) ResetStatus() {
+	m.status = nil
+}
+
+// SetRate sets the "rate" field.
+func (m *TripMutation) SetRate(i int) {
+	m.rate = &i
+	m.addrate = nil
+}
+
+// Rate returns the value of the "rate" field in the mutation.
+func (m *TripMutation) Rate() (r int, exists bool) {
+	v := m.rate
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRate returns the old "rate" field's value of the Trip entity.
+// If the Trip object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TripMutation) OldRate(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRate is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRate requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRate: %w", err)
+	}
+	return oldValue.Rate, nil
+}
+
+// AddRate adds i to the "rate" field.
+func (m *TripMutation) AddRate(i int) {
+	if m.addrate != nil {
+		*m.addrate += i
+	} else {
+		m.addrate = &i
+	}
+}
+
+// AddedRate returns the value that was added to the "rate" field in this mutation.
+func (m *TripMutation) AddedRate() (r int, exists bool) {
+	v := m.addrate
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearRate clears the value of the "rate" field.
+func (m *TripMutation) ClearRate() {
+	m.rate = nil
+	m.addrate = nil
+	m.clearedFields[trip.FieldRate] = struct{}{}
+}
+
+// RateCleared returns if the "rate" field was cleared in this mutation.
+func (m *TripMutation) RateCleared() bool {
+	_, ok := m.clearedFields[trip.FieldRate]
+	return ok
+}
+
+// ResetRate resets all changes to the "rate" field.
+func (m *TripMutation) ResetRate() {
+	m.rate = nil
+	m.addrate = nil
+	delete(m.clearedFields, trip.FieldRate)
+}
+
+// ClearUser clears the "user" edge to the User entity.
+func (m *TripMutation) ClearUser() {
+	m.cleareduser = true
+}
+
+// UserCleared reports if the "user" edge to the User entity was cleared.
+func (m *TripMutation) UserCleared() bool {
+	return m.cleareduser
+}
+
+// UserIDs returns the "user" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// UserID instead. It exists only for internal usage by the builders.
+func (m *TripMutation) UserIDs() (ids []int) {
+	if id := m.user; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetUser resets all changes to the "user" edge.
+func (m *TripMutation) ResetUser() {
+	m.user = nil
+	m.cleareduser = false
+}
+
+// Where appends a list predicates to the TripMutation builder.
+func (m *TripMutation) Where(ps ...predicate.Trip) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the TripMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *TripMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Trip, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *TripMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *TripMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (Trip).
+func (m *TripMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *TripMutation) Fields() []string {
+	fields := make([]string, 0, 11)
+	if m.created_at != nil {
+		fields = append(fields, trip.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, trip.FieldUpdatedAt)
+	}
+	if m.user != nil {
+		fields = append(fields, trip.FieldUserID)
+	}
+	if m.drive_id != nil {
+		fields = append(fields, trip.FieldDriveID)
+	}
+	if m.start_x != nil {
+		fields = append(fields, trip.FieldStartX)
+	}
+	if m.start_y != nil {
+		fields = append(fields, trip.FieldStartY)
+	}
+	if m.end_x != nil {
+		fields = append(fields, trip.FieldEndX)
+	}
+	if m.end_y != nil {
+		fields = append(fields, trip.FieldEndY)
+	}
+	if m.price != nil {
+		fields = append(fields, trip.FieldPrice)
+	}
+	if m.status != nil {
+		fields = append(fields, trip.FieldStatus)
+	}
+	if m.rate != nil {
+		fields = append(fields, trip.FieldRate)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *TripMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case trip.FieldCreatedAt:
+		return m.CreatedAt()
+	case trip.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case trip.FieldUserID:
+		return m.UserID()
+	case trip.FieldDriveID:
+		return m.DriveID()
+	case trip.FieldStartX:
+		return m.StartX()
+	case trip.FieldStartY:
+		return m.StartY()
+	case trip.FieldEndX:
+		return m.EndX()
+	case trip.FieldEndY:
+		return m.EndY()
+	case trip.FieldPrice:
+		return m.Price()
+	case trip.FieldStatus:
+		return m.Status()
+	case trip.FieldRate:
+		return m.Rate()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *TripMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case trip.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case trip.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case trip.FieldUserID:
+		return m.OldUserID(ctx)
+	case trip.FieldDriveID:
+		return m.OldDriveID(ctx)
+	case trip.FieldStartX:
+		return m.OldStartX(ctx)
+	case trip.FieldStartY:
+		return m.OldStartY(ctx)
+	case trip.FieldEndX:
+		return m.OldEndX(ctx)
+	case trip.FieldEndY:
+		return m.OldEndY(ctx)
+	case trip.FieldPrice:
+		return m.OldPrice(ctx)
+	case trip.FieldStatus:
+		return m.OldStatus(ctx)
+	case trip.FieldRate:
+		return m.OldRate(ctx)
+	}
+	return nil, fmt.Errorf("unknown Trip field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *TripMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case trip.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case trip.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case trip.FieldUserID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUserID(v)
+		return nil
+	case trip.FieldDriveID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDriveID(v)
+		return nil
+	case trip.FieldStartX:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStartX(v)
+		return nil
+	case trip.FieldStartY:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStartY(v)
+		return nil
+	case trip.FieldEndX:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEndX(v)
+		return nil
+	case trip.FieldEndY:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEndY(v)
+		return nil
+	case trip.FieldPrice:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPrice(v)
+		return nil
+	case trip.FieldStatus:
+		v, ok := value.(trip.Status)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStatus(v)
+		return nil
+	case trip.FieldRate:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRate(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Trip field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *TripMutation) AddedFields() []string {
+	var fields []string
+	if m.adddrive_id != nil {
+		fields = append(fields, trip.FieldDriveID)
+	}
+	if m.addstart_x != nil {
+		fields = append(fields, trip.FieldStartX)
+	}
+	if m.addstart_y != nil {
+		fields = append(fields, trip.FieldStartY)
+	}
+	if m.addend_x != nil {
+		fields = append(fields, trip.FieldEndX)
+	}
+	if m.addend_y != nil {
+		fields = append(fields, trip.FieldEndY)
+	}
+	if m.addprice != nil {
+		fields = append(fields, trip.FieldPrice)
+	}
+	if m.addrate != nil {
+		fields = append(fields, trip.FieldRate)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *TripMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case trip.FieldDriveID:
+		return m.AddedDriveID()
+	case trip.FieldStartX:
+		return m.AddedStartX()
+	case trip.FieldStartY:
+		return m.AddedStartY()
+	case trip.FieldEndX:
+		return m.AddedEndX()
+	case trip.FieldEndY:
+		return m.AddedEndY()
+	case trip.FieldPrice:
+		return m.AddedPrice()
+	case trip.FieldRate:
+		return m.AddedRate()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *TripMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case trip.FieldDriveID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddDriveID(v)
+		return nil
+	case trip.FieldStartX:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddStartX(v)
+		return nil
+	case trip.FieldStartY:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddStartY(v)
+		return nil
+	case trip.FieldEndX:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddEndX(v)
+		return nil
+	case trip.FieldEndY:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddEndY(v)
+		return nil
+	case trip.FieldPrice:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddPrice(v)
+		return nil
+	case trip.FieldRate:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddRate(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Trip numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *TripMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(trip.FieldDriveID) {
+		fields = append(fields, trip.FieldDriveID)
+	}
+	if m.FieldCleared(trip.FieldRate) {
+		fields = append(fields, trip.FieldRate)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *TripMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *TripMutation) ClearField(name string) error {
+	switch name {
+	case trip.FieldDriveID:
+		m.ClearDriveID()
+		return nil
+	case trip.FieldRate:
+		m.ClearRate()
+		return nil
+	}
+	return fmt.Errorf("unknown Trip nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *TripMutation) ResetField(name string) error {
+	switch name {
+	case trip.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case trip.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case trip.FieldUserID:
+		m.ResetUserID()
+		return nil
+	case trip.FieldDriveID:
+		m.ResetDriveID()
+		return nil
+	case trip.FieldStartX:
+		m.ResetStartX()
+		return nil
+	case trip.FieldStartY:
+		m.ResetStartY()
+		return nil
+	case trip.FieldEndX:
+		m.ResetEndX()
+		return nil
+	case trip.FieldEndY:
+		m.ResetEndY()
+		return nil
+	case trip.FieldPrice:
+		m.ResetPrice()
+		return nil
+	case trip.FieldStatus:
+		m.ResetStatus()
+		return nil
+	case trip.FieldRate:
+		m.ResetRate()
+		return nil
+	}
+	return fmt.Errorf("unknown Trip field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *TripMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.user != nil {
+		edges = append(edges, trip.EdgeUser)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *TripMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case trip.EdgeUser:
+		if id := m.user; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *TripMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *TripMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *TripMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.cleareduser {
+		edges = append(edges, trip.EdgeUser)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *TripMutation) EdgeCleared(name string) bool {
+	switch name {
+	case trip.EdgeUser:
+		return m.cleareduser
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *TripMutation) ClearEdge(name string) error {
+	switch name {
+	case trip.EdgeUser:
+		m.ClearUser()
+		return nil
+	}
+	return fmt.Errorf("unknown Trip unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *TripMutation) ResetEdge(name string) error {
+	switch name {
+	case trip.EdgeUser:
+		m.ResetUser()
+		return nil
+	}
+	return fmt.Errorf("unknown Trip edge %s", name)
+}
+
 // UserMutation represents an operation that mutates the User nodes in the graph.
 type UserMutation struct {
 	config
@@ -476,6 +1674,9 @@ type UserMutation struct {
 	full_name     *string
 	password      *string
 	clearedFields map[string]struct{}
+	trips         map[int]struct{}
+	removedtrips  map[int]struct{}
+	clearedtrips  bool
 	done          bool
 	oldValue      func(context.Context) (*User, error)
 	predicates    []predicate.User
@@ -795,6 +1996,60 @@ func (m *UserMutation) ResetPassword() {
 	m.password = nil
 }
 
+// AddTripIDs adds the "trips" edge to the Trip entity by ids.
+func (m *UserMutation) AddTripIDs(ids ...int) {
+	if m.trips == nil {
+		m.trips = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.trips[ids[i]] = struct{}{}
+	}
+}
+
+// ClearTrips clears the "trips" edge to the Trip entity.
+func (m *UserMutation) ClearTrips() {
+	m.clearedtrips = true
+}
+
+// TripsCleared reports if the "trips" edge to the Trip entity was cleared.
+func (m *UserMutation) TripsCleared() bool {
+	return m.clearedtrips
+}
+
+// RemoveTripIDs removes the "trips" edge to the Trip entity by IDs.
+func (m *UserMutation) RemoveTripIDs(ids ...int) {
+	if m.removedtrips == nil {
+		m.removedtrips = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.trips, ids[i])
+		m.removedtrips[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedTrips returns the removed IDs of the "trips" edge to the Trip entity.
+func (m *UserMutation) RemovedTripsIDs() (ids []int) {
+	for id := range m.removedtrips {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// TripsIDs returns the "trips" edge IDs in the mutation.
+func (m *UserMutation) TripsIDs() (ids []int) {
+	for id := range m.trips {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetTrips resets all changes to the "trips" edge.
+func (m *UserMutation) ResetTrips() {
+	m.trips = nil
+	m.clearedtrips = false
+	m.removedtrips = nil
+}
+
 // Where appends a list predicates to the UserMutation builder.
 func (m *UserMutation) Where(ps ...predicate.User) {
 	m.predicates = append(m.predicates, ps...)
@@ -1013,48 +2268,84 @@ func (m *UserMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *UserMutation) AddedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.trips != nil {
+		edges = append(edges, user.EdgeTrips)
+	}
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
 func (m *UserMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case user.EdgeTrips:
+		ids := make([]ent.Value, 0, len(m.trips))
+		for id := range m.trips {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *UserMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.removedtrips != nil {
+		edges = append(edges, user.EdgeTrips)
+	}
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
 func (m *UserMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case user.EdgeTrips:
+		ids := make([]ent.Value, 0, len(m.removedtrips))
+		for id := range m.removedtrips {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *UserMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.clearedtrips {
+		edges = append(edges, user.EdgeTrips)
+	}
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
 func (m *UserMutation) EdgeCleared(name string) bool {
+	switch name {
+	case user.EdgeTrips:
+		return m.clearedtrips
+	}
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
 func (m *UserMutation) ClearEdge(name string) error {
+	switch name {
+	}
 	return fmt.Errorf("unknown User unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
 func (m *UserMutation) ResetEdge(name string) error {
+	switch name {
+	case user.EdgeTrips:
+		m.ResetTrips()
+		return nil
+	}
 	return fmt.Errorf("unknown User edge %s", name)
 }
