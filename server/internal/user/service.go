@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"regexp"
 	"time"
 
@@ -14,24 +15,26 @@ import (
 
 type Service interface {
 	CreateUser(ctx context.Context, user *User, password string) (*User, time.Time, error)
+	Authenticate(ctx context.Context, username, password string) (*User, error)
 	Confirm(ctx context.Context, user *User, otp string) error
 	FindUser(ctx context.Context, params *UserParams) (*User, error)
 	SendConfirmationToken(ctx context.Context, user *User) (time.Time, error)
 }
 
 type ServiceImpl struct {
-	logger    logr.Logger
-	entClient *ent.Client
-	// passwordHasher      PasswordHasher
-	otpSender OTPService
+	logger         logr.Logger
+	entClient      *ent.Client
+	passwordHasher PasswordHasher
+	otpSender      OTPService
 }
 
 func NewService(db *sql.DB) *ServiceImpl {
 	client := entutil.NewClientFromDB(db)
 	s := &ServiceImpl{
-		logger:    log.ZapLogger(),
-		entClient: client,
-		otpSender: NewOTPService(db),
+		logger:         log.ZapLogger(),
+		entClient:      client,
+		passwordHasher: &BcryptPasswordHasher{},
+		otpSender:      NewOTPService(db),
 	}
 	return s
 }
@@ -41,7 +44,14 @@ func (s *ServiceImpl) CreateUser(ctx context.Context, user *User, password strin
 	if !isValidPhoneNumber(user.PhoneNumber) {
 		return nil, time.Time{}, InvalidPhoneError{}
 	}
-	// validate pass and hash
+	if err := DefaultPasswordComplexity.ValidatePassword(password); err != nil {
+		return nil, time.Time{}, err
+	}
+	hashedPw, err := s.passwordHasher.HashPassword(password)
+	if err != nil {
+		return nil, time.Time{}, fmt.Errorf("failed hashing password: %w", err)
+	}
+	user.Password = hashedPw
 	u, err := repo.CreateUser(ctx, user)
 	if err != nil {
 		return nil, time.Time{}, err
@@ -52,6 +62,29 @@ func (s *ServiceImpl) CreateUser(ctx context.Context, user *User, password strin
 		return nil, time.Time{}, err
 	}
 	return u, nextTime, nil
+}
+
+func (s *ServiceImpl) Authenticate(ctx context.Context, phoneNumber, password string) (*User, error) {
+	repo := NewRepo(s.entClient)
+
+	if !isValidPhoneNumber(phoneNumber) {
+		return nil, InvalidPhoneError{}
+	}
+	user, err := repo.FindUser(ctx, &UserParams{PhoneNumber: phoneNumber})
+	if err != nil {
+		if IsUserNotFound(err) {
+			return nil, UserNotFoundError{}
+		} else {
+			return nil, fmt.Errorf("failed querying user from DB: %w", err)
+		}
+
+	}
+
+	if !s.passwordHasher.CheckPasswordHash(password, user.Password) {
+		return nil, InvalidPasswordError{}
+	}
+
+	return user, nil
 }
 
 func (s *ServiceImpl) Confirm(ctx context.Context, usr *User, otp string) error {

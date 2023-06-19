@@ -1,0 +1,27 @@
+name: Deploy Backend
+
+on:
+  push:
+    tags:
+      - be*
+
+jobs:
+  build:
+    name: build and push Docker image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout files
+        uses: actions/checkout@v2
+
+      - name: Change working directory to backend folder
+        run: cd server
+
+      - uses: mr-smithers-excellent/docker-build-push@v4
+        name: Build and push Docker image
+        with:
+          image: huydnt1801/cd-backend
+          registry: ghcr.io
+          dockerfile: Dockerfile
+          username: ${{ github.actor }}
+          password: ${{ secrets.PAT }}

@@ -1,3 +1,7 @@
+TARGET = bin
+TARGET_BIN = app
+GO_CMD_MAIN = cmd/app/main.go
+
 MYSQL_DATABASE_URI = mysql://$(MYSQL_USERNAME):$(MYSQL_PASSWORD)@$(MYSQL_HOST):$(MYSQL_PORT)/$(MYSQL_DATABASE)
 
 migrate:
@@ -11,3 +15,9 @@ migrate-up:
 
 generate-ent:
 	go generate ./internal/ent
+
+build:
+	go build -o $(TARGET)/$(TARGET_BIN) $(GO_CMD_MAIN)
+
+run:
+	go run $(GO_CMD_MAIN)

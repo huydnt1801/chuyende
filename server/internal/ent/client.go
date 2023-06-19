@@ -13,7 +13,9 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/huydnt1801/chuyende/internal/ent/otp"
+	"github.com/huydnt1801/chuyende/internal/ent/trip"
 	"github.com/huydnt1801/chuyende/internal/ent/user"
 )
 
@@ -24,6 +26,8 @@ type Client struct {
 	Schema *migrate.Schema
 	// Otp is the client for interacting with the Otp builders.
 	Otp *OtpClient
+	// Trip is the client for interacting with the Trip builders.
+	Trip *TripClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 }
@@ -40,6 +44,7 @@ func NewClient(opts ...Option) *Client {
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.Otp = NewOtpClient(c.config)
+	c.Trip = NewTripClient(c.config)
 	c.User = NewUserClient(c.config)
 }
 
@@ -124,6 +129,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		ctx:    ctx,
 		config: cfg,
 		Otp:    NewOtpClient(cfg),
+		Trip:   NewTripClient(cfg),
 		User:   NewUserClient(cfg),
 	}, nil
 }
@@ -145,6 +151,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		ctx:    ctx,
 		config: cfg,
 		Otp:    NewOtpClient(cfg),
+		Trip:   NewTripClient(cfg),
 		User:   NewUserClient(cfg),
 	}, nil
 }
@@ -175,6 +182,7 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	c.Otp.Use(hooks...)
+	c.Trip.Use(hooks...)
 	c.User.Use(hooks...)
 }
 
@@ -182,6 +190,7 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	c.Otp.Intercept(interceptors...)
+	c.Trip.Intercept(interceptors...)
 	c.User.Intercept(interceptors...)
 }
 
@@ -190,6 +199,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
 	case *OtpMutation:
 		return c.Otp.mutate(ctx, m)
+	case *TripMutation:
+		return c.Trip.mutate(ctx, m)
 	case *UserMutation:
 		return c.User.mutate(ctx, m)
 	default:
@@ -315,6 +326,140 @@ func (c *OtpClient) mutate(ctx context.Context, m *OtpMutation) (Value, error) {
 	}
 }
 
+// TripClient is a client for the Trip schema.
+type TripClient struct {
+	config
+}
+
+// NewTripClient returns a client for the Trip from the given config.
+func NewTripClient(c config) *TripClient {
+	return &TripClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `trip.Hooks(f(g(h())))`.
+func (c *TripClient) Use(hooks ...Hook) {
+	c.hooks.Trip = append(c.hooks.Trip, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `trip.Intercept(f(g(h())))`.
+func (c *TripClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Trip = append(c.inters.Trip, interceptors...)
+}
+
+// Create returns a builder for creating a Trip entity.
+func (c *TripClient) Create() *TripCreate {
+	mutation := newTripMutation(c.config, OpCreate)
+	return &TripCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Trip entities.
+func (c *TripClient) CreateBulk(builders ...*TripCreate) *TripCreateBulk {
+	return &TripCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Trip.
+func (c *TripClient) Update() *TripUpdate {
+	mutation := newTripMutation(c.config, OpUpdate)
+	return &TripUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *TripClient) UpdateOne(t *Trip) *TripUpdateOne {
+	mutation := newTripMutation(c.config, OpUpdateOne, withTrip(t))
+	return &TripUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *TripClient) UpdateOneID(id int) *TripUpdateOne {
+	mutation := newTripMutation(c.config, OpUpdateOne, withTripID(id))
+	return &TripUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Trip.
+func (c *TripClient) Delete() *TripDelete {
+	mutation := newTripMutation(c.config, OpDelete)
+	return &TripDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *TripClient) DeleteOne(t *Trip) *TripDeleteOne {
+	return c.DeleteOneID(t.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *TripClient) DeleteOneID(id int) *TripDeleteOne {
+	builder := c.Delete().Where(trip.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &TripDeleteOne{builder}
+}
+
+// Query returns a query builder for Trip.
+func (c *TripClient) Query() *TripQuery {
+	return &TripQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeTrip},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Trip entity by its id.
+func (c *TripClient) Get(ctx context.Context, id int) (*Trip, error) {
+	return c.Query().Where(trip.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *TripClient) GetX(ctx context.Context, id int) *Trip {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryUser queries the user edge of a Trip.
+func (c *TripClient) QueryUser(t *Trip) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := t.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(trip.Table, trip.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, trip.UserTable, trip.UserColumn),
+		)
+		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *TripClient) Hooks() []Hook {
+	return c.hooks.Trip
+}
+
+// Interceptors returns the client interceptors.
+func (c *TripClient) Interceptors() []Interceptor {
+	return c.inters.Trip
+}
+
+func (c *TripClient) mutate(ctx context.Context, m *TripMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&TripCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&TripUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&TripUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&TripDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Trip mutation op: %q", m.Op())
+	}
+}
+
 // UserClient is a client for the User schema.
 type UserClient struct {
 	config
@@ -408,6 +553,22 @@ func (c *UserClient) GetX(ctx context.Context, id int) *User {
 	return obj
 }
 
+// QueryTrips queries the trips edge of a User.
+func (c *UserClient) QueryTrips(u *User) *TripQuery {
+	query := (&TripClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := u.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(trip.Table, trip.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.TripsTable, user.TripsColumn),
+		)
+		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *UserClient) Hooks() []Hook {
 	return c.hooks.User
@@ -436,9 +597,9 @@ func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error)
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Otp, User []ent.Hook
+		Otp, Trip, User []ent.Hook
 	}
 	inters struct {
-		Otp, User []ent.Interceptor
+		Otp, Trip, User []ent.Interceptor
 	}
 )

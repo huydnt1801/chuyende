@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -25,8 +26,17 @@ const (
 	FieldFullName = "full_name"
 	// FieldPassword holds the string denoting the password field in the database.
 	FieldPassword = "password"
+	// EdgeTrips holds the string denoting the trips edge name in mutations.
+	EdgeTrips = "trips"
 	// Table holds the table name of the user in the database.
 	Table = "users"
+	// TripsTable is the table that holds the trips relation/edge.
+	TripsTable = "trips"
+	// TripsInverseTable is the table name for the Trip entity.
+	// It exists in this package in order to avoid circular dependency with the "trip" package.
+	TripsInverseTable = "trips"
+	// TripsColumn is the table column denoting the trips relation/edge.
+	TripsColumn = "user_id"
 )
 
 // Columns holds all SQL columns for user fields.
@@ -99,4 +109,25 @@ func ByFullName(opts ...sql.OrderTermOption) OrderOption {
 // ByPassword orders the results by the password field.
 func ByPassword(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldPassword, opts...).ToFunc()
+}
+
+// ByTripsCount orders the results by trips count.
+func ByTripsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newTripsStep(), opts...)
+	}
+}
+
+// ByTrips orders the results by trips terms.
+func ByTrips(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newTripsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+func newTripsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(TripsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, TripsTable, TripsColumn),
+	)
 }

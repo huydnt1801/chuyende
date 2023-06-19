@@ -7,6 +7,7 @@ import (
 
 	"github.com/huydnt1801/chuyende/internal/ent/otp"
 	"github.com/huydnt1801/chuyende/internal/ent/schema"
+	"github.com/huydnt1801/chuyende/internal/ent/trip"
 	"github.com/huydnt1801/chuyende/internal/ent/user"
 )
 
@@ -20,6 +21,39 @@ func init() {
 	otpDescCreatedAt := otpFields[2].Descriptor()
 	// otp.DefaultCreatedAt holds the default value on creation for the created_at field.
 	otp.DefaultCreatedAt = otpDescCreatedAt.Default.(func() time.Time)
+	tripMixin := schema.Trip{}.Mixin()
+	tripMixinFields0 := tripMixin[0].Fields()
+	_ = tripMixinFields0
+	tripFields := schema.Trip{}.Fields()
+	_ = tripFields
+	// tripDescCreatedAt is the schema descriptor for created_at field.
+	tripDescCreatedAt := tripMixinFields0[0].Descriptor()
+	// trip.DefaultCreatedAt holds the default value on creation for the created_at field.
+	trip.DefaultCreatedAt = tripDescCreatedAt.Default.(func() time.Time)
+	// tripDescUpdatedAt is the schema descriptor for updated_at field.
+	tripDescUpdatedAt := tripMixinFields0[1].Descriptor()
+	// trip.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	trip.DefaultUpdatedAt = tripDescUpdatedAt.Default.(func() time.Time)
+	// trip.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	trip.UpdateDefaultUpdatedAt = tripDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// tripDescRate is the schema descriptor for rate field.
+	tripDescRate := tripFields[8].Descriptor()
+	// trip.RateValidator is a validator for the "rate" field. It is called by the builders before save.
+	trip.RateValidator = func() func(int) error {
+		validators := tripDescRate.Validators
+		fns := [...]func(int) error{
+			validators[0].(func(int) error),
+			validators[1].(func(int) error),
+		}
+		return func(rate int) error {
+			for _, fn := range fns {
+				if err := fn(rate); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
 	userMixin := schema.User{}.Mixin()
 	userMixinFields0 := userMixin[0].Fields()
 	_ = userMixinFields0

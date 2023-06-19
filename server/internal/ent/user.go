@@ -28,8 +28,29 @@ type User struct {
 	// FullName holds the value of the "full_name" field.
 	FullName string `json:"full_name,omitempty"`
 	// Password holds the value of the "password" field.
-	Password     string `json:"password,omitempty"`
+	Password string `json:"password,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the UserQuery when eager-loading is set.
+	Edges        UserEdges `json:"edges"`
 	selectValues sql.SelectValues
+}
+
+// UserEdges holds the relations/edges for other nodes in the graph.
+type UserEdges struct {
+	// Trips holds the value of the trips edge.
+	Trips []*Trip `json:"trips,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+}
+
+// TripsOrErr returns the Trips value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) TripsOrErr() ([]*Trip, error) {
+	if e.loadedTypes[0] {
+		return e.Trips, nil
+	}
+	return nil, &NotLoadedError{edge: "trips"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -113,6 +134,11 @@ func (u *User) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (u *User) Value(name string) (ent.Value, error) {
 	return u.selectValues.Get(name)
+}
+
+// QueryTrips queries the "trips" edge of the User entity.
+func (u *User) QueryTrips() *TripQuery {
+	return NewUserClient(u.config).QueryTrips(u)
 }
 
 // Update returns a builder for updating this User.

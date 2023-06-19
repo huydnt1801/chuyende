@@ -23,7 +23,8 @@ func main() {
 			}
 
 			accSrv := server.NewAccountServer(db)
-			srv, err := server.NewServer(accSrv)
+			tripSrv := server.NewTripServer(db)
+			srv, err := server.NewServer(accSrv, tripSrv)
 			if err != nil {
 				return err
 			}

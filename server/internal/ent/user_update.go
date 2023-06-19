@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/huydnt1801/chuyende/internal/ent/predicate"
+	"github.com/huydnt1801/chuyende/internal/ent/trip"
 	"github.com/huydnt1801/chuyende/internal/ent/user"
 )
 
@@ -66,9 +67,45 @@ func (uu *UserUpdate) SetPassword(s string) *UserUpdate {
 	return uu
 }
 
+// AddTripIDs adds the "trips" edge to the Trip entity by IDs.
+func (uu *UserUpdate) AddTripIDs(ids ...int) *UserUpdate {
+	uu.mutation.AddTripIDs(ids...)
+	return uu
+}
+
+// AddTrips adds the "trips" edges to the Trip entity.
+func (uu *UserUpdate) AddTrips(t ...*Trip) *UserUpdate {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return uu.AddTripIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (uu *UserUpdate) Mutation() *UserMutation {
 	return uu.mutation
+}
+
+// ClearTrips clears all "trips" edges to the Trip entity.
+func (uu *UserUpdate) ClearTrips() *UserUpdate {
+	uu.mutation.ClearTrips()
+	return uu
+}
+
+// RemoveTripIDs removes the "trips" edge to Trip entities by IDs.
+func (uu *UserUpdate) RemoveTripIDs(ids ...int) *UserUpdate {
+	uu.mutation.RemoveTripIDs(ids...)
+	return uu
+}
+
+// RemoveTrips removes "trips" edges to Trip entities.
+func (uu *UserUpdate) RemoveTrips(t ...*Trip) *UserUpdate {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return uu.RemoveTripIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -144,6 +181,51 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := uu.mutation.Password(); ok {
 		_spec.SetField(user.FieldPassword, field.TypeString, value)
 	}
+	if uu.mutation.TripsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.TripsTable,
+			Columns: []string{user.TripsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(trip.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.RemovedTripsIDs(); len(nodes) > 0 && !uu.mutation.TripsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.TripsTable,
+			Columns: []string{user.TripsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(trip.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.TripsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.TripsTable,
+			Columns: []string{user.TripsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(trip.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, uu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{user.Label}
@@ -202,9 +284,45 @@ func (uuo *UserUpdateOne) SetPassword(s string) *UserUpdateOne {
 	return uuo
 }
 
+// AddTripIDs adds the "trips" edge to the Trip entity by IDs.
+func (uuo *UserUpdateOne) AddTripIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.AddTripIDs(ids...)
+	return uuo
+}
+
+// AddTrips adds the "trips" edges to the Trip entity.
+func (uuo *UserUpdateOne) AddTrips(t ...*Trip) *UserUpdateOne {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return uuo.AddTripIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (uuo *UserUpdateOne) Mutation() *UserMutation {
 	return uuo.mutation
+}
+
+// ClearTrips clears all "trips" edges to the Trip entity.
+func (uuo *UserUpdateOne) ClearTrips() *UserUpdateOne {
+	uuo.mutation.ClearTrips()
+	return uuo
+}
+
+// RemoveTripIDs removes the "trips" edge to Trip entities by IDs.
+func (uuo *UserUpdateOne) RemoveTripIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.RemoveTripIDs(ids...)
+	return uuo
+}
+
+// RemoveTrips removes "trips" edges to Trip entities.
+func (uuo *UserUpdateOne) RemoveTrips(t ...*Trip) *UserUpdateOne {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return uuo.RemoveTripIDs(ids...)
 }
 
 // Where appends a list predicates to the UserUpdate builder.
@@ -309,6 +427,51 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 	}
 	if value, ok := uuo.mutation.Password(); ok {
 		_spec.SetField(user.FieldPassword, field.TypeString, value)
+	}
+	if uuo.mutation.TripsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.TripsTable,
+			Columns: []string{user.TripsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(trip.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.RemovedTripsIDs(); len(nodes) > 0 && !uuo.mutation.TripsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.TripsTable,
+			Columns: []string{user.TripsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(trip.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.TripsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.TripsTable,
+			Columns: []string{user.TripsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(trip.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &User{config: uuo.config}
 	_spec.Assign = _node.assignValues

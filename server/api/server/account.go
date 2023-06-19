@@ -36,7 +36,7 @@ func NewAccountServer(db *sql.DB) *AccountServer {
 	return srv
 }
 
-func (s AccountServer) register(c echo.Context) error {
+func (s *AccountServer) Register(c echo.Context) error {
 	r := c.Request()
 	ctx := r.Context()
 	data := &RegisterRequest{}
@@ -61,13 +61,13 @@ func (s AccountServer) register(c echo.Context) error {
 }
 
 type RegisterRequest struct {
-	PhoneNumber string `json:"phone_number" validate:"required"`
-	FullName    string `json:"full_name" validate:"required"`
+	PhoneNumber string `json:"phoneNumber" validate:"required"`
+	FullName    string `json:"fullName" validate:"required"`
 	Password    string `json:"password" validate:"required"`
 	Password2   string `json:"password2" validate:"required"`
 }
 
-func (s *AccountServer) registerConfirm(c echo.Context) error {
+func (s *AccountServer) RegisterConfirm(c echo.Context) error {
 	r := c.Request()
 	ctx := r.Context()
 	data := &RegisterConfirmRequest{}
@@ -115,6 +115,55 @@ type RegisterConfirmRequest struct {
 	Type  string `json:"type" validate:"required"`
 	Token string `json:"token" validate:"required"`
 	OTP   string `json:"otp"`
+}
+
+func (s *AccountServer) Login(c echo.Context) error {
+	r := c.Request()
+	ctx := r.Context()
+	data := &LoginRequest{}
+	if err := c.Bind(data); err != nil {
+		return err
+	}
+	if err := c.Validate(data); err != nil {
+		return err
+	}
+	usr, err := s.userSvc.Authenticate(ctx, data.PhoneNumber, data.Password)
+	if err != nil {
+		return err
+	}
+	return c.JSON(http.StatusOK, usr)
+}
+
+type LoginRequest struct {
+	PhoneNumber string `json:"phoneNumber" validate:"required"`
+	Password    string `json:"password" validate:"required"`
+}
+
+type CheckPhoneRequest struct {
+	PhoneNumber string `json:"phoneNumber" validate:"required"`
+}
+
+func (s *AccountServer) CheckPhone(c echo.Context) error {
+	r := c.Request()
+	ctx := r.Context()
+	data := &CheckPhoneRequest{}
+	if err := c.Bind(data); err != nil {
+		return err
+	}
+	if err := c.Validate(data); err != nil {
+		return err
+	}
+	if data.PhoneNumber == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid information")
+	}
+	usr, err := s.userSvc.FindUser(ctx, &user.UserParams{PhoneNumber: data.PhoneNumber})
+	if user.IsUserNotFound(err) {
+		return c.JSON(http.StatusOK, nil)
+	}
+	if err != nil {
+		return err
+	}
+	return c.JSON(http.StatusOK, usr)
 }
 
 func (s *AccountServer) signData(data []byte) []byte {
