@@ -1,9 +1,7 @@
-import avatar1 from "../../assets/images/avatar.png";
-import blitzcrank from "../../assets/images/blitzcrank.jpg";
-import banhmique from "../../assets/images/banhmique.png";
+import avatar1 from "../../assets/images/1.png";
+import blitzcrank from "../../assets/images/2.png";
 
 export {
     avatar1,
     blitzcrank,
-    banhmique
 }

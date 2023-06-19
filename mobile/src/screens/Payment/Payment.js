@@ -1,12 +1,12 @@
 import { Text, View } from "react-native";
 
-const Login = () => {
+const Payment = () => {
 
     return (
         <View style={{ flex: 1 }}>
-            <Text>Login</Text>
+            <Text>Payment</Text>
         </View>
     );
 }
 
-export default Login
+export default Payment
