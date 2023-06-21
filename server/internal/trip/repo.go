@@ -37,7 +37,7 @@ func (r *RepoImpl) FindTrip(ctx context.Context, params *TripParams) ([]*Trip, e
 		q = q.Where(trip.UserID(*v))
 	}
 	if v := params.DriveID; v != nil {
-		q = q.Where(trip.DriveID(*v))
+		q = q.Where(trip.DriverID(*v))
 	}
 	if v := params.Status; v != nil {
 		q = q.Where(trip.StatusEQ(*v))
@@ -75,7 +75,7 @@ func (r *RepoImpl) UpdateTrip(ctx context.Context, id int, updated *TripUpdate) 
 	q := r.client.Trip.UpdateOneID(id)
 
 	if v := updated.DriveID; v != nil {
-		q.SetDriveID(*v)
+		q.SetDriverID(*v)
 	}
 	if v := updated.Status; v != nil {
 		q.SetStatus(*v)

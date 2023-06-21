@@ -13,6 +13,7 @@ import (
 	"github.com/huydnt1801/chuyende/internal/ent/predicate"
 	"github.com/huydnt1801/chuyende/internal/ent/trip"
 	"github.com/huydnt1801/chuyende/internal/ent/user"
+	"github.com/huydnt1801/chuyende/internal/ent/vehicledriver"
 )
 
 // TripQuery is the builder for querying Trip entities.
@@ -23,6 +24,7 @@ type TripQuery struct {
 	inters     []Interceptor
 	predicates []predicate.Trip
 	withUser   *UserQuery
+	withDriver *VehicleDriverQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -74,6 +76,28 @@ func (tq *TripQuery) QueryUser() *UserQuery {
 			sqlgraph.From(trip.Table, trip.FieldID, selector),
 			sqlgraph.To(user.Table, user.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, trip.UserTable, trip.UserColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(tq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryDriver chains the current query on the "driver" edge.
+func (tq *TripQuery) QueryDriver() *VehicleDriverQuery {
+	query := (&VehicleDriverClient{config: tq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := tq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := tq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(trip.Table, trip.FieldID, selector),
+			sqlgraph.To(vehicledriver.Table, vehicledriver.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, trip.DriverTable, trip.DriverColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(tq.driver.Dialect(), step)
 		return fromU, nil
@@ -274,6 +298,7 @@ func (tq *TripQuery) Clone() *TripQuery {
 		inters:     append([]Interceptor{}, tq.inters...),
 		predicates: append([]predicate.Trip{}, tq.predicates...),
 		withUser:   tq.withUser.Clone(),
+		withDriver: tq.withDriver.Clone(),
 		// clone intermediate query.
 		sql:  tq.sql.Clone(),
 		path: tq.path,
@@ -288,6 +313,17 @@ func (tq *TripQuery) WithUser(opts ...func(*UserQuery)) *TripQuery {
 		opt(query)
 	}
 	tq.withUser = query
+	return tq
+}
+
+// WithDriver tells the query-builder to eager-load the nodes that are connected to
+// the "driver" edge. The optional arguments are used to configure the query builder of the edge.
+func (tq *TripQuery) WithDriver(opts ...func(*VehicleDriverQuery)) *TripQuery {
+	query := (&VehicleDriverClient{config: tq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	tq.withDriver = query
 	return tq
 }
 
@@ -369,8 +405,9 @@ func (tq *TripQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Trip, e
 	var (
 		nodes       = []*Trip{}
 		_spec       = tq.querySpec()
-		loadedTypes = [1]bool{
+		loadedTypes = [2]bool{
 			tq.withUser != nil,
+			tq.withDriver != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -394,6 +431,12 @@ func (tq *TripQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Trip, e
 	if query := tq.withUser; query != nil {
 		if err := tq.loadUser(ctx, query, nodes, nil,
 			func(n *Trip, e *User) { n.Edges.User = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := tq.withDriver; query != nil {
+		if err := tq.loadDriver(ctx, query, nodes, nil,
+			func(n *Trip, e *VehicleDriver) { n.Edges.Driver = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -429,6 +472,35 @@ func (tq *TripQuery) loadUser(ctx context.Context, query *UserQuery, nodes []*Tr
 	}
 	return nil
 }
+func (tq *TripQuery) loadDriver(ctx context.Context, query *VehicleDriverQuery, nodes []*Trip, init func(*Trip), assign func(*Trip, *VehicleDriver)) error {
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*Trip)
+	for i := range nodes {
+		fk := nodes[i].DriverID
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(vehicledriver.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "driver_id" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
 
 func (tq *TripQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := tq.querySpec()
@@ -457,6 +529,9 @@ func (tq *TripQuery) querySpec() *sqlgraph.QuerySpec {
 		}
 		if tq.withUser != nil {
 			_spec.Node.AddColumnOnce(trip.FieldUserID)
+		}
+		if tq.withDriver != nil {
+			_spec.Node.AddColumnOnce(trip.FieldDriverID)
 		}
 	}
 	if ps := tq.predicates; len(ps) > 0 {

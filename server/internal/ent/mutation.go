@@ -13,8 +13,10 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/huydnt1801/chuyende/internal/ent/otp"
 	"github.com/huydnt1801/chuyende/internal/ent/predicate"
+	"github.com/huydnt1801/chuyende/internal/ent/session"
 	"github.com/huydnt1801/chuyende/internal/ent/trip"
 	"github.com/huydnt1801/chuyende/internal/ent/user"
+	"github.com/huydnt1801/chuyende/internal/ent/vehicledriver"
 )
 
 const (
@@ -26,9 +28,11 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeOtp  = "Otp"
-	TypeTrip = "Trip"
-	TypeUser = "User"
+	TypeOtp           = "Otp"
+	TypeSession       = "Session"
+	TypeTrip          = "Trip"
+	TypeUser          = "User"
+	TypeVehicleDriver = "VehicleDriver"
 )
 
 // OtpMutation represents an operation that mutates the Otp nodes in the graph.
@@ -465,35 +469,827 @@ func (m *OtpMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown Otp edge %s", name)
 }
 
+// SessionMutation represents an operation that mutates the Session nodes in the graph.
+type SessionMutation struct {
+	config
+	op             Op
+	typ            string
+	id             *int
+	created_at     *time.Time
+	updated_at     *time.Time
+	session_id     *string
+	expire_in      *time.Time
+	revoked        *bool
+	clearedFields  map[string]struct{}
+	user           *int
+	cleareduser    bool
+	_driver        *int
+	cleared_driver bool
+	done           bool
+	oldValue       func(context.Context) (*Session, error)
+	predicates     []predicate.Session
+}
+
+var _ ent.Mutation = (*SessionMutation)(nil)
+
+// sessionOption allows management of the mutation configuration using functional options.
+type sessionOption func(*SessionMutation)
+
+// newSessionMutation creates new mutation for the Session entity.
+func newSessionMutation(c config, op Op, opts ...sessionOption) *SessionMutation {
+	m := &SessionMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeSession,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withSessionID sets the ID field of the mutation.
+func withSessionID(id int) sessionOption {
+	return func(m *SessionMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Session
+		)
+		m.oldValue = func(ctx context.Context) (*Session, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Session.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withSession sets the old Session of the mutation.
+func withSession(node *Session) sessionOption {
+	return func(m *SessionMutation) {
+		m.oldValue = func(context.Context) (*Session, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m SessionMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m SessionMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *SessionMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *SessionMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().Session.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *SessionMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *SessionMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the Session entity.
+// If the Session object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SessionMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *SessionMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *SessionMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *SessionMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the Session entity.
+// If the Session object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SessionMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *SessionMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetUserID sets the "user_id" field.
+func (m *SessionMutation) SetUserID(i int) {
+	m.user = &i
+}
+
+// UserID returns the value of the "user_id" field in the mutation.
+func (m *SessionMutation) UserID() (r int, exists bool) {
+	v := m.user
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUserID returns the old "user_id" field's value of the Session entity.
+// If the Session object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SessionMutation) OldUserID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUserID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUserID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUserID: %w", err)
+	}
+	return oldValue.UserID, nil
+}
+
+// ClearUserID clears the value of the "user_id" field.
+func (m *SessionMutation) ClearUserID() {
+	m.user = nil
+	m.clearedFields[session.FieldUserID] = struct{}{}
+}
+
+// UserIDCleared returns if the "user_id" field was cleared in this mutation.
+func (m *SessionMutation) UserIDCleared() bool {
+	_, ok := m.clearedFields[session.FieldUserID]
+	return ok
+}
+
+// ResetUserID resets all changes to the "user_id" field.
+func (m *SessionMutation) ResetUserID() {
+	m.user = nil
+	delete(m.clearedFields, session.FieldUserID)
+}
+
+// SetDriverID sets the "driver_id" field.
+func (m *SessionMutation) SetDriverID(i int) {
+	m._driver = &i
+}
+
+// DriverID returns the value of the "driver_id" field in the mutation.
+func (m *SessionMutation) DriverID() (r int, exists bool) {
+	v := m._driver
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDriverID returns the old "driver_id" field's value of the Session entity.
+// If the Session object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SessionMutation) OldDriverID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDriverID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDriverID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDriverID: %w", err)
+	}
+	return oldValue.DriverID, nil
+}
+
+// ClearDriverID clears the value of the "driver_id" field.
+func (m *SessionMutation) ClearDriverID() {
+	m._driver = nil
+	m.clearedFields[session.FieldDriverID] = struct{}{}
+}
+
+// DriverIDCleared returns if the "driver_id" field was cleared in this mutation.
+func (m *SessionMutation) DriverIDCleared() bool {
+	_, ok := m.clearedFields[session.FieldDriverID]
+	return ok
+}
+
+// ResetDriverID resets all changes to the "driver_id" field.
+func (m *SessionMutation) ResetDriverID() {
+	m._driver = nil
+	delete(m.clearedFields, session.FieldDriverID)
+}
+
+// SetSessionID sets the "session_id" field.
+func (m *SessionMutation) SetSessionID(s string) {
+	m.session_id = &s
+}
+
+// SessionID returns the value of the "session_id" field in the mutation.
+func (m *SessionMutation) SessionID() (r string, exists bool) {
+	v := m.session_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSessionID returns the old "session_id" field's value of the Session entity.
+// If the Session object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SessionMutation) OldSessionID(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSessionID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSessionID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSessionID: %w", err)
+	}
+	return oldValue.SessionID, nil
+}
+
+// ResetSessionID resets all changes to the "session_id" field.
+func (m *SessionMutation) ResetSessionID() {
+	m.session_id = nil
+}
+
+// SetExpireIn sets the "expire_in" field.
+func (m *SessionMutation) SetExpireIn(t time.Time) {
+	m.expire_in = &t
+}
+
+// ExpireIn returns the value of the "expire_in" field in the mutation.
+func (m *SessionMutation) ExpireIn() (r time.Time, exists bool) {
+	v := m.expire_in
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldExpireIn returns the old "expire_in" field's value of the Session entity.
+// If the Session object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SessionMutation) OldExpireIn(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldExpireIn is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldExpireIn requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldExpireIn: %w", err)
+	}
+	return oldValue.ExpireIn, nil
+}
+
+// ResetExpireIn resets all changes to the "expire_in" field.
+func (m *SessionMutation) ResetExpireIn() {
+	m.expire_in = nil
+}
+
+// SetRevoked sets the "revoked" field.
+func (m *SessionMutation) SetRevoked(b bool) {
+	m.revoked = &b
+}
+
+// Revoked returns the value of the "revoked" field in the mutation.
+func (m *SessionMutation) Revoked() (r bool, exists bool) {
+	v := m.revoked
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRevoked returns the old "revoked" field's value of the Session entity.
+// If the Session object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SessionMutation) OldRevoked(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRevoked is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRevoked requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRevoked: %w", err)
+	}
+	return oldValue.Revoked, nil
+}
+
+// ResetRevoked resets all changes to the "revoked" field.
+func (m *SessionMutation) ResetRevoked() {
+	m.revoked = nil
+}
+
+// ClearUser clears the "user" edge to the User entity.
+func (m *SessionMutation) ClearUser() {
+	m.cleareduser = true
+}
+
+// UserCleared reports if the "user" edge to the User entity was cleared.
+func (m *SessionMutation) UserCleared() bool {
+	return m.UserIDCleared() || m.cleareduser
+}
+
+// UserIDs returns the "user" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// UserID instead. It exists only for internal usage by the builders.
+func (m *SessionMutation) UserIDs() (ids []int) {
+	if id := m.user; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetUser resets all changes to the "user" edge.
+func (m *SessionMutation) ResetUser() {
+	m.user = nil
+	m.cleareduser = false
+}
+
+// ClearDriver clears the "driver" edge to the VehicleDriver entity.
+func (m *SessionMutation) ClearDriver() {
+	m.cleared_driver = true
+}
+
+// DriverCleared reports if the "driver" edge to the VehicleDriver entity was cleared.
+func (m *SessionMutation) DriverCleared() bool {
+	return m.DriverIDCleared() || m.cleared_driver
+}
+
+// DriverIDs returns the "driver" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// DriverID instead. It exists only for internal usage by the builders.
+func (m *SessionMutation) DriverIDs() (ids []int) {
+	if id := m._driver; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetDriver resets all changes to the "driver" edge.
+func (m *SessionMutation) ResetDriver() {
+	m._driver = nil
+	m.cleared_driver = false
+}
+
+// Where appends a list predicates to the SessionMutation builder.
+func (m *SessionMutation) Where(ps ...predicate.Session) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the SessionMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *SessionMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Session, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *SessionMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *SessionMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (Session).
+func (m *SessionMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *SessionMutation) Fields() []string {
+	fields := make([]string, 0, 7)
+	if m.created_at != nil {
+		fields = append(fields, session.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, session.FieldUpdatedAt)
+	}
+	if m.user != nil {
+		fields = append(fields, session.FieldUserID)
+	}
+	if m._driver != nil {
+		fields = append(fields, session.FieldDriverID)
+	}
+	if m.session_id != nil {
+		fields = append(fields, session.FieldSessionID)
+	}
+	if m.expire_in != nil {
+		fields = append(fields, session.FieldExpireIn)
+	}
+	if m.revoked != nil {
+		fields = append(fields, session.FieldRevoked)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *SessionMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case session.FieldCreatedAt:
+		return m.CreatedAt()
+	case session.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case session.FieldUserID:
+		return m.UserID()
+	case session.FieldDriverID:
+		return m.DriverID()
+	case session.FieldSessionID:
+		return m.SessionID()
+	case session.FieldExpireIn:
+		return m.ExpireIn()
+	case session.FieldRevoked:
+		return m.Revoked()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *SessionMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case session.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case session.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case session.FieldUserID:
+		return m.OldUserID(ctx)
+	case session.FieldDriverID:
+		return m.OldDriverID(ctx)
+	case session.FieldSessionID:
+		return m.OldSessionID(ctx)
+	case session.FieldExpireIn:
+		return m.OldExpireIn(ctx)
+	case session.FieldRevoked:
+		return m.OldRevoked(ctx)
+	}
+	return nil, fmt.Errorf("unknown Session field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *SessionMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case session.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case session.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case session.FieldUserID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUserID(v)
+		return nil
+	case session.FieldDriverID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDriverID(v)
+		return nil
+	case session.FieldSessionID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSessionID(v)
+		return nil
+	case session.FieldExpireIn:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetExpireIn(v)
+		return nil
+	case session.FieldRevoked:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRevoked(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Session field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *SessionMutation) AddedFields() []string {
+	var fields []string
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *SessionMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *SessionMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Session numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *SessionMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(session.FieldUserID) {
+		fields = append(fields, session.FieldUserID)
+	}
+	if m.FieldCleared(session.FieldDriverID) {
+		fields = append(fields, session.FieldDriverID)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *SessionMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *SessionMutation) ClearField(name string) error {
+	switch name {
+	case session.FieldUserID:
+		m.ClearUserID()
+		return nil
+	case session.FieldDriverID:
+		m.ClearDriverID()
+		return nil
+	}
+	return fmt.Errorf("unknown Session nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *SessionMutation) ResetField(name string) error {
+	switch name {
+	case session.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case session.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case session.FieldUserID:
+		m.ResetUserID()
+		return nil
+	case session.FieldDriverID:
+		m.ResetDriverID()
+		return nil
+	case session.FieldSessionID:
+		m.ResetSessionID()
+		return nil
+	case session.FieldExpireIn:
+		m.ResetExpireIn()
+		return nil
+	case session.FieldRevoked:
+		m.ResetRevoked()
+		return nil
+	}
+	return fmt.Errorf("unknown Session field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *SessionMutation) AddedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.user != nil {
+		edges = append(edges, session.EdgeUser)
+	}
+	if m._driver != nil {
+		edges = append(edges, session.EdgeDriver)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *SessionMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case session.EdgeUser:
+		if id := m.user; id != nil {
+			return []ent.Value{*id}
+		}
+	case session.EdgeDriver:
+		if id := m._driver; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *SessionMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 2)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *SessionMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *SessionMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.cleareduser {
+		edges = append(edges, session.EdgeUser)
+	}
+	if m.cleared_driver {
+		edges = append(edges, session.EdgeDriver)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *SessionMutation) EdgeCleared(name string) bool {
+	switch name {
+	case session.EdgeUser:
+		return m.cleareduser
+	case session.EdgeDriver:
+		return m.cleared_driver
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *SessionMutation) ClearEdge(name string) error {
+	switch name {
+	case session.EdgeUser:
+		m.ClearUser()
+		return nil
+	case session.EdgeDriver:
+		m.ClearDriver()
+		return nil
+	}
+	return fmt.Errorf("unknown Session unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *SessionMutation) ResetEdge(name string) error {
+	switch name {
+	case session.EdgeUser:
+		m.ResetUser()
+		return nil
+	case session.EdgeDriver:
+		m.ResetDriver()
+		return nil
+	}
+	return fmt.Errorf("unknown Session edge %s", name)
+}
+
 // TripMutation represents an operation that mutates the Trip nodes in the graph.
 type TripMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *int
-	created_at    *time.Time
-	updated_at    *time.Time
-	drive_id      *int
-	adddrive_id   *int
-	start_x       *float64
-	addstart_x    *float64
-	start_y       *float64
-	addstart_y    *float64
-	end_x         *float64
-	addend_x      *float64
-	end_y         *float64
-	addend_y      *float64
-	price         *float64
-	addprice      *float64
-	status        *trip.Status
-	rate          *int
-	addrate       *int
-	clearedFields map[string]struct{}
-	user          *int
-	cleareduser   bool
-	done          bool
-	oldValue      func(context.Context) (*Trip, error)
-	predicates    []predicate.Trip
+	op             Op
+	typ            string
+	id             *int
+	created_at     *time.Time
+	updated_at     *time.Time
+	start_x        *float64
+	addstart_x     *float64
+	start_y        *float64
+	addstart_y     *float64
+	end_x          *float64
+	addend_x       *float64
+	end_y          *float64
+	addend_y       *float64
+	price          *float64
+	addprice       *float64
+	status         *trip.Status
+	rate           *int
+	addrate        *int
+	clearedFields  map[string]struct{}
+	user           *int
+	cleareduser    bool
+	_driver        *int
+	cleared_driver bool
+	done           bool
+	oldValue       func(context.Context) (*Trip, error)
+	predicates     []predicate.Trip
 }
 
 var _ ent.Mutation = (*TripMutation)(nil)
@@ -702,74 +1498,53 @@ func (m *TripMutation) ResetUserID() {
 	m.user = nil
 }
 
-// SetDriveID sets the "drive_id" field.
-func (m *TripMutation) SetDriveID(i int) {
-	m.drive_id = &i
-	m.adddrive_id = nil
+// SetDriverID sets the "driver_id" field.
+func (m *TripMutation) SetDriverID(i int) {
+	m._driver = &i
 }
 
-// DriveID returns the value of the "drive_id" field in the mutation.
-func (m *TripMutation) DriveID() (r int, exists bool) {
-	v := m.drive_id
+// DriverID returns the value of the "driver_id" field in the mutation.
+func (m *TripMutation) DriverID() (r int, exists bool) {
+	v := m._driver
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldDriveID returns the old "drive_id" field's value of the Trip entity.
+// OldDriverID returns the old "driver_id" field's value of the Trip entity.
 // If the Trip object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *TripMutation) OldDriveID(ctx context.Context) (v int, err error) {
+func (m *TripMutation) OldDriverID(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldDriveID is only allowed on UpdateOne operations")
+		return v, errors.New("OldDriverID is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldDriveID requires an ID field in the mutation")
+		return v, errors.New("OldDriverID requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldDriveID: %w", err)
+		return v, fmt.Errorf("querying old value for OldDriverID: %w", err)
 	}
-	return oldValue.DriveID, nil
+	return oldValue.DriverID, nil
 }
 
-// AddDriveID adds i to the "drive_id" field.
-func (m *TripMutation) AddDriveID(i int) {
-	if m.adddrive_id != nil {
-		*m.adddrive_id += i
-	} else {
-		m.adddrive_id = &i
-	}
+// ClearDriverID clears the value of the "driver_id" field.
+func (m *TripMutation) ClearDriverID() {
+	m._driver = nil
+	m.clearedFields[trip.FieldDriverID] = struct{}{}
 }
 
-// AddedDriveID returns the value that was added to the "drive_id" field in this mutation.
-func (m *TripMutation) AddedDriveID() (r int, exists bool) {
-	v := m.adddrive_id
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ClearDriveID clears the value of the "drive_id" field.
-func (m *TripMutation) ClearDriveID() {
-	m.drive_id = nil
-	m.adddrive_id = nil
-	m.clearedFields[trip.FieldDriveID] = struct{}{}
-}
-
-// DriveIDCleared returns if the "drive_id" field was cleared in this mutation.
-func (m *TripMutation) DriveIDCleared() bool {
-	_, ok := m.clearedFields[trip.FieldDriveID]
+// DriverIDCleared returns if the "driver_id" field was cleared in this mutation.
+func (m *TripMutation) DriverIDCleared() bool {
+	_, ok := m.clearedFields[trip.FieldDriverID]
 	return ok
 }
 
-// ResetDriveID resets all changes to the "drive_id" field.
-func (m *TripMutation) ResetDriveID() {
-	m.drive_id = nil
-	m.adddrive_id = nil
-	delete(m.clearedFields, trip.FieldDriveID)
+// ResetDriverID resets all changes to the "driver_id" field.
+func (m *TripMutation) ResetDriverID() {
+	m._driver = nil
+	delete(m.clearedFields, trip.FieldDriverID)
 }
 
 // SetStartX sets the "start_x" field.
@@ -1184,6 +1959,32 @@ func (m *TripMutation) ResetUser() {
 	m.cleareduser = false
 }
 
+// ClearDriver clears the "driver" edge to the VehicleDriver entity.
+func (m *TripMutation) ClearDriver() {
+	m.cleared_driver = true
+}
+
+// DriverCleared reports if the "driver" edge to the VehicleDriver entity was cleared.
+func (m *TripMutation) DriverCleared() bool {
+	return m.DriverIDCleared() || m.cleared_driver
+}
+
+// DriverIDs returns the "driver" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// DriverID instead. It exists only for internal usage by the builders.
+func (m *TripMutation) DriverIDs() (ids []int) {
+	if id := m._driver; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetDriver resets all changes to the "driver" edge.
+func (m *TripMutation) ResetDriver() {
+	m._driver = nil
+	m.cleared_driver = false
+}
+
 // Where appends a list predicates to the TripMutation builder.
 func (m *TripMutation) Where(ps ...predicate.Trip) {
 	m.predicates = append(m.predicates, ps...)
@@ -1228,8 +2029,8 @@ func (m *TripMutation) Fields() []string {
 	if m.user != nil {
 		fields = append(fields, trip.FieldUserID)
 	}
-	if m.drive_id != nil {
-		fields = append(fields, trip.FieldDriveID)
+	if m._driver != nil {
+		fields = append(fields, trip.FieldDriverID)
 	}
 	if m.start_x != nil {
 		fields = append(fields, trip.FieldStartX)
@@ -1266,8 +2067,8 @@ func (m *TripMutation) Field(name string) (ent.Value, bool) {
 		return m.UpdatedAt()
 	case trip.FieldUserID:
 		return m.UserID()
-	case trip.FieldDriveID:
-		return m.DriveID()
+	case trip.FieldDriverID:
+		return m.DriverID()
 	case trip.FieldStartX:
 		return m.StartX()
 	case trip.FieldStartY:
@@ -1297,8 +2098,8 @@ func (m *TripMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldUpdatedAt(ctx)
 	case trip.FieldUserID:
 		return m.OldUserID(ctx)
-	case trip.FieldDriveID:
-		return m.OldDriveID(ctx)
+	case trip.FieldDriverID:
+		return m.OldDriverID(ctx)
 	case trip.FieldStartX:
 		return m.OldStartX(ctx)
 	case trip.FieldStartY:
@@ -1343,12 +2144,12 @@ func (m *TripMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetUserID(v)
 		return nil
-	case trip.FieldDriveID:
+	case trip.FieldDriverID:
 		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetDriveID(v)
+		m.SetDriverID(v)
 		return nil
 	case trip.FieldStartX:
 		v, ok := value.(float64)
@@ -1407,9 +2208,6 @@ func (m *TripMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *TripMutation) AddedFields() []string {
 	var fields []string
-	if m.adddrive_id != nil {
-		fields = append(fields, trip.FieldDriveID)
-	}
 	if m.addstart_x != nil {
 		fields = append(fields, trip.FieldStartX)
 	}
@@ -1436,8 +2234,6 @@ func (m *TripMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *TripMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
-	case trip.FieldDriveID:
-		return m.AddedDriveID()
 	case trip.FieldStartX:
 		return m.AddedStartX()
 	case trip.FieldStartY:
@@ -1459,13 +2255,6 @@ func (m *TripMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *TripMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case trip.FieldDriveID:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddDriveID(v)
-		return nil
 	case trip.FieldStartX:
 		v, ok := value.(float64)
 		if !ok {
@@ -1516,8 +2305,8 @@ func (m *TripMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *TripMutation) ClearedFields() []string {
 	var fields []string
-	if m.FieldCleared(trip.FieldDriveID) {
-		fields = append(fields, trip.FieldDriveID)
+	if m.FieldCleared(trip.FieldDriverID) {
+		fields = append(fields, trip.FieldDriverID)
 	}
 	if m.FieldCleared(trip.FieldRate) {
 		fields = append(fields, trip.FieldRate)
@@ -1536,8 +2325,8 @@ func (m *TripMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *TripMutation) ClearField(name string) error {
 	switch name {
-	case trip.FieldDriveID:
-		m.ClearDriveID()
+	case trip.FieldDriverID:
+		m.ClearDriverID()
 		return nil
 	case trip.FieldRate:
 		m.ClearRate()
@@ -1559,8 +2348,8 @@ func (m *TripMutation) ResetField(name string) error {
 	case trip.FieldUserID:
 		m.ResetUserID()
 		return nil
-	case trip.FieldDriveID:
-		m.ResetDriveID()
+	case trip.FieldDriverID:
+		m.ResetDriverID()
 		return nil
 	case trip.FieldStartX:
 		m.ResetStartX()
@@ -1589,9 +2378,12 @@ func (m *TripMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *TripMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.user != nil {
 		edges = append(edges, trip.EdgeUser)
+	}
+	if m._driver != nil {
+		edges = append(edges, trip.EdgeDriver)
 	}
 	return edges
 }
@@ -1604,13 +2396,17 @@ func (m *TripMutation) AddedIDs(name string) []ent.Value {
 		if id := m.user; id != nil {
 			return []ent.Value{*id}
 		}
+	case trip.EdgeDriver:
+		if id := m._driver; id != nil {
+			return []ent.Value{*id}
+		}
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *TripMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	return edges
 }
 
@@ -1622,9 +2418,12 @@ func (m *TripMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *TripMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.cleareduser {
 		edges = append(edges, trip.EdgeUser)
+	}
+	if m.cleared_driver {
+		edges = append(edges, trip.EdgeDriver)
 	}
 	return edges
 }
@@ -1635,6 +2434,8 @@ func (m *TripMutation) EdgeCleared(name string) bool {
 	switch name {
 	case trip.EdgeUser:
 		return m.cleareduser
+	case trip.EdgeDriver:
+		return m.cleared_driver
 	}
 	return false
 }
@@ -1645,6 +2446,9 @@ func (m *TripMutation) ClearEdge(name string) error {
 	switch name {
 	case trip.EdgeUser:
 		m.ClearUser()
+		return nil
+	case trip.EdgeDriver:
+		m.ClearDriver()
 		return nil
 	}
 	return fmt.Errorf("unknown Trip unique edge %s", name)
@@ -1657,6 +2461,9 @@ func (m *TripMutation) ResetEdge(name string) error {
 	case trip.EdgeUser:
 		m.ResetUser()
 		return nil
+	case trip.EdgeDriver:
+		m.ResetDriver()
+		return nil
 	}
 	return fmt.Errorf("unknown Trip edge %s", name)
 }
@@ -1664,22 +2471,25 @@ func (m *TripMutation) ResetEdge(name string) error {
 // UserMutation represents an operation that mutates the User nodes in the graph.
 type UserMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *int
-	created_at    *time.Time
-	updated_at    *time.Time
-	phone_number  *string
-	confirmed     *bool
-	full_name     *string
-	password      *string
-	clearedFields map[string]struct{}
-	trips         map[int]struct{}
-	removedtrips  map[int]struct{}
-	clearedtrips  bool
-	done          bool
-	oldValue      func(context.Context) (*User, error)
-	predicates    []predicate.User
+	op              Op
+	typ             string
+	id              *int
+	created_at      *time.Time
+	updated_at      *time.Time
+	phone_number    *string
+	confirmed       *bool
+	full_name       *string
+	password        *string
+	clearedFields   map[string]struct{}
+	trips           map[int]struct{}
+	removedtrips    map[int]struct{}
+	clearedtrips    bool
+	sessions        map[int]struct{}
+	removedsessions map[int]struct{}
+	clearedsessions bool
+	done            bool
+	oldValue        func(context.Context) (*User, error)
+	predicates      []predicate.User
 }
 
 var _ ent.Mutation = (*UserMutation)(nil)
@@ -2050,6 +2860,60 @@ func (m *UserMutation) ResetTrips() {
 	m.removedtrips = nil
 }
 
+// AddSessionIDs adds the "sessions" edge to the Session entity by ids.
+func (m *UserMutation) AddSessionIDs(ids ...int) {
+	if m.sessions == nil {
+		m.sessions = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.sessions[ids[i]] = struct{}{}
+	}
+}
+
+// ClearSessions clears the "sessions" edge to the Session entity.
+func (m *UserMutation) ClearSessions() {
+	m.clearedsessions = true
+}
+
+// SessionsCleared reports if the "sessions" edge to the Session entity was cleared.
+func (m *UserMutation) SessionsCleared() bool {
+	return m.clearedsessions
+}
+
+// RemoveSessionIDs removes the "sessions" edge to the Session entity by IDs.
+func (m *UserMutation) RemoveSessionIDs(ids ...int) {
+	if m.removedsessions == nil {
+		m.removedsessions = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.sessions, ids[i])
+		m.removedsessions[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedSessions returns the removed IDs of the "sessions" edge to the Session entity.
+func (m *UserMutation) RemovedSessionsIDs() (ids []int) {
+	for id := range m.removedsessions {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// SessionsIDs returns the "sessions" edge IDs in the mutation.
+func (m *UserMutation) SessionsIDs() (ids []int) {
+	for id := range m.sessions {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetSessions resets all changes to the "sessions" edge.
+func (m *UserMutation) ResetSessions() {
+	m.sessions = nil
+	m.clearedsessions = false
+	m.removedsessions = nil
+}
+
 // Where appends a list predicates to the UserMutation builder.
 func (m *UserMutation) Where(ps ...predicate.User) {
 	m.predicates = append(m.predicates, ps...)
@@ -2268,9 +3132,12 @@ func (m *UserMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *UserMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.trips != nil {
 		edges = append(edges, user.EdgeTrips)
+	}
+	if m.sessions != nil {
+		edges = append(edges, user.EdgeSessions)
 	}
 	return edges
 }
@@ -2285,15 +3152,24 @@ func (m *UserMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case user.EdgeSessions:
+		ids := make([]ent.Value, 0, len(m.sessions))
+		for id := range m.sessions {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *UserMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.removedtrips != nil {
 		edges = append(edges, user.EdgeTrips)
+	}
+	if m.removedsessions != nil {
+		edges = append(edges, user.EdgeSessions)
 	}
 	return edges
 }
@@ -2308,15 +3184,24 @@ func (m *UserMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case user.EdgeSessions:
+		ids := make([]ent.Value, 0, len(m.removedsessions))
+		for id := range m.removedsessions {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *UserMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.clearedtrips {
 		edges = append(edges, user.EdgeTrips)
+	}
+	if m.clearedsessions {
+		edges = append(edges, user.EdgeSessions)
 	}
 	return edges
 }
@@ -2327,6 +3212,8 @@ func (m *UserMutation) EdgeCleared(name string) bool {
 	switch name {
 	case user.EdgeTrips:
 		return m.clearedtrips
+	case user.EdgeSessions:
+		return m.clearedsessions
 	}
 	return false
 }
@@ -2346,6 +3233,727 @@ func (m *UserMutation) ResetEdge(name string) error {
 	case user.EdgeTrips:
 		m.ResetTrips()
 		return nil
+	case user.EdgeSessions:
+		m.ResetSessions()
+		return nil
 	}
 	return fmt.Errorf("unknown User edge %s", name)
+}
+
+// VehicleDriverMutation represents an operation that mutates the VehicleDriver nodes in the graph.
+type VehicleDriverMutation struct {
+	config
+	op              Op
+	typ             string
+	id              *int
+	created_at      *time.Time
+	updated_at      *time.Time
+	phone_number    *string
+	full_name       *string
+	password        *string
+	clearedFields   map[string]struct{}
+	trips           map[int]struct{}
+	removedtrips    map[int]struct{}
+	clearedtrips    bool
+	sessions        map[int]struct{}
+	removedsessions map[int]struct{}
+	clearedsessions bool
+	done            bool
+	oldValue        func(context.Context) (*VehicleDriver, error)
+	predicates      []predicate.VehicleDriver
+}
+
+var _ ent.Mutation = (*VehicleDriverMutation)(nil)
+
+// vehicledriverOption allows management of the mutation configuration using functional options.
+type vehicledriverOption func(*VehicleDriverMutation)
+
+// newVehicleDriverMutation creates new mutation for the VehicleDriver entity.
+func newVehicleDriverMutation(c config, op Op, opts ...vehicledriverOption) *VehicleDriverMutation {
+	m := &VehicleDriverMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeVehicleDriver,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withVehicleDriverID sets the ID field of the mutation.
+func withVehicleDriverID(id int) vehicledriverOption {
+	return func(m *VehicleDriverMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *VehicleDriver
+		)
+		m.oldValue = func(ctx context.Context) (*VehicleDriver, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().VehicleDriver.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withVehicleDriver sets the old VehicleDriver of the mutation.
+func withVehicleDriver(node *VehicleDriver) vehicledriverOption {
+	return func(m *VehicleDriverMutation) {
+		m.oldValue = func(context.Context) (*VehicleDriver, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m VehicleDriverMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m VehicleDriverMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *VehicleDriverMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *VehicleDriverMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().VehicleDriver.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *VehicleDriverMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *VehicleDriverMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the VehicleDriver entity.
+// If the VehicleDriver object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *VehicleDriverMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *VehicleDriverMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *VehicleDriverMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *VehicleDriverMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the VehicleDriver entity.
+// If the VehicleDriver object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *VehicleDriverMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *VehicleDriverMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetPhoneNumber sets the "phone_number" field.
+func (m *VehicleDriverMutation) SetPhoneNumber(s string) {
+	m.phone_number = &s
+}
+
+// PhoneNumber returns the value of the "phone_number" field in the mutation.
+func (m *VehicleDriverMutation) PhoneNumber() (r string, exists bool) {
+	v := m.phone_number
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPhoneNumber returns the old "phone_number" field's value of the VehicleDriver entity.
+// If the VehicleDriver object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *VehicleDriverMutation) OldPhoneNumber(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPhoneNumber is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPhoneNumber requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPhoneNumber: %w", err)
+	}
+	return oldValue.PhoneNumber, nil
+}
+
+// ResetPhoneNumber resets all changes to the "phone_number" field.
+func (m *VehicleDriverMutation) ResetPhoneNumber() {
+	m.phone_number = nil
+}
+
+// SetFullName sets the "full_name" field.
+func (m *VehicleDriverMutation) SetFullName(s string) {
+	m.full_name = &s
+}
+
+// FullName returns the value of the "full_name" field in the mutation.
+func (m *VehicleDriverMutation) FullName() (r string, exists bool) {
+	v := m.full_name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldFullName returns the old "full_name" field's value of the VehicleDriver entity.
+// If the VehicleDriver object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *VehicleDriverMutation) OldFullName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldFullName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldFullName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldFullName: %w", err)
+	}
+	return oldValue.FullName, nil
+}
+
+// ResetFullName resets all changes to the "full_name" field.
+func (m *VehicleDriverMutation) ResetFullName() {
+	m.full_name = nil
+}
+
+// SetPassword sets the "password" field.
+func (m *VehicleDriverMutation) SetPassword(s string) {
+	m.password = &s
+}
+
+// Password returns the value of the "password" field in the mutation.
+func (m *VehicleDriverMutation) Password() (r string, exists bool) {
+	v := m.password
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPassword returns the old "password" field's value of the VehicleDriver entity.
+// If the VehicleDriver object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *VehicleDriverMutation) OldPassword(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPassword is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPassword requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPassword: %w", err)
+	}
+	return oldValue.Password, nil
+}
+
+// ResetPassword resets all changes to the "password" field.
+func (m *VehicleDriverMutation) ResetPassword() {
+	m.password = nil
+}
+
+// AddTripIDs adds the "trips" edge to the Trip entity by ids.
+func (m *VehicleDriverMutation) AddTripIDs(ids ...int) {
+	if m.trips == nil {
+		m.trips = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.trips[ids[i]] = struct{}{}
+	}
+}
+
+// ClearTrips clears the "trips" edge to the Trip entity.
+func (m *VehicleDriverMutation) ClearTrips() {
+	m.clearedtrips = true
+}
+
+// TripsCleared reports if the "trips" edge to the Trip entity was cleared.
+func (m *VehicleDriverMutation) TripsCleared() bool {
+	return m.clearedtrips
+}
+
+// RemoveTripIDs removes the "trips" edge to the Trip entity by IDs.
+func (m *VehicleDriverMutation) RemoveTripIDs(ids ...int) {
+	if m.removedtrips == nil {
+		m.removedtrips = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.trips, ids[i])
+		m.removedtrips[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedTrips returns the removed IDs of the "trips" edge to the Trip entity.
+func (m *VehicleDriverMutation) RemovedTripsIDs() (ids []int) {
+	for id := range m.removedtrips {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// TripsIDs returns the "trips" edge IDs in the mutation.
+func (m *VehicleDriverMutation) TripsIDs() (ids []int) {
+	for id := range m.trips {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetTrips resets all changes to the "trips" edge.
+func (m *VehicleDriverMutation) ResetTrips() {
+	m.trips = nil
+	m.clearedtrips = false
+	m.removedtrips = nil
+}
+
+// AddSessionIDs adds the "sessions" edge to the Session entity by ids.
+func (m *VehicleDriverMutation) AddSessionIDs(ids ...int) {
+	if m.sessions == nil {
+		m.sessions = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.sessions[ids[i]] = struct{}{}
+	}
+}
+
+// ClearSessions clears the "sessions" edge to the Session entity.
+func (m *VehicleDriverMutation) ClearSessions() {
+	m.clearedsessions = true
+}
+
+// SessionsCleared reports if the "sessions" edge to the Session entity was cleared.
+func (m *VehicleDriverMutation) SessionsCleared() bool {
+	return m.clearedsessions
+}
+
+// RemoveSessionIDs removes the "sessions" edge to the Session entity by IDs.
+func (m *VehicleDriverMutation) RemoveSessionIDs(ids ...int) {
+	if m.removedsessions == nil {
+		m.removedsessions = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.sessions, ids[i])
+		m.removedsessions[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedSessions returns the removed IDs of the "sessions" edge to the Session entity.
+func (m *VehicleDriverMutation) RemovedSessionsIDs() (ids []int) {
+	for id := range m.removedsessions {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// SessionsIDs returns the "sessions" edge IDs in the mutation.
+func (m *VehicleDriverMutation) SessionsIDs() (ids []int) {
+	for id := range m.sessions {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetSessions resets all changes to the "sessions" edge.
+func (m *VehicleDriverMutation) ResetSessions() {
+	m.sessions = nil
+	m.clearedsessions = false
+	m.removedsessions = nil
+}
+
+// Where appends a list predicates to the VehicleDriverMutation builder.
+func (m *VehicleDriverMutation) Where(ps ...predicate.VehicleDriver) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the VehicleDriverMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *VehicleDriverMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.VehicleDriver, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *VehicleDriverMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *VehicleDriverMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (VehicleDriver).
+func (m *VehicleDriverMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *VehicleDriverMutation) Fields() []string {
+	fields := make([]string, 0, 5)
+	if m.created_at != nil {
+		fields = append(fields, vehicledriver.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, vehicledriver.FieldUpdatedAt)
+	}
+	if m.phone_number != nil {
+		fields = append(fields, vehicledriver.FieldPhoneNumber)
+	}
+	if m.full_name != nil {
+		fields = append(fields, vehicledriver.FieldFullName)
+	}
+	if m.password != nil {
+		fields = append(fields, vehicledriver.FieldPassword)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *VehicleDriverMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case vehicledriver.FieldCreatedAt:
+		return m.CreatedAt()
+	case vehicledriver.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case vehicledriver.FieldPhoneNumber:
+		return m.PhoneNumber()
+	case vehicledriver.FieldFullName:
+		return m.FullName()
+	case vehicledriver.FieldPassword:
+		return m.Password()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *VehicleDriverMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case vehicledriver.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case vehicledriver.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case vehicledriver.FieldPhoneNumber:
+		return m.OldPhoneNumber(ctx)
+	case vehicledriver.FieldFullName:
+		return m.OldFullName(ctx)
+	case vehicledriver.FieldPassword:
+		return m.OldPassword(ctx)
+	}
+	return nil, fmt.Errorf("unknown VehicleDriver field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *VehicleDriverMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case vehicledriver.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case vehicledriver.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case vehicledriver.FieldPhoneNumber:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPhoneNumber(v)
+		return nil
+	case vehicledriver.FieldFullName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetFullName(v)
+		return nil
+	case vehicledriver.FieldPassword:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPassword(v)
+		return nil
+	}
+	return fmt.Errorf("unknown VehicleDriver field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *VehicleDriverMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *VehicleDriverMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *VehicleDriverMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown VehicleDriver numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *VehicleDriverMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *VehicleDriverMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *VehicleDriverMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown VehicleDriver nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *VehicleDriverMutation) ResetField(name string) error {
+	switch name {
+	case vehicledriver.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case vehicledriver.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case vehicledriver.FieldPhoneNumber:
+		m.ResetPhoneNumber()
+		return nil
+	case vehicledriver.FieldFullName:
+		m.ResetFullName()
+		return nil
+	case vehicledriver.FieldPassword:
+		m.ResetPassword()
+		return nil
+	}
+	return fmt.Errorf("unknown VehicleDriver field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *VehicleDriverMutation) AddedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.trips != nil {
+		edges = append(edges, vehicledriver.EdgeTrips)
+	}
+	if m.sessions != nil {
+		edges = append(edges, vehicledriver.EdgeSessions)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *VehicleDriverMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case vehicledriver.EdgeTrips:
+		ids := make([]ent.Value, 0, len(m.trips))
+		for id := range m.trips {
+			ids = append(ids, id)
+		}
+		return ids
+	case vehicledriver.EdgeSessions:
+		ids := make([]ent.Value, 0, len(m.sessions))
+		for id := range m.sessions {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *VehicleDriverMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.removedtrips != nil {
+		edges = append(edges, vehicledriver.EdgeTrips)
+	}
+	if m.removedsessions != nil {
+		edges = append(edges, vehicledriver.EdgeSessions)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *VehicleDriverMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case vehicledriver.EdgeTrips:
+		ids := make([]ent.Value, 0, len(m.removedtrips))
+		for id := range m.removedtrips {
+			ids = append(ids, id)
+		}
+		return ids
+	case vehicledriver.EdgeSessions:
+		ids := make([]ent.Value, 0, len(m.removedsessions))
+		for id := range m.removedsessions {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *VehicleDriverMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.clearedtrips {
+		edges = append(edges, vehicledriver.EdgeTrips)
+	}
+	if m.clearedsessions {
+		edges = append(edges, vehicledriver.EdgeSessions)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *VehicleDriverMutation) EdgeCleared(name string) bool {
+	switch name {
+	case vehicledriver.EdgeTrips:
+		return m.clearedtrips
+	case vehicledriver.EdgeSessions:
+		return m.clearedsessions
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *VehicleDriverMutation) ClearEdge(name string) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown VehicleDriver unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *VehicleDriverMutation) ResetEdge(name string) error {
+	switch name {
+	case vehicledriver.EdgeTrips:
+		m.ResetTrips()
+		return nil
+	case vehicledriver.EdgeSessions:
+		m.ResetSessions()
+		return nil
+	}
+	return fmt.Errorf("unknown VehicleDriver edge %s", name)
 }

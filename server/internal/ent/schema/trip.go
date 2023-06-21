@@ -21,7 +21,7 @@ func (Trip) Mixin() []ent.Mixin {
 func (Trip) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("user_id"),
-		field.Int("drive_id").
+		field.Int("driver_id").
 			Optional().
 			StructTag(`mapstructure:",omitempty"`),
 		field.Float("start_x"),
@@ -48,5 +48,9 @@ func (Trip) Edges() []ent.Edge {
 			Required().
 			Unique().
 			Field("user_id"),
+		edge.From("driver", VehicleDriver.Type).
+			Ref("trips").
+			Unique().
+			Field("driver_id"),
 	}
 }

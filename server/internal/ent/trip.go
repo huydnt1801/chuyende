@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/huydnt1801/chuyende/internal/ent/trip"
 	"github.com/huydnt1801/chuyende/internal/ent/user"
+	"github.com/huydnt1801/chuyende/internal/ent/vehicledriver"
 )
 
 // Trip is the model entity for the Trip schema.
@@ -24,8 +25,8 @@ type Trip struct {
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// UserID holds the value of the "user_id" field.
 	UserID int `json:"user_id,omitempty"`
-	// DriveID holds the value of the "drive_id" field.
-	DriveID int `json:"drive_id,omitempty" mapstructure:",omitempty"`
+	// DriverID holds the value of the "driver_id" field.
+	DriverID int `json:"driver_id,omitempty" mapstructure:",omitempty"`
 	// StartX holds the value of the "start_x" field.
 	StartX float64 `json:"start_x,omitempty"`
 	// StartY holds the value of the "start_y" field.
@@ -50,9 +51,11 @@ type Trip struct {
 type TripEdges struct {
 	// User holds the value of the user edge.
 	User *User `json:"user,omitempty"`
+	// Driver holds the value of the driver edge.
+	Driver *VehicleDriver `json:"driver,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
 // UserOrErr returns the User value or an error if the edge
@@ -68,6 +71,19 @@ func (e TripEdges) UserOrErr() (*User, error) {
 	return nil, &NotLoadedError{edge: "user"}
 }
 
+// DriverOrErr returns the Driver value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e TripEdges) DriverOrErr() (*VehicleDriver, error) {
+	if e.loadedTypes[1] {
+		if e.Driver == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: vehicledriver.Label}
+		}
+		return e.Driver, nil
+	}
+	return nil, &NotLoadedError{edge: "driver"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*Trip) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
@@ -75,7 +91,7 @@ func (*Trip) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case trip.FieldStartX, trip.FieldStartY, trip.FieldEndX, trip.FieldEndY, trip.FieldPrice:
 			values[i] = new(sql.NullFloat64)
-		case trip.FieldID, trip.FieldUserID, trip.FieldDriveID, trip.FieldRate:
+		case trip.FieldID, trip.FieldUserID, trip.FieldDriverID, trip.FieldRate:
 			values[i] = new(sql.NullInt64)
 		case trip.FieldStatus:
 			values[i] = new(sql.NullString)
@@ -120,11 +136,11 @@ func (t *Trip) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				t.UserID = int(value.Int64)
 			}
-		case trip.FieldDriveID:
+		case trip.FieldDriverID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field drive_id", values[i])
+				return fmt.Errorf("unexpected type %T for field driver_id", values[i])
 			} else if value.Valid {
-				t.DriveID = int(value.Int64)
+				t.DriverID = int(value.Int64)
 			}
 		case trip.FieldStartX:
 			if value, ok := values[i].(*sql.NullFloat64); !ok {
@@ -186,6 +202,11 @@ func (t *Trip) QueryUser() *UserQuery {
 	return NewTripClient(t.config).QueryUser(t)
 }
 
+// QueryDriver queries the "driver" edge of the Trip entity.
+func (t *Trip) QueryDriver() *VehicleDriverQuery {
+	return NewTripClient(t.config).QueryDriver(t)
+}
+
 // Update returns a builder for updating this Trip.
 // Note that you need to call Trip.Unwrap() before calling this method if this Trip
 // was returned from a transaction, and the transaction was committed or rolled back.
@@ -218,8 +239,8 @@ func (t *Trip) String() string {
 	builder.WriteString("user_id=")
 	builder.WriteString(fmt.Sprintf("%v", t.UserID))
 	builder.WriteString(", ")
-	builder.WriteString("drive_id=")
-	builder.WriteString(fmt.Sprintf("%v", t.DriveID))
+	builder.WriteString("driver_id=")
+	builder.WriteString(fmt.Sprintf("%v", t.DriverID))
 	builder.WriteString(", ")
 	builder.WriteString("start_x=")
 	builder.WriteString(fmt.Sprintf("%v", t.StartX))

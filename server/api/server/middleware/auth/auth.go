@@ -11,9 +11,6 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-// SessionMaxAge session cookie max age in seconds. Default: 30 days.
-var SessionMaxAge = 30 * 86400 // 30 days
-
 func Middleware(db *sql.DB) echo.MiddlewareFunc {
 	// client := entutil.NewClientFromDB(db)
 	// cfg := config.MustParseConfig()
@@ -57,7 +54,6 @@ func saveSession(c echo.Context) {
 	}
 	c.Response().Before(func() {
 		sess := getSession(c)
-		sess.Options.MaxAge = SessionMaxAge
 		sess.Options.HttpOnly = true
 		sess.Options.Secure = true
 		sess.Options.SameSite = http.SameSiteNoneMode
