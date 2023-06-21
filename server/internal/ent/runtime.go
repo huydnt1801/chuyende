@@ -7,8 +7,10 @@ import (
 
 	"github.com/huydnt1801/chuyende/internal/ent/otp"
 	"github.com/huydnt1801/chuyende/internal/ent/schema"
+	"github.com/huydnt1801/chuyende/internal/ent/session"
 	"github.com/huydnt1801/chuyende/internal/ent/trip"
 	"github.com/huydnt1801/chuyende/internal/ent/user"
+	"github.com/huydnt1801/chuyende/internal/ent/vehicledriver"
 )
 
 // The init function reads all schema descriptors with runtime code
@@ -21,6 +23,25 @@ func init() {
 	otpDescCreatedAt := otpFields[2].Descriptor()
 	// otp.DefaultCreatedAt holds the default value on creation for the created_at field.
 	otp.DefaultCreatedAt = otpDescCreatedAt.Default.(func() time.Time)
+	sessionMixin := schema.Session{}.Mixin()
+	sessionMixinFields0 := sessionMixin[0].Fields()
+	_ = sessionMixinFields0
+	sessionFields := schema.Session{}.Fields()
+	_ = sessionFields
+	// sessionDescCreatedAt is the schema descriptor for created_at field.
+	sessionDescCreatedAt := sessionMixinFields0[0].Descriptor()
+	// session.DefaultCreatedAt holds the default value on creation for the created_at field.
+	session.DefaultCreatedAt = sessionDescCreatedAt.Default.(func() time.Time)
+	// sessionDescUpdatedAt is the schema descriptor for updated_at field.
+	sessionDescUpdatedAt := sessionMixinFields0[1].Descriptor()
+	// session.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	session.DefaultUpdatedAt = sessionDescUpdatedAt.Default.(func() time.Time)
+	// session.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	session.UpdateDefaultUpdatedAt = sessionDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// sessionDescRevoked is the schema descriptor for revoked field.
+	sessionDescRevoked := sessionFields[4].Descriptor()
+	// session.DefaultRevoked holds the default value on creation for the revoked field.
+	session.DefaultRevoked = sessionDescRevoked.Default.(bool)
 	tripMixin := schema.Trip{}.Mixin()
 	tripMixinFields0 := tripMixin[0].Fields()
 	_ = tripMixinFields0
@@ -77,4 +98,23 @@ func init() {
 	userDescConfirmed := userFields[1].Descriptor()
 	// user.DefaultConfirmed holds the default value on creation for the confirmed field.
 	user.DefaultConfirmed = userDescConfirmed.Default.(bool)
+	vehicledriverMixin := schema.VehicleDriver{}.Mixin()
+	vehicledriverMixinFields0 := vehicledriverMixin[0].Fields()
+	_ = vehicledriverMixinFields0
+	vehicledriverFields := schema.VehicleDriver{}.Fields()
+	_ = vehicledriverFields
+	// vehicledriverDescCreatedAt is the schema descriptor for created_at field.
+	vehicledriverDescCreatedAt := vehicledriverMixinFields0[0].Descriptor()
+	// vehicledriver.DefaultCreatedAt holds the default value on creation for the created_at field.
+	vehicledriver.DefaultCreatedAt = vehicledriverDescCreatedAt.Default.(func() time.Time)
+	// vehicledriverDescUpdatedAt is the schema descriptor for updated_at field.
+	vehicledriverDescUpdatedAt := vehicledriverMixinFields0[1].Descriptor()
+	// vehicledriver.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	vehicledriver.DefaultUpdatedAt = vehicledriverDescUpdatedAt.Default.(func() time.Time)
+	// vehicledriver.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	vehicledriver.UpdateDefaultUpdatedAt = vehicledriverDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// vehicledriverDescPhoneNumber is the schema descriptor for phone_number field.
+	vehicledriverDescPhoneNumber := vehicledriverFields[0].Descriptor()
+	// vehicledriver.PhoneNumberValidator is a validator for the "phone_number" field. It is called by the builders before save.
+	vehicledriver.PhoneNumberValidator = vehicledriverDescPhoneNumber.Validators[0].(func(string) error)
 }

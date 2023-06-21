@@ -15,8 +15,10 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/huydnt1801/chuyende/internal/ent/otp"
+	"github.com/huydnt1801/chuyende/internal/ent/session"
 	"github.com/huydnt1801/chuyende/internal/ent/trip"
 	"github.com/huydnt1801/chuyende/internal/ent/user"
+	"github.com/huydnt1801/chuyende/internal/ent/vehicledriver"
 )
 
 // Client is the client that holds all ent builders.
@@ -26,10 +28,14 @@ type Client struct {
 	Schema *migrate.Schema
 	// Otp is the client for interacting with the Otp builders.
 	Otp *OtpClient
+	// Session is the client for interacting with the Session builders.
+	Session *SessionClient
 	// Trip is the client for interacting with the Trip builders.
 	Trip *TripClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
+	// VehicleDriver is the client for interacting with the VehicleDriver builders.
+	VehicleDriver *VehicleDriverClient
 }
 
 // NewClient creates a new client configured with the given options.
@@ -44,8 +50,10 @@ func NewClient(opts ...Option) *Client {
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.Otp = NewOtpClient(c.config)
+	c.Session = NewSessionClient(c.config)
 	c.Trip = NewTripClient(c.config)
 	c.User = NewUserClient(c.config)
+	c.VehicleDriver = NewVehicleDriverClient(c.config)
 }
 
 type (
@@ -126,11 +134,13 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:    ctx,
-		config: cfg,
-		Otp:    NewOtpClient(cfg),
-		Trip:   NewTripClient(cfg),
-		User:   NewUserClient(cfg),
+		ctx:           ctx,
+		config:        cfg,
+		Otp:           NewOtpClient(cfg),
+		Session:       NewSessionClient(cfg),
+		Trip:          NewTripClient(cfg),
+		User:          NewUserClient(cfg),
+		VehicleDriver: NewVehicleDriverClient(cfg),
 	}, nil
 }
 
@@ -148,11 +158,13 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:    ctx,
-		config: cfg,
-		Otp:    NewOtpClient(cfg),
-		Trip:   NewTripClient(cfg),
-		User:   NewUserClient(cfg),
+		ctx:           ctx,
+		config:        cfg,
+		Otp:           NewOtpClient(cfg),
+		Session:       NewSessionClient(cfg),
+		Trip:          NewTripClient(cfg),
+		User:          NewUserClient(cfg),
+		VehicleDriver: NewVehicleDriverClient(cfg),
 	}, nil
 }
 
@@ -182,16 +194,20 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	c.Otp.Use(hooks...)
+	c.Session.Use(hooks...)
 	c.Trip.Use(hooks...)
 	c.User.Use(hooks...)
+	c.VehicleDriver.Use(hooks...)
 }
 
 // Intercept adds the query interceptors to all the entity clients.
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	c.Otp.Intercept(interceptors...)
+	c.Session.Intercept(interceptors...)
 	c.Trip.Intercept(interceptors...)
 	c.User.Intercept(interceptors...)
+	c.VehicleDriver.Intercept(interceptors...)
 }
 
 // Mutate implements the ent.Mutator interface.
@@ -199,10 +215,14 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
 	case *OtpMutation:
 		return c.Otp.mutate(ctx, m)
+	case *SessionMutation:
+		return c.Session.mutate(ctx, m)
 	case *TripMutation:
 		return c.Trip.mutate(ctx, m)
 	case *UserMutation:
 		return c.User.mutate(ctx, m)
+	case *VehicleDriverMutation:
+		return c.VehicleDriver.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
 	}
@@ -326,6 +346,156 @@ func (c *OtpClient) mutate(ctx context.Context, m *OtpMutation) (Value, error) {
 	}
 }
 
+// SessionClient is a client for the Session schema.
+type SessionClient struct {
+	config
+}
+
+// NewSessionClient returns a client for the Session from the given config.
+func NewSessionClient(c config) *SessionClient {
+	return &SessionClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `session.Hooks(f(g(h())))`.
+func (c *SessionClient) Use(hooks ...Hook) {
+	c.hooks.Session = append(c.hooks.Session, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `session.Intercept(f(g(h())))`.
+func (c *SessionClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Session = append(c.inters.Session, interceptors...)
+}
+
+// Create returns a builder for creating a Session entity.
+func (c *SessionClient) Create() *SessionCreate {
+	mutation := newSessionMutation(c.config, OpCreate)
+	return &SessionCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Session entities.
+func (c *SessionClient) CreateBulk(builders ...*SessionCreate) *SessionCreateBulk {
+	return &SessionCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Session.
+func (c *SessionClient) Update() *SessionUpdate {
+	mutation := newSessionMutation(c.config, OpUpdate)
+	return &SessionUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *SessionClient) UpdateOne(s *Session) *SessionUpdateOne {
+	mutation := newSessionMutation(c.config, OpUpdateOne, withSession(s))
+	return &SessionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *SessionClient) UpdateOneID(id int) *SessionUpdateOne {
+	mutation := newSessionMutation(c.config, OpUpdateOne, withSessionID(id))
+	return &SessionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Session.
+func (c *SessionClient) Delete() *SessionDelete {
+	mutation := newSessionMutation(c.config, OpDelete)
+	return &SessionDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *SessionClient) DeleteOne(s *Session) *SessionDeleteOne {
+	return c.DeleteOneID(s.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *SessionClient) DeleteOneID(id int) *SessionDeleteOne {
+	builder := c.Delete().Where(session.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &SessionDeleteOne{builder}
+}
+
+// Query returns a query builder for Session.
+func (c *SessionClient) Query() *SessionQuery {
+	return &SessionQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeSession},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Session entity by its id.
+func (c *SessionClient) Get(ctx context.Context, id int) (*Session, error) {
+	return c.Query().Where(session.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *SessionClient) GetX(ctx context.Context, id int) *Session {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryUser queries the user edge of a Session.
+func (c *SessionClient) QueryUser(s *Session) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(session.Table, session.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, session.UserTable, session.UserColumn),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryDriver queries the driver edge of a Session.
+func (c *SessionClient) QueryDriver(s *Session) *VehicleDriverQuery {
+	query := (&VehicleDriverClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(session.Table, session.FieldID, id),
+			sqlgraph.To(vehicledriver.Table, vehicledriver.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, session.DriverTable, session.DriverColumn),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *SessionClient) Hooks() []Hook {
+	return c.hooks.Session
+}
+
+// Interceptors returns the client interceptors.
+func (c *SessionClient) Interceptors() []Interceptor {
+	return c.inters.Session
+}
+
+func (c *SessionClient) mutate(ctx context.Context, m *SessionMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&SessionCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&SessionUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&SessionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&SessionDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Session mutation op: %q", m.Op())
+	}
+}
+
 // TripClient is a client for the Trip schema.
 type TripClient struct {
 	config
@@ -428,6 +598,22 @@ func (c *TripClient) QueryUser(t *Trip) *UserQuery {
 			sqlgraph.From(trip.Table, trip.FieldID, id),
 			sqlgraph.To(user.Table, user.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, trip.UserTable, trip.UserColumn),
+		)
+		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryDriver queries the driver edge of a Trip.
+func (c *TripClient) QueryDriver(t *Trip) *VehicleDriverQuery {
+	query := (&VehicleDriverClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := t.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(trip.Table, trip.FieldID, id),
+			sqlgraph.To(vehicledriver.Table, vehicledriver.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, trip.DriverTable, trip.DriverColumn),
 		)
 		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
 		return fromV, nil
@@ -569,6 +755,22 @@ func (c *UserClient) QueryTrips(u *User) *TripQuery {
 	return query
 }
 
+// QuerySessions queries the sessions edge of a User.
+func (c *UserClient) QuerySessions(u *User) *SessionQuery {
+	query := (&SessionClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := u.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(session.Table, session.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.SessionsTable, user.SessionsColumn),
+		)
+		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *UserClient) Hooks() []Hook {
 	return c.hooks.User
@@ -594,12 +796,162 @@ func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error)
 	}
 }
 
+// VehicleDriverClient is a client for the VehicleDriver schema.
+type VehicleDriverClient struct {
+	config
+}
+
+// NewVehicleDriverClient returns a client for the VehicleDriver from the given config.
+func NewVehicleDriverClient(c config) *VehicleDriverClient {
+	return &VehicleDriverClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `vehicledriver.Hooks(f(g(h())))`.
+func (c *VehicleDriverClient) Use(hooks ...Hook) {
+	c.hooks.VehicleDriver = append(c.hooks.VehicleDriver, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `vehicledriver.Intercept(f(g(h())))`.
+func (c *VehicleDriverClient) Intercept(interceptors ...Interceptor) {
+	c.inters.VehicleDriver = append(c.inters.VehicleDriver, interceptors...)
+}
+
+// Create returns a builder for creating a VehicleDriver entity.
+func (c *VehicleDriverClient) Create() *VehicleDriverCreate {
+	mutation := newVehicleDriverMutation(c.config, OpCreate)
+	return &VehicleDriverCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of VehicleDriver entities.
+func (c *VehicleDriverClient) CreateBulk(builders ...*VehicleDriverCreate) *VehicleDriverCreateBulk {
+	return &VehicleDriverCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for VehicleDriver.
+func (c *VehicleDriverClient) Update() *VehicleDriverUpdate {
+	mutation := newVehicleDriverMutation(c.config, OpUpdate)
+	return &VehicleDriverUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *VehicleDriverClient) UpdateOne(vd *VehicleDriver) *VehicleDriverUpdateOne {
+	mutation := newVehicleDriverMutation(c.config, OpUpdateOne, withVehicleDriver(vd))
+	return &VehicleDriverUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *VehicleDriverClient) UpdateOneID(id int) *VehicleDriverUpdateOne {
+	mutation := newVehicleDriverMutation(c.config, OpUpdateOne, withVehicleDriverID(id))
+	return &VehicleDriverUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for VehicleDriver.
+func (c *VehicleDriverClient) Delete() *VehicleDriverDelete {
+	mutation := newVehicleDriverMutation(c.config, OpDelete)
+	return &VehicleDriverDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *VehicleDriverClient) DeleteOne(vd *VehicleDriver) *VehicleDriverDeleteOne {
+	return c.DeleteOneID(vd.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *VehicleDriverClient) DeleteOneID(id int) *VehicleDriverDeleteOne {
+	builder := c.Delete().Where(vehicledriver.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &VehicleDriverDeleteOne{builder}
+}
+
+// Query returns a query builder for VehicleDriver.
+func (c *VehicleDriverClient) Query() *VehicleDriverQuery {
+	return &VehicleDriverQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeVehicleDriver},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a VehicleDriver entity by its id.
+func (c *VehicleDriverClient) Get(ctx context.Context, id int) (*VehicleDriver, error) {
+	return c.Query().Where(vehicledriver.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *VehicleDriverClient) GetX(ctx context.Context, id int) *VehicleDriver {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryTrips queries the trips edge of a VehicleDriver.
+func (c *VehicleDriverClient) QueryTrips(vd *VehicleDriver) *TripQuery {
+	query := (&TripClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := vd.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(vehicledriver.Table, vehicledriver.FieldID, id),
+			sqlgraph.To(trip.Table, trip.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, vehicledriver.TripsTable, vehicledriver.TripsColumn),
+		)
+		fromV = sqlgraph.Neighbors(vd.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QuerySessions queries the sessions edge of a VehicleDriver.
+func (c *VehicleDriverClient) QuerySessions(vd *VehicleDriver) *SessionQuery {
+	query := (&SessionClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := vd.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(vehicledriver.Table, vehicledriver.FieldID, id),
+			sqlgraph.To(session.Table, session.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, vehicledriver.SessionsTable, vehicledriver.SessionsColumn),
+		)
+		fromV = sqlgraph.Neighbors(vd.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *VehicleDriverClient) Hooks() []Hook {
+	return c.hooks.VehicleDriver
+}
+
+// Interceptors returns the client interceptors.
+func (c *VehicleDriverClient) Interceptors() []Interceptor {
+	return c.inters.VehicleDriver
+}
+
+func (c *VehicleDriverClient) mutate(ctx context.Context, m *VehicleDriverMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&VehicleDriverCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&VehicleDriverUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&VehicleDriverUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&VehicleDriverDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown VehicleDriver mutation op: %q", m.Op())
+	}
+}
+
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Otp, Trip, User []ent.Hook
+		Otp, Session, Trip, User, VehicleDriver []ent.Hook
 	}
 	inters struct {
-		Otp, Trip, User []ent.Interceptor
+		Otp, Session, Trip, User, VehicleDriver []ent.Interceptor
 	}
 )

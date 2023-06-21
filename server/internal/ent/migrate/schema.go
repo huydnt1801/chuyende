@@ -21,12 +21,49 @@ var (
 		Columns:    OtpsColumns,
 		PrimaryKey: []*schema.Column{OtpsColumns[0]},
 	}
+	// SessionsColumns holds the columns for the "sessions" table.
+	SessionsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "session_id", Type: field.TypeString},
+		{Name: "expire_in", Type: field.TypeTime},
+		{Name: "revoked", Type: field.TypeBool, Default: false},
+		{Name: "user_id", Type: field.TypeInt, Nullable: true},
+		{Name: "driver_id", Type: field.TypeInt, Nullable: true},
+	}
+	// SessionsTable holds the schema information for the "sessions" table.
+	SessionsTable = &schema.Table{
+		Name:       "sessions",
+		Columns:    SessionsColumns,
+		PrimaryKey: []*schema.Column{SessionsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "sessions_users_sessions",
+				Columns:    []*schema.Column{SessionsColumns[6]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "sessions_vehicle_drivers_sessions",
+				Columns:    []*schema.Column{SessionsColumns[7]},
+				RefColumns: []*schema.Column{VehicleDriversColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "session_session_id",
+				Unique:  false,
+				Columns: []*schema.Column{SessionsColumns[3]},
+			},
+		},
+	}
 	// TripsColumns holds the columns for the "trips" table.
 	TripsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
-		{Name: "drive_id", Type: field.TypeInt, Nullable: true},
 		{Name: "start_x", Type: field.TypeFloat64},
 		{Name: "start_y", Type: field.TypeFloat64},
 		{Name: "end_x", Type: field.TypeFloat64},
@@ -35,6 +72,7 @@ var (
 		{Name: "status", Type: field.TypeEnum, Enums: []string{"pending", "accept", "done", "cancel"}, Default: "pending"},
 		{Name: "rate", Type: field.TypeInt, Nullable: true},
 		{Name: "user_id", Type: field.TypeInt},
+		{Name: "driver_id", Type: field.TypeInt, Nullable: true},
 	}
 	// TripsTable holds the schema information for the "trips" table.
 	TripsTable = &schema.Table{
@@ -44,9 +82,15 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "trips_users_trips",
-				Columns:    []*schema.Column{TripsColumns[11]},
+				Columns:    []*schema.Column{TripsColumns[10]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "trips_vehicle_drivers_trips",
+				Columns:    []*schema.Column{TripsColumns[11]},
+				RefColumns: []*schema.Column{VehicleDriversColumns[0]},
+				OnDelete:   schema.SetNull,
 			},
 		},
 	}
@@ -66,14 +110,34 @@ var (
 		Columns:    UsersColumns,
 		PrimaryKey: []*schema.Column{UsersColumns[0]},
 	}
+	// VehicleDriversColumns holds the columns for the "vehicle_drivers" table.
+	VehicleDriversColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "phone_number", Type: field.TypeString, Unique: true, Size: 15},
+		{Name: "full_name", Type: field.TypeString},
+		{Name: "password", Type: field.TypeString},
+	}
+	// VehicleDriversTable holds the schema information for the "vehicle_drivers" table.
+	VehicleDriversTable = &schema.Table{
+		Name:       "vehicle_drivers",
+		Columns:    VehicleDriversColumns,
+		PrimaryKey: []*schema.Column{VehicleDriversColumns[0]},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		OtpsTable,
+		SessionsTable,
 		TripsTable,
 		UsersTable,
+		VehicleDriversTable,
 	}
 )
 
 func init() {
+	SessionsTable.ForeignKeys[0].RefTable = UsersTable
+	SessionsTable.ForeignKeys[1].RefTable = VehicleDriversTable
 	TripsTable.ForeignKeys[0].RefTable = UsersTable
+	TripsTable.ForeignKeys[1].RefTable = VehicleDriversTable
 }

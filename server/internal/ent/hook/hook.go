@@ -21,6 +21,18 @@ func (f OtpFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) 
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.OtpMutation", m)
 }
 
+// The SessionFunc type is an adapter to allow the use of ordinary
+// function as Session mutator.
+type SessionFunc func(context.Context, *ent.SessionMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f SessionFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.SessionMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.SessionMutation", m)
+}
+
 // The TripFunc type is an adapter to allow the use of ordinary
 // function as Trip mutator.
 type TripFunc func(context.Context, *ent.TripMutation) (ent.Value, error)
@@ -43,6 +55,18 @@ func (f UserFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error)
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.UserMutation", m)
+}
+
+// The VehicleDriverFunc type is an adapter to allow the use of ordinary
+// function as VehicleDriver mutator.
+type VehicleDriverFunc func(context.Context, *ent.VehicleDriverMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f VehicleDriverFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.VehicleDriverMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.VehicleDriverMutation", m)
 }
 
 // Condition is a hook condition function.

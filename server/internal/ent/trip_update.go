@@ -14,6 +14,7 @@ import (
 	"github.com/huydnt1801/chuyende/internal/ent/predicate"
 	"github.com/huydnt1801/chuyende/internal/ent/trip"
 	"github.com/huydnt1801/chuyende/internal/ent/user"
+	"github.com/huydnt1801/chuyende/internal/ent/vehicledriver"
 )
 
 // TripUpdate is the builder for updating Trip entities.
@@ -41,30 +42,23 @@ func (tu *TripUpdate) SetUserID(i int) *TripUpdate {
 	return tu
 }
 
-// SetDriveID sets the "drive_id" field.
-func (tu *TripUpdate) SetDriveID(i int) *TripUpdate {
-	tu.mutation.ResetDriveID()
-	tu.mutation.SetDriveID(i)
+// SetDriverID sets the "driver_id" field.
+func (tu *TripUpdate) SetDriverID(i int) *TripUpdate {
+	tu.mutation.SetDriverID(i)
 	return tu
 }
 
-// SetNillableDriveID sets the "drive_id" field if the given value is not nil.
-func (tu *TripUpdate) SetNillableDriveID(i *int) *TripUpdate {
+// SetNillableDriverID sets the "driver_id" field if the given value is not nil.
+func (tu *TripUpdate) SetNillableDriverID(i *int) *TripUpdate {
 	if i != nil {
-		tu.SetDriveID(*i)
+		tu.SetDriverID(*i)
 	}
 	return tu
 }
 
-// AddDriveID adds i to the "drive_id" field.
-func (tu *TripUpdate) AddDriveID(i int) *TripUpdate {
-	tu.mutation.AddDriveID(i)
-	return tu
-}
-
-// ClearDriveID clears the value of the "drive_id" field.
-func (tu *TripUpdate) ClearDriveID() *TripUpdate {
-	tu.mutation.ClearDriveID()
+// ClearDriverID clears the value of the "driver_id" field.
+func (tu *TripUpdate) ClearDriverID() *TripUpdate {
+	tu.mutation.ClearDriverID()
 	return tu
 }
 
@@ -179,6 +173,11 @@ func (tu *TripUpdate) SetUser(u *User) *TripUpdate {
 	return tu.SetUserID(u.ID)
 }
 
+// SetDriver sets the "driver" edge to the VehicleDriver entity.
+func (tu *TripUpdate) SetDriver(v *VehicleDriver) *TripUpdate {
+	return tu.SetDriverID(v.ID)
+}
+
 // Mutation returns the TripMutation object of the builder.
 func (tu *TripUpdate) Mutation() *TripMutation {
 	return tu.mutation
@@ -187,6 +186,12 @@ func (tu *TripUpdate) Mutation() *TripMutation {
 // ClearUser clears the "user" edge to the User entity.
 func (tu *TripUpdate) ClearUser() *TripUpdate {
 	tu.mutation.ClearUser()
+	return tu
+}
+
+// ClearDriver clears the "driver" edge to the VehicleDriver entity.
+func (tu *TripUpdate) ClearDriver() *TripUpdate {
+	tu.mutation.ClearDriver()
 	return tu
 }
 
@@ -259,15 +264,6 @@ func (tu *TripUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := tu.mutation.UpdatedAt(); ok {
 		_spec.SetField(trip.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := tu.mutation.DriveID(); ok {
-		_spec.SetField(trip.FieldDriveID, field.TypeInt, value)
-	}
-	if value, ok := tu.mutation.AddedDriveID(); ok {
-		_spec.AddField(trip.FieldDriveID, field.TypeInt, value)
-	}
-	if tu.mutation.DriveIDCleared() {
-		_spec.ClearField(trip.FieldDriveID, field.TypeInt)
-	}
 	if value, ok := tu.mutation.StartX(); ok {
 		_spec.SetField(trip.FieldStartX, field.TypeFloat64, value)
 	}
@@ -339,6 +335,35 @@ func (tu *TripUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if tu.mutation.DriverCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   trip.DriverTable,
+			Columns: []string{trip.DriverColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(vehicledriver.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := tu.mutation.DriverIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   trip.DriverTable,
+			Columns: []string{trip.DriverColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(vehicledriver.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, tu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{trip.Label}
@@ -371,30 +396,23 @@ func (tuo *TripUpdateOne) SetUserID(i int) *TripUpdateOne {
 	return tuo
 }
 
-// SetDriveID sets the "drive_id" field.
-func (tuo *TripUpdateOne) SetDriveID(i int) *TripUpdateOne {
-	tuo.mutation.ResetDriveID()
-	tuo.mutation.SetDriveID(i)
+// SetDriverID sets the "driver_id" field.
+func (tuo *TripUpdateOne) SetDriverID(i int) *TripUpdateOne {
+	tuo.mutation.SetDriverID(i)
 	return tuo
 }
 
-// SetNillableDriveID sets the "drive_id" field if the given value is not nil.
-func (tuo *TripUpdateOne) SetNillableDriveID(i *int) *TripUpdateOne {
+// SetNillableDriverID sets the "driver_id" field if the given value is not nil.
+func (tuo *TripUpdateOne) SetNillableDriverID(i *int) *TripUpdateOne {
 	if i != nil {
-		tuo.SetDriveID(*i)
+		tuo.SetDriverID(*i)
 	}
 	return tuo
 }
 
-// AddDriveID adds i to the "drive_id" field.
-func (tuo *TripUpdateOne) AddDriveID(i int) *TripUpdateOne {
-	tuo.mutation.AddDriveID(i)
-	return tuo
-}
-
-// ClearDriveID clears the value of the "drive_id" field.
-func (tuo *TripUpdateOne) ClearDriveID() *TripUpdateOne {
-	tuo.mutation.ClearDriveID()
+// ClearDriverID clears the value of the "driver_id" field.
+func (tuo *TripUpdateOne) ClearDriverID() *TripUpdateOne {
+	tuo.mutation.ClearDriverID()
 	return tuo
 }
 
@@ -509,6 +527,11 @@ func (tuo *TripUpdateOne) SetUser(u *User) *TripUpdateOne {
 	return tuo.SetUserID(u.ID)
 }
 
+// SetDriver sets the "driver" edge to the VehicleDriver entity.
+func (tuo *TripUpdateOne) SetDriver(v *VehicleDriver) *TripUpdateOne {
+	return tuo.SetDriverID(v.ID)
+}
+
 // Mutation returns the TripMutation object of the builder.
 func (tuo *TripUpdateOne) Mutation() *TripMutation {
 	return tuo.mutation
@@ -517,6 +540,12 @@ func (tuo *TripUpdateOne) Mutation() *TripMutation {
 // ClearUser clears the "user" edge to the User entity.
 func (tuo *TripUpdateOne) ClearUser() *TripUpdateOne {
 	tuo.mutation.ClearUser()
+	return tuo
+}
+
+// ClearDriver clears the "driver" edge to the VehicleDriver entity.
+func (tuo *TripUpdateOne) ClearDriver() *TripUpdateOne {
+	tuo.mutation.ClearDriver()
 	return tuo
 }
 
@@ -619,15 +648,6 @@ func (tuo *TripUpdateOne) sqlSave(ctx context.Context) (_node *Trip, err error) 
 	if value, ok := tuo.mutation.UpdatedAt(); ok {
 		_spec.SetField(trip.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := tuo.mutation.DriveID(); ok {
-		_spec.SetField(trip.FieldDriveID, field.TypeInt, value)
-	}
-	if value, ok := tuo.mutation.AddedDriveID(); ok {
-		_spec.AddField(trip.FieldDriveID, field.TypeInt, value)
-	}
-	if tuo.mutation.DriveIDCleared() {
-		_spec.ClearField(trip.FieldDriveID, field.TypeInt)
-	}
 	if value, ok := tuo.mutation.StartX(); ok {
 		_spec.SetField(trip.FieldStartX, field.TypeFloat64, value)
 	}
@@ -692,6 +712,35 @@ func (tuo *TripUpdateOne) sqlSave(ctx context.Context) (_node *Trip, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if tuo.mutation.DriverCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   trip.DriverTable,
+			Columns: []string{trip.DriverColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(vehicledriver.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := tuo.mutation.DriverIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   trip.DriverTable,
+			Columns: []string{trip.DriverColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(vehicledriver.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

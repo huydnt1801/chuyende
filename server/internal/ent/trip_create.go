@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/huydnt1801/chuyende/internal/ent/trip"
 	"github.com/huydnt1801/chuyende/internal/ent/user"
+	"github.com/huydnt1801/chuyende/internal/ent/vehicledriver"
 )
 
 // TripCreate is the builder for creating a Trip entity.
@@ -57,16 +58,16 @@ func (tc *TripCreate) SetUserID(i int) *TripCreate {
 	return tc
 }
 
-// SetDriveID sets the "drive_id" field.
-func (tc *TripCreate) SetDriveID(i int) *TripCreate {
-	tc.mutation.SetDriveID(i)
+// SetDriverID sets the "driver_id" field.
+func (tc *TripCreate) SetDriverID(i int) *TripCreate {
+	tc.mutation.SetDriverID(i)
 	return tc
 }
 
-// SetNillableDriveID sets the "drive_id" field if the given value is not nil.
-func (tc *TripCreate) SetNillableDriveID(i *int) *TripCreate {
+// SetNillableDriverID sets the "driver_id" field if the given value is not nil.
+func (tc *TripCreate) SetNillableDriverID(i *int) *TripCreate {
 	if i != nil {
-		tc.SetDriveID(*i)
+		tc.SetDriverID(*i)
 	}
 	return tc
 }
@@ -132,6 +133,11 @@ func (tc *TripCreate) SetNillableRate(i *int) *TripCreate {
 // SetUser sets the "user" edge to the User entity.
 func (tc *TripCreate) SetUser(u *User) *TripCreate {
 	return tc.SetUserID(u.ID)
+}
+
+// SetDriver sets the "driver" edge to the VehicleDriver entity.
+func (tc *TripCreate) SetDriver(v *VehicleDriver) *TripCreate {
+	return tc.SetDriverID(v.ID)
 }
 
 // Mutation returns the TripMutation object of the builder.
@@ -260,10 +266,6 @@ func (tc *TripCreate) createSpec() (*Trip, *sqlgraph.CreateSpec) {
 		_spec.SetField(trip.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
 	}
-	if value, ok := tc.mutation.DriveID(); ok {
-		_spec.SetField(trip.FieldDriveID, field.TypeInt, value)
-		_node.DriveID = value
-	}
 	if value, ok := tc.mutation.StartX(); ok {
 		_spec.SetField(trip.FieldStartX, field.TypeFloat64, value)
 		_node.StartX = value
@@ -307,6 +309,23 @@ func (tc *TripCreate) createSpec() (*Trip, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.UserID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := tc.mutation.DriverIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   trip.DriverTable,
+			Columns: []string{trip.DriverColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(vehicledriver.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.DriverID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
@@ -385,27 +404,21 @@ func (u *TripUpsert) UpdateUserID() *TripUpsert {
 	return u
 }
 
-// SetDriveID sets the "drive_id" field.
-func (u *TripUpsert) SetDriveID(v int) *TripUpsert {
-	u.Set(trip.FieldDriveID, v)
+// SetDriverID sets the "driver_id" field.
+func (u *TripUpsert) SetDriverID(v int) *TripUpsert {
+	u.Set(trip.FieldDriverID, v)
 	return u
 }
 
-// UpdateDriveID sets the "drive_id" field to the value that was provided on create.
-func (u *TripUpsert) UpdateDriveID() *TripUpsert {
-	u.SetExcluded(trip.FieldDriveID)
+// UpdateDriverID sets the "driver_id" field to the value that was provided on create.
+func (u *TripUpsert) UpdateDriverID() *TripUpsert {
+	u.SetExcluded(trip.FieldDriverID)
 	return u
 }
 
-// AddDriveID adds v to the "drive_id" field.
-func (u *TripUpsert) AddDriveID(v int) *TripUpsert {
-	u.Add(trip.FieldDriveID, v)
-	return u
-}
-
-// ClearDriveID clears the value of the "drive_id" field.
-func (u *TripUpsert) ClearDriveID() *TripUpsert {
-	u.SetNull(trip.FieldDriveID)
+// ClearDriverID clears the value of the "driver_id" field.
+func (u *TripUpsert) ClearDriverID() *TripUpsert {
+	u.SetNull(trip.FieldDriverID)
 	return u
 }
 
@@ -608,31 +621,24 @@ func (u *TripUpsertOne) UpdateUserID() *TripUpsertOne {
 	})
 }
 
-// SetDriveID sets the "drive_id" field.
-func (u *TripUpsertOne) SetDriveID(v int) *TripUpsertOne {
+// SetDriverID sets the "driver_id" field.
+func (u *TripUpsertOne) SetDriverID(v int) *TripUpsertOne {
 	return u.Update(func(s *TripUpsert) {
-		s.SetDriveID(v)
+		s.SetDriverID(v)
 	})
 }
 
-// AddDriveID adds v to the "drive_id" field.
-func (u *TripUpsertOne) AddDriveID(v int) *TripUpsertOne {
+// UpdateDriverID sets the "driver_id" field to the value that was provided on create.
+func (u *TripUpsertOne) UpdateDriverID() *TripUpsertOne {
 	return u.Update(func(s *TripUpsert) {
-		s.AddDriveID(v)
+		s.UpdateDriverID()
 	})
 }
 
-// UpdateDriveID sets the "drive_id" field to the value that was provided on create.
-func (u *TripUpsertOne) UpdateDriveID() *TripUpsertOne {
+// ClearDriverID clears the value of the "driver_id" field.
+func (u *TripUpsertOne) ClearDriverID() *TripUpsertOne {
 	return u.Update(func(s *TripUpsert) {
-		s.UpdateDriveID()
-	})
-}
-
-// ClearDriveID clears the value of the "drive_id" field.
-func (u *TripUpsertOne) ClearDriveID() *TripUpsertOne {
-	return u.Update(func(s *TripUpsert) {
-		s.ClearDriveID()
+		s.ClearDriverID()
 	})
 }
 
@@ -1018,31 +1024,24 @@ func (u *TripUpsertBulk) UpdateUserID() *TripUpsertBulk {
 	})
 }
 
-// SetDriveID sets the "drive_id" field.
-func (u *TripUpsertBulk) SetDriveID(v int) *TripUpsertBulk {
+// SetDriverID sets the "driver_id" field.
+func (u *TripUpsertBulk) SetDriverID(v int) *TripUpsertBulk {
 	return u.Update(func(s *TripUpsert) {
-		s.SetDriveID(v)
+		s.SetDriverID(v)
 	})
 }
 
-// AddDriveID adds v to the "drive_id" field.
-func (u *TripUpsertBulk) AddDriveID(v int) *TripUpsertBulk {
+// UpdateDriverID sets the "driver_id" field to the value that was provided on create.
+func (u *TripUpsertBulk) UpdateDriverID() *TripUpsertBulk {
 	return u.Update(func(s *TripUpsert) {
-		s.AddDriveID(v)
+		s.UpdateDriverID()
 	})
 }
 
-// UpdateDriveID sets the "drive_id" field to the value that was provided on create.
-func (u *TripUpsertBulk) UpdateDriveID() *TripUpsertBulk {
+// ClearDriverID clears the value of the "driver_id" field.
+func (u *TripUpsertBulk) ClearDriverID() *TripUpsertBulk {
 	return u.Update(func(s *TripUpsert) {
-		s.UpdateDriveID()
-	})
-}
-
-// ClearDriveID clears the value of the "drive_id" field.
-func (u *TripUpsertBulk) ClearDriveID() *TripUpsertBulk {
-	return u.Update(func(s *TripUpsert) {
-		s.ClearDriveID()
+		s.ClearDriverID()
 	})
 }
 

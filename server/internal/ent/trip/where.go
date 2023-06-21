@@ -70,9 +70,9 @@ func UserID(v int) predicate.Trip {
 	return predicate.Trip(sql.FieldEQ(FieldUserID, v))
 }
 
-// DriveID applies equality check predicate on the "drive_id" field. It's identical to DriveIDEQ.
-func DriveID(v int) predicate.Trip {
-	return predicate.Trip(sql.FieldEQ(FieldDriveID, v))
+// DriverID applies equality check predicate on the "driver_id" field. It's identical to DriverIDEQ.
+func DriverID(v int) predicate.Trip {
+	return predicate.Trip(sql.FieldEQ(FieldDriverID, v))
 }
 
 // StartX applies equality check predicate on the "start_x" field. It's identical to StartXEQ.
@@ -205,54 +205,34 @@ func UserIDNotIn(vs ...int) predicate.Trip {
 	return predicate.Trip(sql.FieldNotIn(FieldUserID, vs...))
 }
 
-// DriveIDEQ applies the EQ predicate on the "drive_id" field.
-func DriveIDEQ(v int) predicate.Trip {
-	return predicate.Trip(sql.FieldEQ(FieldDriveID, v))
+// DriverIDEQ applies the EQ predicate on the "driver_id" field.
+func DriverIDEQ(v int) predicate.Trip {
+	return predicate.Trip(sql.FieldEQ(FieldDriverID, v))
 }
 
-// DriveIDNEQ applies the NEQ predicate on the "drive_id" field.
-func DriveIDNEQ(v int) predicate.Trip {
-	return predicate.Trip(sql.FieldNEQ(FieldDriveID, v))
+// DriverIDNEQ applies the NEQ predicate on the "driver_id" field.
+func DriverIDNEQ(v int) predicate.Trip {
+	return predicate.Trip(sql.FieldNEQ(FieldDriverID, v))
 }
 
-// DriveIDIn applies the In predicate on the "drive_id" field.
-func DriveIDIn(vs ...int) predicate.Trip {
-	return predicate.Trip(sql.FieldIn(FieldDriveID, vs...))
+// DriverIDIn applies the In predicate on the "driver_id" field.
+func DriverIDIn(vs ...int) predicate.Trip {
+	return predicate.Trip(sql.FieldIn(FieldDriverID, vs...))
 }
 
-// DriveIDNotIn applies the NotIn predicate on the "drive_id" field.
-func DriveIDNotIn(vs ...int) predicate.Trip {
-	return predicate.Trip(sql.FieldNotIn(FieldDriveID, vs...))
+// DriverIDNotIn applies the NotIn predicate on the "driver_id" field.
+func DriverIDNotIn(vs ...int) predicate.Trip {
+	return predicate.Trip(sql.FieldNotIn(FieldDriverID, vs...))
 }
 
-// DriveIDGT applies the GT predicate on the "drive_id" field.
-func DriveIDGT(v int) predicate.Trip {
-	return predicate.Trip(sql.FieldGT(FieldDriveID, v))
+// DriverIDIsNil applies the IsNil predicate on the "driver_id" field.
+func DriverIDIsNil() predicate.Trip {
+	return predicate.Trip(sql.FieldIsNull(FieldDriverID))
 }
 
-// DriveIDGTE applies the GTE predicate on the "drive_id" field.
-func DriveIDGTE(v int) predicate.Trip {
-	return predicate.Trip(sql.FieldGTE(FieldDriveID, v))
-}
-
-// DriveIDLT applies the LT predicate on the "drive_id" field.
-func DriveIDLT(v int) predicate.Trip {
-	return predicate.Trip(sql.FieldLT(FieldDriveID, v))
-}
-
-// DriveIDLTE applies the LTE predicate on the "drive_id" field.
-func DriveIDLTE(v int) predicate.Trip {
-	return predicate.Trip(sql.FieldLTE(FieldDriveID, v))
-}
-
-// DriveIDIsNil applies the IsNil predicate on the "drive_id" field.
-func DriveIDIsNil() predicate.Trip {
-	return predicate.Trip(sql.FieldIsNull(FieldDriveID))
-}
-
-// DriveIDNotNil applies the NotNil predicate on the "drive_id" field.
-func DriveIDNotNil() predicate.Trip {
-	return predicate.Trip(sql.FieldNotNull(FieldDriveID))
+// DriverIDNotNil applies the NotNil predicate on the "driver_id" field.
+func DriverIDNotNil() predicate.Trip {
+	return predicate.Trip(sql.FieldNotNull(FieldDriverID))
 }
 
 // StartXEQ applies the EQ predicate on the "start_x" field.
@@ -540,6 +520,29 @@ func HasUser() predicate.Trip {
 func HasUserWith(preds ...predicate.User) predicate.Trip {
 	return predicate.Trip(func(s *sql.Selector) {
 		step := newUserStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasDriver applies the HasEdge predicate on the "driver" edge.
+func HasDriver() predicate.Trip {
+	return predicate.Trip(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, DriverTable, DriverColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasDriverWith applies the HasEdge predicate on the "driver" edge with a given conditions (other predicates).
+func HasDriverWith(preds ...predicate.VehicleDriver) predicate.Trip {
+	return predicate.Trip(func(s *sql.Selector) {
+		step := newDriverStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

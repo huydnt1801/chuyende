@@ -15,7 +15,7 @@ import (
 
 type Service interface {
 	CreateUser(ctx context.Context, user *User, password string) (*User, time.Time, error)
-	Authenticate(ctx context.Context, username, password string) (*User, error)
+	Authenticate(ctx context.Context, username, password string) (*User, string, error)
 	Confirm(ctx context.Context, user *User, otp string) error
 	FindUser(ctx context.Context, params *UserParams) (*User, error)
 	SendConfirmationToken(ctx context.Context, user *User) (time.Time, error)
@@ -26,6 +26,7 @@ type ServiceImpl struct {
 	entClient      *ent.Client
 	passwordHasher PasswordHasher
 	otpSender      OTPService
+	sessionSvc     SessionService
 }
 
 func NewService(db *sql.DB) *ServiceImpl {
@@ -35,6 +36,7 @@ func NewService(db *sql.DB) *ServiceImpl {
 		entClient:      client,
 		passwordHasher: &BcryptPasswordHasher{},
 		otpSender:      NewOTPService(db),
+		sessionSvc:     NewSessionService(db),
 	}
 	return s
 }
@@ -64,27 +66,32 @@ func (s *ServiceImpl) CreateUser(ctx context.Context, user *User, password strin
 	return u, nextTime, nil
 }
 
-func (s *ServiceImpl) Authenticate(ctx context.Context, phoneNumber, password string) (*User, error) {
+func (s *ServiceImpl) Authenticate(ctx context.Context, phoneNumber, password string) (*User, string, error) {
 	repo := NewRepo(s.entClient)
 
 	if !isValidPhoneNumber(phoneNumber) {
-		return nil, InvalidPhoneError{}
+		return nil, "", InvalidPhoneError{}
 	}
 	user, err := repo.FindUser(ctx, &UserParams{PhoneNumber: phoneNumber})
 	if err != nil {
 		if IsUserNotFound(err) {
-			return nil, UserNotFoundError{}
+			return nil, "", UserNotFoundError{}
 		} else {
-			return nil, fmt.Errorf("failed querying user from DB: %w", err)
+			return nil, "", fmt.Errorf("failed querying user from DB: %w", err)
 		}
 
 	}
 
 	if !s.passwordHasher.CheckPasswordHash(password, user.Password) {
-		return nil, InvalidPasswordError{}
+		return nil, "", InvalidPasswordError{}
+	}
+	user.Password = ""
+	sessID, err := s.sessionSvc.CreateSession(ctx, user, 0)
+	if err != nil {
+		return nil, "", err
 	}
 
-	return user, nil
+	return user, sessID, nil
 }
 
 func (s *ServiceImpl) Confirm(ctx context.Context, usr *User, otp string) error {
@@ -109,7 +116,12 @@ func (s *ServiceImpl) Confirm(ctx context.Context, usr *User, otp string) error 
 
 func (s *ServiceImpl) FindUser(ctx context.Context, params *UserParams) (*User, error) {
 	repo := NewRepo(s.entClient)
-	return repo.FindUser(ctx, params)
+	user, err := repo.FindUser(ctx, params)
+	if err != nil {
+		return nil, err
+	}
+	user.Password = ""
+	return user, nil
 }
 
 func (s *ServiceImpl) SendConfirmationToken(ctx context.Context, user *User) (time.Time, error) {

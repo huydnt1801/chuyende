@@ -12,7 +12,9 @@ import (
 	"time"
 
 	"github.com/go-logr/logr"
+	"github.com/huydnt1801/chuyende/api/server/middleware/auth"
 	"github.com/huydnt1801/chuyende/internal/config"
+	"github.com/huydnt1801/chuyende/internal/driver"
 	"github.com/huydnt1801/chuyende/internal/user"
 	"github.com/huydnt1801/chuyende/pkg/log"
 	"github.com/labstack/echo/v4"
@@ -22,7 +24,8 @@ type AccountServer struct {
 	logger    logr.Logger
 	secretKey string
 
-	userSvc user.Service
+	userSvc   user.Service
+	driverSvc driver.Service
 }
 
 func NewAccountServer(db *sql.DB) *AccountServer {
@@ -32,6 +35,7 @@ func NewAccountServer(db *sql.DB) *AccountServer {
 		logger:    log.ZapLogger(),
 		secretKey: cfg.SecretKey,
 		userSvc:   svc,
+		driverSvc: driver.NewService(db),
 	}
 	return srv
 }
@@ -114,7 +118,7 @@ func (s *AccountServer) RegisterConfirm(c echo.Context) error {
 type RegisterConfirmRequest struct {
 	Type  string `json:"type" validate:"required"`
 	Token string `json:"token" validate:"required"`
-	OTP   string `json:"otp"`
+	OTP   string `json:"otp" validate:"required"`
 }
 
 func (s *AccountServer) Login(c echo.Context) error {
@@ -127,14 +131,37 @@ func (s *AccountServer) Login(c echo.Context) error {
 	if err := c.Validate(data); err != nil {
 		return err
 	}
-	usr, err := s.userSvc.Authenticate(ctx, data.PhoneNumber, data.Password)
+	usr, sessID, err := s.userSvc.Authenticate(ctx, data.PhoneNumber, data.Password)
+	if err != nil {
+		return err
+	}
+	auth.LoginUser(c, sessID)
+	return c.JSON(http.StatusOK, usr)
+}
+
+type LoginRequest struct {
+	PhoneNumber string `json:"phoneNumber" validate:"required"`
+	Password    string `json:"password" validate:"required"`
+}
+
+func (s *AccountServer) LoginDriver(c echo.Context) error {
+	r := c.Request()
+	ctx := r.Context()
+	data := &LoginDriverRequest{}
+	if err := c.Bind(data); err != nil {
+		return err
+	}
+	if err := c.Validate(data); err != nil {
+		return err
+	}
+	usr, err := s.driverSvc.Authenticate(ctx, data.PhoneNumber, data.Password)
 	if err != nil {
 		return err
 	}
 	return c.JSON(http.StatusOK, usr)
 }
 
-type LoginRequest struct {
+type LoginDriverRequest struct {
 	PhoneNumber string `json:"phoneNumber" validate:"required"`
 	Password    string `json:"password" validate:"required"`
 }

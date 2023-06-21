@@ -9,11 +9,11 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/huydnt1801/chuyende/internal/ent/user"
+	"github.com/huydnt1801/chuyende/internal/ent/vehicledriver"
 )
 
-// User is the model entity for the User schema.
-type User struct {
+// VehicleDriver is the model entity for the VehicleDriver schema.
+type VehicleDriver struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
@@ -23,20 +23,18 @@ type User struct {
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// PhoneNumber holds the value of the "phone_number" field.
 	PhoneNumber string `json:"phone_number,omitempty"`
-	// Confirmed holds the value of the "confirmed" field.
-	Confirmed bool `json:"confirmed,omitempty"`
 	// FullName holds the value of the "full_name" field.
 	FullName string `json:"full_name,omitempty"`
 	// Password holds the value of the "password" field.
 	Password string `json:"password,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
-	// The values are being populated by the UserQuery when eager-loading is set.
-	Edges        UserEdges `json:"edges"`
+	// The values are being populated by the VehicleDriverQuery when eager-loading is set.
+	Edges        VehicleDriverEdges `json:"edges"`
 	selectValues sql.SelectValues
 }
 
-// UserEdges holds the relations/edges for other nodes in the graph.
-type UserEdges struct {
+// VehicleDriverEdges holds the relations/edges for other nodes in the graph.
+type VehicleDriverEdges struct {
 	// Trips holds the value of the trips edge.
 	Trips []*Trip `json:"trips,omitempty"`
 	// Sessions holds the value of the sessions edge.
@@ -48,7 +46,7 @@ type UserEdges struct {
 
 // TripsOrErr returns the Trips value or an error if the edge
 // was not loaded in eager-loading.
-func (e UserEdges) TripsOrErr() ([]*Trip, error) {
+func (e VehicleDriverEdges) TripsOrErr() ([]*Trip, error) {
 	if e.loadedTypes[0] {
 		return e.Trips, nil
 	}
@@ -57,7 +55,7 @@ func (e UserEdges) TripsOrErr() ([]*Trip, error) {
 
 // SessionsOrErr returns the Sessions value or an error if the edge
 // was not loaded in eager-loading.
-func (e UserEdges) SessionsOrErr() ([]*Session, error) {
+func (e VehicleDriverEdges) SessionsOrErr() ([]*Session, error) {
 	if e.loadedTypes[1] {
 		return e.Sessions, nil
 	}
@@ -65,17 +63,15 @@ func (e UserEdges) SessionsOrErr() ([]*Session, error) {
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
-func (*User) scanValues(columns []string) ([]any, error) {
+func (*VehicleDriver) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case user.FieldConfirmed:
-			values[i] = new(sql.NullBool)
-		case user.FieldID:
+		case vehicledriver.FieldID:
 			values[i] = new(sql.NullInt64)
-		case user.FieldPhoneNumber, user.FieldFullName, user.FieldPassword:
+		case vehicledriver.FieldPhoneNumber, vehicledriver.FieldFullName, vehicledriver.FieldPassword:
 			values[i] = new(sql.NullString)
-		case user.FieldCreatedAt, user.FieldUpdatedAt:
+		case vehicledriver.FieldCreatedAt, vehicledriver.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -85,121 +81,112 @@ func (*User) scanValues(columns []string) ([]any, error) {
 }
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
-// to the User fields.
-func (u *User) assignValues(columns []string, values []any) error {
+// to the VehicleDriver fields.
+func (vd *VehicleDriver) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
 	for i := range columns {
 		switch columns[i] {
-		case user.FieldID:
+		case vehicledriver.FieldID:
 			value, ok := values[i].(*sql.NullInt64)
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			u.ID = int(value.Int64)
-		case user.FieldCreatedAt:
+			vd.ID = int(value.Int64)
+		case vehicledriver.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				u.CreatedAt = value.Time
+				vd.CreatedAt = value.Time
 			}
-		case user.FieldUpdatedAt:
+		case vehicledriver.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
-				u.UpdatedAt = value.Time
+				vd.UpdatedAt = value.Time
 			}
-		case user.FieldPhoneNumber:
+		case vehicledriver.FieldPhoneNumber:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field phone_number", values[i])
 			} else if value.Valid {
-				u.PhoneNumber = value.String
+				vd.PhoneNumber = value.String
 			}
-		case user.FieldConfirmed:
-			if value, ok := values[i].(*sql.NullBool); !ok {
-				return fmt.Errorf("unexpected type %T for field confirmed", values[i])
-			} else if value.Valid {
-				u.Confirmed = value.Bool
-			}
-		case user.FieldFullName:
+		case vehicledriver.FieldFullName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field full_name", values[i])
 			} else if value.Valid {
-				u.FullName = value.String
+				vd.FullName = value.String
 			}
-		case user.FieldPassword:
+		case vehicledriver.FieldPassword:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field password", values[i])
 			} else if value.Valid {
-				u.Password = value.String
+				vd.Password = value.String
 			}
 		default:
-			u.selectValues.Set(columns[i], values[i])
+			vd.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
 }
 
-// Value returns the ent.Value that was dynamically selected and assigned to the User.
+// Value returns the ent.Value that was dynamically selected and assigned to the VehicleDriver.
 // This includes values selected through modifiers, order, etc.
-func (u *User) Value(name string) (ent.Value, error) {
-	return u.selectValues.Get(name)
+func (vd *VehicleDriver) Value(name string) (ent.Value, error) {
+	return vd.selectValues.Get(name)
 }
 
-// QueryTrips queries the "trips" edge of the User entity.
-func (u *User) QueryTrips() *TripQuery {
-	return NewUserClient(u.config).QueryTrips(u)
+// QueryTrips queries the "trips" edge of the VehicleDriver entity.
+func (vd *VehicleDriver) QueryTrips() *TripQuery {
+	return NewVehicleDriverClient(vd.config).QueryTrips(vd)
 }
 
-// QuerySessions queries the "sessions" edge of the User entity.
-func (u *User) QuerySessions() *SessionQuery {
-	return NewUserClient(u.config).QuerySessions(u)
+// QuerySessions queries the "sessions" edge of the VehicleDriver entity.
+func (vd *VehicleDriver) QuerySessions() *SessionQuery {
+	return NewVehicleDriverClient(vd.config).QuerySessions(vd)
 }
 
-// Update returns a builder for updating this User.
-// Note that you need to call User.Unwrap() before calling this method if this User
+// Update returns a builder for updating this VehicleDriver.
+// Note that you need to call VehicleDriver.Unwrap() before calling this method if this VehicleDriver
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (u *User) Update() *UserUpdateOne {
-	return NewUserClient(u.config).UpdateOne(u)
+func (vd *VehicleDriver) Update() *VehicleDriverUpdateOne {
+	return NewVehicleDriverClient(vd.config).UpdateOne(vd)
 }
 
-// Unwrap unwraps the User entity that was returned from a transaction after it was closed,
+// Unwrap unwraps the VehicleDriver entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (u *User) Unwrap() *User {
-	_tx, ok := u.config.driver.(*txDriver)
+func (vd *VehicleDriver) Unwrap() *VehicleDriver {
+	_tx, ok := vd.config.driver.(*txDriver)
 	if !ok {
-		panic("ent: User is not a transactional entity")
+		panic("ent: VehicleDriver is not a transactional entity")
 	}
-	u.config.driver = _tx.drv
-	return u
+	vd.config.driver = _tx.drv
+	return vd
 }
 
 // String implements the fmt.Stringer.
-func (u *User) String() string {
+func (vd *VehicleDriver) String() string {
 	var builder strings.Builder
-	builder.WriteString("User(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", u.ID))
+	builder.WriteString("VehicleDriver(")
+	builder.WriteString(fmt.Sprintf("id=%v, ", vd.ID))
 	builder.WriteString("created_at=")
-	builder.WriteString(u.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(vd.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("updated_at=")
-	builder.WriteString(u.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString(vd.UpdatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("phone_number=")
-	builder.WriteString(u.PhoneNumber)
-	builder.WriteString(", ")
-	builder.WriteString("confirmed=")
-	builder.WriteString(fmt.Sprintf("%v", u.Confirmed))
+	builder.WriteString(vd.PhoneNumber)
 	builder.WriteString(", ")
 	builder.WriteString("full_name=")
-	builder.WriteString(u.FullName)
+	builder.WriteString(vd.FullName)
 	builder.WriteString(", ")
 	builder.WriteString("password=")
-	builder.WriteString(u.Password)
+	builder.WriteString(vd.Password)
 	builder.WriteByte(')')
 	return builder.String()
 }
 
-// Users is a parsable slice of User.
-type Users []*User
+// VehicleDrivers is a parsable slice of VehicleDriver.
+type VehicleDrivers []*VehicleDriver

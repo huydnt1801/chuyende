@@ -14,10 +14,14 @@ type Tx struct {
 	config
 	// Otp is the client for interacting with the Otp builders.
 	Otp *OtpClient
+	// Session is the client for interacting with the Session builders.
+	Session *SessionClient
 	// Trip is the client for interacting with the Trip builders.
 	Trip *TripClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
+	// VehicleDriver is the client for interacting with the VehicleDriver builders.
+	VehicleDriver *VehicleDriverClient
 
 	// lazily loaded.
 	client     *Client
@@ -150,8 +154,10 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.Otp = NewOtpClient(tx.config)
+	tx.Session = NewSessionClient(tx.config)
 	tx.Trip = NewTripClient(tx.config)
 	tx.User = NewUserClient(tx.config)
+	tx.VehicleDriver = NewVehicleDriverClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.
