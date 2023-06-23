@@ -33,6 +33,11 @@ type ListTripRequest struct {
 	Rate    *int    `query:"rate"`
 }
 
+type ListTripResponse struct {
+	Code int          `json:"code"`
+	Data []*trip.Trip `json:"data"`
+}
+
 func (s *TripServer) ListTrip(c echo.Context) error {
 	r := c.Request()
 	ctx := r.Context()
@@ -54,7 +59,7 @@ func (s *TripServer) ListTrip(c echo.Context) error {
 		return err
 	}
 
-	return c.JSON(http.StatusOK, trip)
+	return c.JSON(http.StatusOK, ListTripResponse{Code: http.StatusOK, Data: trip})
 }
 
 type CreateTripRequest struct {
@@ -64,6 +69,11 @@ type CreateTripRequest struct {
 	EndX   float64 `json:"endX" validate:"required"`
 	EndY   float64 `json:"endY" validate:"required"`
 	Price  float64 `json:"price" validate:"required"`
+}
+
+type CreateTripResponse struct {
+	Code int        `json:"code"`
+	Data *trip.Trip `json:"data"`
 }
 
 func (s *TripServer) CreateTrip(c echo.Context) error {
@@ -86,12 +96,17 @@ func (s *TripServer) CreateTrip(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return c.JSON(http.StatusOK, trip)
+	return c.JSON(http.StatusCreated, CreateTripResponse{Code: http.StatusOK, Data: trip})
 }
 
 type UpdateStatusTripRequest struct {
 	TripID int    `param:"tripId" validate:"required,numeric"`
 	Status string `json:"status"`
+}
+
+type UpdateStatusTripResponse struct {
+	Code int        `json:"code"`
+	Data *trip.Trip `json:"data"`
 }
 
 func (s *TripServer) UpdateStatusTrip(c echo.Context) error {
@@ -114,12 +129,17 @@ func (s *TripServer) UpdateStatusTrip(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return c.JSON(http.StatusOK, trip)
+	return c.JSON(http.StatusOK, UpdateStatusTripResponse{Code: http.StatusOK, Data: trip})
 }
 
 type RateTripRequest struct {
 	TripID int `param:"tripId" validate:"required,numeric"`
 	Rate   int `json:"rate"`
+}
+
+type RateTripResponse struct {
+	Code int        `json:"code"`
+	Data *trip.Trip `json:"data"`
 }
 
 func (s *TripServer) RateTrip(c echo.Context) error {
@@ -142,11 +162,16 @@ func (s *TripServer) RateTrip(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return c.JSON(http.StatusOK, trip)
+	return c.JSON(http.StatusOK, RateTripResponse{Code: http.StatusOK, Data: trip})
 }
 
 type AcceptTripRequest struct {
 	TripID int `param:"tripId" validate:"required,numeric"`
+}
+
+type AcceptTripResponse struct {
+	Code int        `json:"code"`
+	Data *trip.Trip `json:"data"`
 }
 
 func (s *TripServer) AcceptTrip(c echo.Context) error {
@@ -169,5 +194,5 @@ func (s *TripServer) AcceptTrip(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return c.JSON(http.StatusOK, trip)
+	return c.JSON(http.StatusOK, AcceptTripResponse{Code: http.StatusOK, Data: trip})
 }

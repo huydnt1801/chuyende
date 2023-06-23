@@ -61,7 +61,7 @@ func (s *AccountServer) Register(c echo.Context) error {
 		return err
 	}
 	token := s.signConfirmInfo("reg", data.PhoneNumber, nextOTPSend)
-	return c.JSON(http.StatusCreated, SuccessResponse{Code: http.StatusCreated, Data: token})
+	return c.JSON(http.StatusCreated, RegisterResponse{Code: http.StatusOK, Data: token})
 }
 
 type RegisterRequest struct {
@@ -69,6 +69,11 @@ type RegisterRequest struct {
 	FullName    string `json:"fullName" validate:"required"`
 	Password    string `json:"password" validate:"required"`
 	Password2   string `json:"password2" validate:"required"`
+}
+
+type RegisterResponse struct {
+	Code int    `json:"code"`
+	Data string `json:"data"`
 }
 
 func (s *AccountServer) RegisterConfirm(c echo.Context) error {
@@ -98,7 +103,7 @@ func (s *AccountServer) RegisterConfirm(c echo.Context) error {
 		if err != nil {
 			return err
 		}
-		return c.JSON(http.StatusNoContent, "")
+		return c.JSON(http.StatusNoContent, RegisterConfirmResponse{Code: http.StatusOK})
 	case "resend-otp":
 		if time.Now().Before(nextOTPSend) {
 			return user.OTPIntervalError{}
@@ -109,7 +114,7 @@ func (s *AccountServer) RegisterConfirm(c echo.Context) error {
 		}
 
 		token := s.signConfirmInfo("reg", phoneNumber, nextOTPSend)
-		return c.JSON(http.StatusCreated, SuccessResponse{Code: http.StatusOK, Data: token})
+		return c.JSON(http.StatusCreated, RegisterConfirmResponse{Code: http.StatusOK, Data: token})
 	default:
 		return c.Redirect(http.StatusSeeOther, r.RequestURI)
 	}
@@ -119,6 +124,11 @@ type RegisterConfirmRequest struct {
 	Type  string `json:"type" validate:"required"`
 	Token string `json:"token" validate:"required"`
 	OTP   string `json:"otp" validate:"required"`
+}
+
+type RegisterConfirmResponse struct {
+	Code int    `json:"code"`
+	Data string `json:"data"`
 }
 
 func (s *AccountServer) Login(c echo.Context) error {
@@ -136,12 +146,17 @@ func (s *AccountServer) Login(c echo.Context) error {
 		return err
 	}
 	auth.LoginUser(c, sessID)
-	return c.JSON(http.StatusOK, usr)
+	return c.JSON(http.StatusOK, LoginResponse{Code: http.StatusOK, Data: usr})
 }
 
 type LoginRequest struct {
 	PhoneNumber string `json:"phoneNumber" validate:"required"`
 	Password    string `json:"password" validate:"required"`
+}
+
+type LoginResponse struct {
+	Code int        `json:"code"`
+	Data *user.User `json:"data"`
 }
 
 func (s *AccountServer) LoginDriver(c echo.Context) error {
@@ -158,7 +173,7 @@ func (s *AccountServer) LoginDriver(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return c.JSON(http.StatusOK, usr)
+	return c.JSON(http.StatusOK, LoginDriverResponse{Code: http.StatusOK, Data: usr})
 }
 
 type LoginDriverRequest struct {
@@ -166,8 +181,9 @@ type LoginDriverRequest struct {
 	Password    string `json:"password" validate:"required"`
 }
 
-type CheckPhoneRequest struct {
-	PhoneNumber string `json:"phoneNumber" validate:"required"`
+type LoginDriverResponse struct {
+	Code int            `json:"code"`
+	Data *driver.Driver `json:"data"`
 }
 
 func (s *AccountServer) CheckPhone(c echo.Context) error {
@@ -185,12 +201,21 @@ func (s *AccountServer) CheckPhone(c echo.Context) error {
 	}
 	usr, err := s.userSvc.FindUser(ctx, &user.UserParams{PhoneNumber: data.PhoneNumber})
 	if user.IsUserNotFound(err) {
-		return c.JSON(http.StatusOK, nil)
+		return c.JSON(http.StatusOK, CheckPhoneResponse{Code: http.StatusOK, Data: nil})
 	}
 	if err != nil {
 		return err
 	}
-	return c.JSON(http.StatusOK, usr)
+	return c.JSON(http.StatusOK, CheckPhoneResponse{Code: http.StatusOK, Data: usr})
+}
+
+type CheckPhoneRequest struct {
+	PhoneNumber string `json:"phoneNumber" validate:"required"`
+}
+
+type CheckPhoneResponse struct {
+	Code int        `json:"code"`
+	Data *user.User `json:"data"`
 }
 
 func (s *AccountServer) signData(data []byte) []byte {
