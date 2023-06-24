@@ -44,9 +44,9 @@ func ParseConfig(prefix string) (*Config, error) {
 	cfg.MySQLDatabase = "chuyende"
 	cfg.Debug = false
 	cfg.MySQLHost = "127.0.0.1"
-	// cfg.MySQLOptions = "chuyende"
 	cfg.MySQLPort = "3306"
 	cfg.MySQLUsername = "root"
+	// cfg.MySQLPassword = "123456"
 	cfg.SecretKey = "something-very-secret-that-you-cannot-know"
 	myMap := make(map[string]string)
 	myMap["parseTime"] = "true"

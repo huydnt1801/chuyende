@@ -4,18 +4,20 @@ import { useNavigation } from "@react-navigation/native"
 import className from "./className";
 import Banner from "./components/Banner/Banner";
 import { blitzcrank } from "../../../../components/Image";
+import { useSelector } from "react-redux";
 
 const HomePage = () => {
 
     const name = "Trương Quang Phú";
     const navigation = useNavigation();
+    const { account } = useSelector(state => state.account)
 
     return (
         <View className={className.container}>
             <StatusBar />
             <View className={className.header}>
                 <Text className={className.welcome}>
-                    {`Chào ${name}!`}
+                    {`Chào ${account?.full_name}!`}
                 </Text>
                 <Pressable>
 

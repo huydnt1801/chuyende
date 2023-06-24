@@ -1,17 +1,15 @@
-import { Text, View, Pressable, TextInput } from "react-native"
+import { useState, useRef } from "react";
+import { Text, View, Pressable, TextInput, StatusBar } from "react-native"
 import { useTranslation } from "react-i18next";
 import { StackActions, useNavigation, useRoute } from "@react-navigation/native";
-import { useState, useRef } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useDispatch } from "react-redux";
 
 import className from "./className";
 import Header from "../../components/Header";
 import Utils from "../../share/Utils";
 import Api from "../../api";
-import { useDispatch } from "react-redux";
 import { setAccount } from "../../slices/Account";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { } from "react";
-import { StatusBar } from "react-native";
 
 const types = {
     ONLY_PASSWORD: 1,
@@ -114,6 +112,7 @@ const PasswordOTP = () => {
     const handleClick = async () => {
         if (type == types.PASSWORD_AND_NAME) {
             Utils.showLoading();
+            await Utils.wait(300);
             const result = await Api.account.register(userPhone, username, password);
             Utils.hideLoading();
             if (result.data) {
@@ -125,16 +124,21 @@ const PasswordOTP = () => {
         if (type == types.ONLY_OPT) {
             Utils.showLoading();
             const result = await Api.account.confirmOTP(Utils.data.token, passwordOrOTP);
-            Utils.hideLoading();
+            await Utils.wait(300);
             if (result.result == Api.ResultCode.SUCCESS) {
                 const login = await Api.account.login(userPhone, password);
+                await Utils.wait(300);
                 if (login.result == Api.ResultCode.SUCCESS) {
                     dispatch(setAccount(login.data.data));
-                    await Utils.setItem("account", JSON.stringify(login.data.data));
+                    try {
+                        await AsyncStorage.setItem("account", JSON.stringify(login.data.data))
+                    } catch (error) { }
+                    Utils.hideLoading();
                     navigation.dispatch(StackActions.replace("Home"))
                 }
             }
             else {
+                Utils.hideLoading();
                 Utils.showMessageDialog({
                     message: t("WrongOTP")
                 });
@@ -143,6 +147,7 @@ const PasswordOTP = () => {
         if (type == types.ONLY_PASSWORD) {
             Utils.showLoading();
             const login = await Api.account.login(userPhone, passwordOrOTP);
+            await Utils.wait(300);
             if (login.result == Api.ResultCode.SUCCESS) {
                 dispatch(setAccount(login.data.data));
                 try {

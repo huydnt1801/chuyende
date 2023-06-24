@@ -1,0 +1,14 @@
+version: '1.0'
+
+services:
+  mysql:
+    container_name: mysql
+    image: mysql:8.0
+    restart: always
+    environment:
+      - MYSQL_DATABASE=chuyende
+      - MYSQL_ALLOW_EMPTY_PASSWORD=true
+    volumes:
+      - ./data/mysql:/var/lib/mysql
+    ports:
+      - "3306:3306"

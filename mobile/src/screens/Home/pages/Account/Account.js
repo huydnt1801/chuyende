@@ -7,18 +7,20 @@ import { faAngleRight, faCar, faEnvelope, faGear, faGem, faHeadphones, faLink, f
 import Avatar from "./components/Avatar";
 import ButtonRow from "./components/ButtonRow";
 import className from "./className";
+import { useSelector } from "react-redux";
 
 const Account = () => {
 
     const { t } = useTranslation();
     const navigation = useNavigation();
+    const { account } = useSelector(state => state.account)
 
     return (
         <View className={className.container}>
             <ScrollView>
                 <Avatar
-                    name={"Truong Quang Phu"}
-                    phone={"+84123132123"}
+                    name={account?.full_name}
+                    phone={`+84 ${account?.phone_number?.slice(1)}`}
                     rate={4.8}
                     onPress={() => 1} />
                 <ButtonRow
