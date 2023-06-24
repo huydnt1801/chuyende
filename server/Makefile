@@ -3,7 +3,6 @@ TARGET_BIN = app
 GO_CMD_MAIN = cmd/app/main.go
 
 MYSQL_DATABASE_URI = mysql://$(MYSQL_USERNAME):$(MYSQL_PASSWORD)@$(MYSQL_HOST):$(MYSQL_PORT)/$(MYSQL_DATABASE)
-# MYSQL_DATABASE_URI = mysql://$(MYSQL_USERNAME):$(MYSQL_PASSWORD)@$(MYSQL_HOST):$(MYSQL_PORT)/$(MYSQL_DATABASE)
 
 migrate:
 	@echo \# make migrate name="$(name)"
