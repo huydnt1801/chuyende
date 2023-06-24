@@ -36,7 +36,7 @@ type PasswordComplexity struct {
 }
 
 var DefaultPasswordComplexity = PasswordComplexity{
-	MinLength:    8,
+	MinLength:    6,
 	MaxLength:    255,
 	NumUppercase: 0,
 	NumSpecial:   0,
