@@ -1,1 +1,1 @@
-export { default } from "./PasswordOTP";
+export { default, types } from "./PasswordOTP";

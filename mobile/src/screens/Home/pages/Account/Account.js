@@ -164,6 +164,7 @@ const Account = () => {
                             size={16}
                             style={{ color: "rgb(107 114 128)" }} />
                     }
+                    onPress={() => navigation.navigate("Setting")}
                 />
                 <Text className={className.version}>{"Phiên bản: 1.1.0"}</Text>
                 <View className={className.bottom}></View>
