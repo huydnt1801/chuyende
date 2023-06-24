@@ -7,11 +7,16 @@ const initialState = {
 const accountSlice = createSlice({
     name: "account",
     initialState: initialState,
-    reducers: {},
+    reducers: {
+        setAccount(state, { payload }) {
+            state.account = payload
+        },
+    },
     extraReducers: (builder) => { }
 });
 
-const accountReducer = accountSlice.reducer;
-const { } = accountSlice.actions;
+const { reducer: accountReducer, actions } = accountSlice;
+const { setAccount } = actions;
 
 export default accountReducer
+export { setAccount }

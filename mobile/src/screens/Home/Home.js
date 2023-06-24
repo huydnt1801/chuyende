@@ -8,6 +8,7 @@ import HomePage from "./pages/HomePage";
 import Account from "./pages/Account";
 import History from "./pages/History";
 import Reward from "./pages/Reward";
+import { useSelector } from "react-redux";
 
 const Tab = createBottomTabNavigator();
 
@@ -41,6 +42,9 @@ const pages = [
 const Home = () => {
 
     const navigation = useNavigation();
+
+    const { account } = useSelector(state => state.account);
+    console.log(account);
 
     return (
         <Tab.Navigator

@@ -37,12 +37,16 @@ const TestScreen = () => {
                     onPress={() => navigation.navigate("Payment")} />
                 <View style={{ height: 12 }}></View>
                 <Button
-                    title="Tìm kiếm địa chỉ (Selectlocation)"
+                    title="Tìm kiếm địa chỉ (SelectlLocation)"
                     onPress={() => navigation.navigate("SelectLocation")} />
                 <View style={{ height: 12 }}></View>
                 <Button
-                    title="Tìm kiếm trên bản đồ"
-                    onPress={() => navigation.navigate("Login")} />
+                    title="Tìm kiếm trên bản đồ (SelectLocationOnMap)"
+                    onPress={() => navigation.navigate("SelectLocationOnMap")} />
+                <View style={{ height: 12 }}></View>
+                <Button
+                    title="Đường đi (TripDirection)"
+                    onPress={() => navigation.navigate("TripDirection")} />
                 <View style={{ height: 12 }}></View>
             </ScrollView>
         </View>
