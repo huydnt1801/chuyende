@@ -30,7 +30,7 @@ const Setting = () => {
 
                 <ButtonRow
                     classNames={`mt-2`}
-                    title={t("Chọn ngôn ngữ")}
+                    title={t("SellectLanguage")}
                     onPress={() => Utils.toast("Coming Soon!")}
                     iconLeft={
                         <FontAwesomeIcon
@@ -44,7 +44,7 @@ const Setting = () => {
                 />
                 <ButtonRow
                     classNames={`mt-2`}
-                    title={t("Cài đặt/Cập nhật mật khẩu")}
+                    title={t("SettingUpdatePassword")}
                     onPress={() => Utils.toast("Coming Soon!")}
                     iconLeft={
                         <FontAwesomeIcon
@@ -57,7 +57,7 @@ const Setting = () => {
                 />
                 <ButtonRow
                     classNames={`mt-2`}
-                    title={t("xác thực sinh trắc học")}
+                    title={t("BiometricAuthentication")}
                     onPress={() => Utils.toast("Coming Soon!")}
                     iconLeft={
                         <FontAwesomeIcon

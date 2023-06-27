@@ -29,5 +29,13 @@
     "WrongOTP": "Mã OTP chưa đúng, hãy kiểm tra lại",
     "WrongPassword": "Mật khẩu không đúng",
     "Setting": "Cài đặt",
-    "Logout": "Đăng xuất"
+    "Logout": "Đăng xuất",
+    "TripSetting": "Cài đặt chuyến đi",
+    "SellectLanguage": "Chọn ngôn ngữ",
+    "SettingUpdatePassword": "Cài đặt/ Cập nhật mật khẩu",
+    "BiometricAuthentication": "xác thực sinh trắc học",
+    "SavedLocations":"Địa điểm đã lưu",
+    "PresentMessages":"Tin nhắn nhanh",
+    "AddEmergencyContacts": "Thêm người liên hệ khẩn cấp",
+    "InvoiceInformation": "Thông tin xuất hóa đơn"
 }
