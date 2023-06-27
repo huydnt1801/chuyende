@@ -27,5 +27,7 @@
     "CanNotConnectInternet": "Không có kết nối Internet",
     "PleaseTryAgain": "Vui lòng kiểm tra lại",
     "WrongOTP": "Mã OTP chưa đúng, hãy kiểm tra lại",
-    "WrongPassword": "Mật khẩu không đúng"
+    "WrongPassword": "Mật khẩu không đúng",
+    "Setting": "Cài đặt",
+    "Logout": "Đăng xuất"
 }
