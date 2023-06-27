@@ -1,6 +1,7 @@
 package server
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -44,4 +45,26 @@ func CustomHTTPErrorHandler(logger logr.Logger) echo.HTTPErrorHandler {
 			logger.Error(err, "Can not handle error")
 		}
 	}
+}
+
+// Only for testing purposes
+func GetErrorCode(err error) int {
+	if err == nil {
+		return http.StatusOK
+	}
+
+	var httpErr interface {
+		error
+		HTTPStatusCode() int
+	}
+	if errors.As(err, &httpErr) {
+		return httpErr.HTTPStatusCode()
+	}
+
+	var echoErr *echo.HTTPError
+	if errors.As(err, &echoErr) {
+		return echoErr.Code
+	}
+
+	return http.StatusInternalServerError
 }
