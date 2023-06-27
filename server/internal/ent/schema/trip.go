@@ -26,11 +26,14 @@ func (Trip) Fields() []ent.Field {
 			StructTag(`mapstructure:",omitempty"`),
 		field.Float("start_x"),
 		field.Float("start_y"),
+		field.String("start_location"),
 		field.Float("end_x"),
 		field.Float("end_y"),
+		field.String("end_location"),
+		field.Float("distance"),
 		field.Float("price"),
 		field.Enum("status").
-			Values("pending", "accept", "done", "cancel").
+			Values("pending", "waiting", "accept", "done", "cancel").
 			Default("pending"),
 		field.Int("rate").
 			Min(1).

@@ -1273,10 +1273,14 @@ type TripMutation struct {
 	addstart_x     *float64
 	start_y        *float64
 	addstart_y     *float64
+	start_location *string
 	end_x          *float64
 	addend_x       *float64
 	end_y          *float64
 	addend_y       *float64
+	end_location   *string
+	distance       *float64
+	adddistance    *float64
 	price          *float64
 	addprice       *float64
 	status         *trip.Status
@@ -1659,6 +1663,42 @@ func (m *TripMutation) ResetStartY() {
 	m.addstart_y = nil
 }
 
+// SetStartLocation sets the "start_location" field.
+func (m *TripMutation) SetStartLocation(s string) {
+	m.start_location = &s
+}
+
+// StartLocation returns the value of the "start_location" field in the mutation.
+func (m *TripMutation) StartLocation() (r string, exists bool) {
+	v := m.start_location
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStartLocation returns the old "start_location" field's value of the Trip entity.
+// If the Trip object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TripMutation) OldStartLocation(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStartLocation is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStartLocation requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStartLocation: %w", err)
+	}
+	return oldValue.StartLocation, nil
+}
+
+// ResetStartLocation resets all changes to the "start_location" field.
+func (m *TripMutation) ResetStartLocation() {
+	m.start_location = nil
+}
+
 // SetEndX sets the "end_x" field.
 func (m *TripMutation) SetEndX(f float64) {
 	m.end_x = &f
@@ -1769,6 +1809,98 @@ func (m *TripMutation) AddedEndY() (r float64, exists bool) {
 func (m *TripMutation) ResetEndY() {
 	m.end_y = nil
 	m.addend_y = nil
+}
+
+// SetEndLocation sets the "end_location" field.
+func (m *TripMutation) SetEndLocation(s string) {
+	m.end_location = &s
+}
+
+// EndLocation returns the value of the "end_location" field in the mutation.
+func (m *TripMutation) EndLocation() (r string, exists bool) {
+	v := m.end_location
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEndLocation returns the old "end_location" field's value of the Trip entity.
+// If the Trip object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TripMutation) OldEndLocation(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEndLocation is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEndLocation requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEndLocation: %w", err)
+	}
+	return oldValue.EndLocation, nil
+}
+
+// ResetEndLocation resets all changes to the "end_location" field.
+func (m *TripMutation) ResetEndLocation() {
+	m.end_location = nil
+}
+
+// SetDistance sets the "distance" field.
+func (m *TripMutation) SetDistance(f float64) {
+	m.distance = &f
+	m.adddistance = nil
+}
+
+// Distance returns the value of the "distance" field in the mutation.
+func (m *TripMutation) Distance() (r float64, exists bool) {
+	v := m.distance
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDistance returns the old "distance" field's value of the Trip entity.
+// If the Trip object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TripMutation) OldDistance(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDistance is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDistance requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDistance: %w", err)
+	}
+	return oldValue.Distance, nil
+}
+
+// AddDistance adds f to the "distance" field.
+func (m *TripMutation) AddDistance(f float64) {
+	if m.adddistance != nil {
+		*m.adddistance += f
+	} else {
+		m.adddistance = &f
+	}
+}
+
+// AddedDistance returns the value that was added to the "distance" field in this mutation.
+func (m *TripMutation) AddedDistance() (r float64, exists bool) {
+	v := m.adddistance
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetDistance resets all changes to the "distance" field.
+func (m *TripMutation) ResetDistance() {
+	m.distance = nil
+	m.adddistance = nil
 }
 
 // SetPrice sets the "price" field.
@@ -2019,7 +2151,7 @@ func (m *TripMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *TripMutation) Fields() []string {
-	fields := make([]string, 0, 11)
+	fields := make([]string, 0, 14)
 	if m.created_at != nil {
 		fields = append(fields, trip.FieldCreatedAt)
 	}
@@ -2038,11 +2170,20 @@ func (m *TripMutation) Fields() []string {
 	if m.start_y != nil {
 		fields = append(fields, trip.FieldStartY)
 	}
+	if m.start_location != nil {
+		fields = append(fields, trip.FieldStartLocation)
+	}
 	if m.end_x != nil {
 		fields = append(fields, trip.FieldEndX)
 	}
 	if m.end_y != nil {
 		fields = append(fields, trip.FieldEndY)
+	}
+	if m.end_location != nil {
+		fields = append(fields, trip.FieldEndLocation)
+	}
+	if m.distance != nil {
+		fields = append(fields, trip.FieldDistance)
 	}
 	if m.price != nil {
 		fields = append(fields, trip.FieldPrice)
@@ -2073,10 +2214,16 @@ func (m *TripMutation) Field(name string) (ent.Value, bool) {
 		return m.StartX()
 	case trip.FieldStartY:
 		return m.StartY()
+	case trip.FieldStartLocation:
+		return m.StartLocation()
 	case trip.FieldEndX:
 		return m.EndX()
 	case trip.FieldEndY:
 		return m.EndY()
+	case trip.FieldEndLocation:
+		return m.EndLocation()
+	case trip.FieldDistance:
+		return m.Distance()
 	case trip.FieldPrice:
 		return m.Price()
 	case trip.FieldStatus:
@@ -2104,10 +2251,16 @@ func (m *TripMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldStartX(ctx)
 	case trip.FieldStartY:
 		return m.OldStartY(ctx)
+	case trip.FieldStartLocation:
+		return m.OldStartLocation(ctx)
 	case trip.FieldEndX:
 		return m.OldEndX(ctx)
 	case trip.FieldEndY:
 		return m.OldEndY(ctx)
+	case trip.FieldEndLocation:
+		return m.OldEndLocation(ctx)
+	case trip.FieldDistance:
+		return m.OldDistance(ctx)
 	case trip.FieldPrice:
 		return m.OldPrice(ctx)
 	case trip.FieldStatus:
@@ -2165,6 +2318,13 @@ func (m *TripMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetStartY(v)
 		return nil
+	case trip.FieldStartLocation:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStartLocation(v)
+		return nil
 	case trip.FieldEndX:
 		v, ok := value.(float64)
 		if !ok {
@@ -2178,6 +2338,20 @@ func (m *TripMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetEndY(v)
+		return nil
+	case trip.FieldEndLocation:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEndLocation(v)
+		return nil
+	case trip.FieldDistance:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDistance(v)
 		return nil
 	case trip.FieldPrice:
 		v, ok := value.(float64)
@@ -2220,6 +2394,9 @@ func (m *TripMutation) AddedFields() []string {
 	if m.addend_y != nil {
 		fields = append(fields, trip.FieldEndY)
 	}
+	if m.adddistance != nil {
+		fields = append(fields, trip.FieldDistance)
+	}
 	if m.addprice != nil {
 		fields = append(fields, trip.FieldPrice)
 	}
@@ -2242,6 +2419,8 @@ func (m *TripMutation) AddedField(name string) (ent.Value, bool) {
 		return m.AddedEndX()
 	case trip.FieldEndY:
 		return m.AddedEndY()
+	case trip.FieldDistance:
+		return m.AddedDistance()
 	case trip.FieldPrice:
 		return m.AddedPrice()
 	case trip.FieldRate:
@@ -2282,6 +2461,13 @@ func (m *TripMutation) AddField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddEndY(v)
+		return nil
+	case trip.FieldDistance:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddDistance(v)
 		return nil
 	case trip.FieldPrice:
 		v, ok := value.(float64)
@@ -2357,11 +2543,20 @@ func (m *TripMutation) ResetField(name string) error {
 	case trip.FieldStartY:
 		m.ResetStartY()
 		return nil
+	case trip.FieldStartLocation:
+		m.ResetStartLocation()
+		return nil
 	case trip.FieldEndX:
 		m.ResetEndX()
 		return nil
 	case trip.FieldEndY:
 		m.ResetEndY()
+		return nil
+	case trip.FieldEndLocation:
+		m.ResetEndLocation()
+		return nil
+	case trip.FieldDistance:
+		m.ResetDistance()
 		return nil
 	case trip.FieldPrice:
 		m.ResetPrice()
@@ -2479,6 +2674,7 @@ type UserMutation struct {
 	phone_number    *string
 	confirmed       *bool
 	full_name       *string
+	image_url       *string
 	password        *string
 	clearedFields   map[string]struct{}
 	trips           map[int]struct{}
@@ -2770,6 +2966,55 @@ func (m *UserMutation) ResetFullName() {
 	m.full_name = nil
 }
 
+// SetImageURL sets the "image_url" field.
+func (m *UserMutation) SetImageURL(s string) {
+	m.image_url = &s
+}
+
+// ImageURL returns the value of the "image_url" field in the mutation.
+func (m *UserMutation) ImageURL() (r string, exists bool) {
+	v := m.image_url
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldImageURL returns the old "image_url" field's value of the User entity.
+// If the User object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserMutation) OldImageURL(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldImageURL is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldImageURL requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldImageURL: %w", err)
+	}
+	return oldValue.ImageURL, nil
+}
+
+// ClearImageURL clears the value of the "image_url" field.
+func (m *UserMutation) ClearImageURL() {
+	m.image_url = nil
+	m.clearedFields[user.FieldImageURL] = struct{}{}
+}
+
+// ImageURLCleared returns if the "image_url" field was cleared in this mutation.
+func (m *UserMutation) ImageURLCleared() bool {
+	_, ok := m.clearedFields[user.FieldImageURL]
+	return ok
+}
+
+// ResetImageURL resets all changes to the "image_url" field.
+func (m *UserMutation) ResetImageURL() {
+	m.image_url = nil
+	delete(m.clearedFields, user.FieldImageURL)
+}
+
 // SetPassword sets the "password" field.
 func (m *UserMutation) SetPassword(s string) {
 	m.password = &s
@@ -2948,7 +3193,7 @@ func (m *UserMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *UserMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 7)
 	if m.created_at != nil {
 		fields = append(fields, user.FieldCreatedAt)
 	}
@@ -2963,6 +3208,9 @@ func (m *UserMutation) Fields() []string {
 	}
 	if m.full_name != nil {
 		fields = append(fields, user.FieldFullName)
+	}
+	if m.image_url != nil {
+		fields = append(fields, user.FieldImageURL)
 	}
 	if m.password != nil {
 		fields = append(fields, user.FieldPassword)
@@ -2985,6 +3233,8 @@ func (m *UserMutation) Field(name string) (ent.Value, bool) {
 		return m.Confirmed()
 	case user.FieldFullName:
 		return m.FullName()
+	case user.FieldImageURL:
+		return m.ImageURL()
 	case user.FieldPassword:
 		return m.Password()
 	}
@@ -3006,6 +3256,8 @@ func (m *UserMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldConfirmed(ctx)
 	case user.FieldFullName:
 		return m.OldFullName(ctx)
+	case user.FieldImageURL:
+		return m.OldImageURL(ctx)
 	case user.FieldPassword:
 		return m.OldPassword(ctx)
 	}
@@ -3052,6 +3304,13 @@ func (m *UserMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetFullName(v)
 		return nil
+	case user.FieldImageURL:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetImageURL(v)
+		return nil
 	case user.FieldPassword:
 		v, ok := value.(string)
 		if !ok {
@@ -3088,7 +3347,11 @@ func (m *UserMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *UserMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(user.FieldImageURL) {
+		fields = append(fields, user.FieldImageURL)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -3101,6 +3364,11 @@ func (m *UserMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *UserMutation) ClearField(name string) error {
+	switch name {
+	case user.FieldImageURL:
+		m.ClearImageURL()
+		return nil
+	}
 	return fmt.Errorf("unknown User nullable field %s", name)
 }
 
@@ -3122,6 +3390,9 @@ func (m *UserMutation) ResetField(name string) error {
 		return nil
 	case user.FieldFullName:
 		m.ResetFullName()
+		return nil
+	case user.FieldImageURL:
+		m.ResetImageURL()
 		return nil
 	case user.FieldPassword:
 		m.ResetPassword()

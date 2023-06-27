@@ -88,6 +88,12 @@ func (tu *TripUpdate) AddStartY(f float64) *TripUpdate {
 	return tu
 }
 
+// SetStartLocation sets the "start_location" field.
+func (tu *TripUpdate) SetStartLocation(s string) *TripUpdate {
+	tu.mutation.SetStartLocation(s)
+	return tu
+}
+
 // SetEndX sets the "end_x" field.
 func (tu *TripUpdate) SetEndX(f float64) *TripUpdate {
 	tu.mutation.ResetEndX()
@@ -111,6 +117,25 @@ func (tu *TripUpdate) SetEndY(f float64) *TripUpdate {
 // AddEndY adds f to the "end_y" field.
 func (tu *TripUpdate) AddEndY(f float64) *TripUpdate {
 	tu.mutation.AddEndY(f)
+	return tu
+}
+
+// SetEndLocation sets the "end_location" field.
+func (tu *TripUpdate) SetEndLocation(s string) *TripUpdate {
+	tu.mutation.SetEndLocation(s)
+	return tu
+}
+
+// SetDistance sets the "distance" field.
+func (tu *TripUpdate) SetDistance(f float64) *TripUpdate {
+	tu.mutation.ResetDistance()
+	tu.mutation.SetDistance(f)
+	return tu
+}
+
+// AddDistance adds f to the "distance" field.
+func (tu *TripUpdate) AddDistance(f float64) *TripUpdate {
+	tu.mutation.AddDistance(f)
 	return tu
 }
 
@@ -276,6 +301,9 @@ func (tu *TripUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := tu.mutation.AddedStartY(); ok {
 		_spec.AddField(trip.FieldStartY, field.TypeFloat64, value)
 	}
+	if value, ok := tu.mutation.StartLocation(); ok {
+		_spec.SetField(trip.FieldStartLocation, field.TypeString, value)
+	}
 	if value, ok := tu.mutation.EndX(); ok {
 		_spec.SetField(trip.FieldEndX, field.TypeFloat64, value)
 	}
@@ -287,6 +315,15 @@ func (tu *TripUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := tu.mutation.AddedEndY(); ok {
 		_spec.AddField(trip.FieldEndY, field.TypeFloat64, value)
+	}
+	if value, ok := tu.mutation.EndLocation(); ok {
+		_spec.SetField(trip.FieldEndLocation, field.TypeString, value)
+	}
+	if value, ok := tu.mutation.Distance(); ok {
+		_spec.SetField(trip.FieldDistance, field.TypeFloat64, value)
+	}
+	if value, ok := tu.mutation.AddedDistance(); ok {
+		_spec.AddField(trip.FieldDistance, field.TypeFloat64, value)
 	}
 	if value, ok := tu.mutation.Price(); ok {
 		_spec.SetField(trip.FieldPrice, field.TypeFloat64, value)
@@ -442,6 +479,12 @@ func (tuo *TripUpdateOne) AddStartY(f float64) *TripUpdateOne {
 	return tuo
 }
 
+// SetStartLocation sets the "start_location" field.
+func (tuo *TripUpdateOne) SetStartLocation(s string) *TripUpdateOne {
+	tuo.mutation.SetStartLocation(s)
+	return tuo
+}
+
 // SetEndX sets the "end_x" field.
 func (tuo *TripUpdateOne) SetEndX(f float64) *TripUpdateOne {
 	tuo.mutation.ResetEndX()
@@ -465,6 +508,25 @@ func (tuo *TripUpdateOne) SetEndY(f float64) *TripUpdateOne {
 // AddEndY adds f to the "end_y" field.
 func (tuo *TripUpdateOne) AddEndY(f float64) *TripUpdateOne {
 	tuo.mutation.AddEndY(f)
+	return tuo
+}
+
+// SetEndLocation sets the "end_location" field.
+func (tuo *TripUpdateOne) SetEndLocation(s string) *TripUpdateOne {
+	tuo.mutation.SetEndLocation(s)
+	return tuo
+}
+
+// SetDistance sets the "distance" field.
+func (tuo *TripUpdateOne) SetDistance(f float64) *TripUpdateOne {
+	tuo.mutation.ResetDistance()
+	tuo.mutation.SetDistance(f)
+	return tuo
+}
+
+// AddDistance adds f to the "distance" field.
+func (tuo *TripUpdateOne) AddDistance(f float64) *TripUpdateOne {
+	tuo.mutation.AddDistance(f)
 	return tuo
 }
 
@@ -660,6 +722,9 @@ func (tuo *TripUpdateOne) sqlSave(ctx context.Context) (_node *Trip, err error) 
 	if value, ok := tuo.mutation.AddedStartY(); ok {
 		_spec.AddField(trip.FieldStartY, field.TypeFloat64, value)
 	}
+	if value, ok := tuo.mutation.StartLocation(); ok {
+		_spec.SetField(trip.FieldStartLocation, field.TypeString, value)
+	}
 	if value, ok := tuo.mutation.EndX(); ok {
 		_spec.SetField(trip.FieldEndX, field.TypeFloat64, value)
 	}
@@ -671,6 +736,15 @@ func (tuo *TripUpdateOne) sqlSave(ctx context.Context) (_node *Trip, err error) 
 	}
 	if value, ok := tuo.mutation.AddedEndY(); ok {
 		_spec.AddField(trip.FieldEndY, field.TypeFloat64, value)
+	}
+	if value, ok := tuo.mutation.EndLocation(); ok {
+		_spec.SetField(trip.FieldEndLocation, field.TypeString, value)
+	}
+	if value, ok := tuo.mutation.Distance(); ok {
+		_spec.SetField(trip.FieldDistance, field.TypeFloat64, value)
+	}
+	if value, ok := tuo.mutation.AddedDistance(); ok {
+		_spec.AddField(trip.FieldDistance, field.TypeFloat64, value)
 	}
 	if value, ok := tuo.mutation.Price(); ok {
 		_spec.SetField(trip.FieldPrice, field.TypeFloat64, value)

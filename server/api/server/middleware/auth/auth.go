@@ -7,38 +7,64 @@ import (
 	"strings"
 
 	"github.com/gorilla/sessions"
+	"github.com/huydnt1801/chuyende/internal/driver"
+	ss "github.com/huydnt1801/chuyende/internal/session"
+	"github.com/huydnt1801/chuyende/internal/user"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 )
 
+type AuthInfo struct {
+	User      *user.User
+	Driver    *driver.Driver
+	SessionID string
+}
+
 func Middleware(db *sql.DB) echo.MiddlewareFunc {
-	// client := entutil.NewClientFromDB(db)
-	// cfg := config.MustParseConfig()
+	ssSvc := ss.NewSessionService(db)
 
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			r := c.Request()
-			// w := c.Response()
-			// ctx := r.Context()
-
-			if strings.HasPrefix(r.URL.Path, "/static") {
-				return next(c)
-			}
+			ctx := r.Context()
 
 			sess := getSession(c)
 			val, found := sess.Values["sessionId"]
 			if found {
-				fmt.Println(val)
+				sessID := fmt.Sprintf("%v", val)
+				usr, driv, err := ssSvc.GetSession(ctx, sessID)
+				if err != nil {
+					return err
+				}
+				LoginUser(c, sessID, usr, driv)
+				return next(c)
 			}
-			return next(c)
+			if strings.HasPrefix(r.URL.Path, "/api/v1/accounts/register") ||
+				strings.HasPrefix(r.URL.Path, "/api/v1/accounts/login") ||
+				strings.HasPrefix(r.URL.Path, "/api/v1/accounts/phone") {
+				return next(c)
+			}
+			return echo.NewHTTPError(http.StatusUnauthorized, "Yêu cầu đăng nhập")
 		}
 	}
 }
 
-func LoginUser(c echo.Context, sessionId string) {
+func LoginUser(c echo.Context, sessionId string, usr *user.User, driv *driver.Driver) {
 	sess := getSession(c)
 	sess.Values["sessionId"] = sessionId
 
+	saveSession(c)
+	c.Set(authInfoKey, AuthInfo{
+		User:      usr,
+		Driver:    driv,
+		SessionID: sessionId,
+	})
+}
+
+func LogoutUser(c echo.Context) {
+	sess := getSession(c)
+	delete(sess.Values, "sessionId")
+	sess.Options.MaxAge = -1
 	saveSession(c)
 }
 
@@ -61,6 +87,18 @@ func saveSession(c echo.Context) {
 	})
 	c.Set(sessionSaveHookAdded, true)
 
+}
+
+func GetAuthInfo(c echo.Context) (AuthInfo, bool) {
+	val := c.Get(authInfoKey)
+	if val == nil {
+		return AuthInfo{}, false
+	}
+	info, ok := val.(AuthInfo)
+	if !ok {
+		return AuthInfo{}, false
+	}
+	return info, true
 }
 
 const (

@@ -78,6 +78,20 @@ func (uc *UserCreate) SetFullName(s string) *UserCreate {
 	return uc
 }
 
+// SetImageURL sets the "image_url" field.
+func (uc *UserCreate) SetImageURL(s string) *UserCreate {
+	uc.mutation.SetImageURL(s)
+	return uc
+}
+
+// SetNillableImageURL sets the "image_url" field if the given value is not nil.
+func (uc *UserCreate) SetNillableImageURL(s *string) *UserCreate {
+	if s != nil {
+		uc.SetImageURL(*s)
+	}
+	return uc
+}
+
 // SetPassword sets the "password" field.
 func (uc *UserCreate) SetPassword(s string) *UserCreate {
 	uc.mutation.SetPassword(s)
@@ -235,6 +249,10 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		_spec.SetField(user.FieldFullName, field.TypeString, value)
 		_node.FullName = value
 	}
+	if value, ok := uc.mutation.ImageURL(); ok {
+		_spec.SetField(user.FieldImageURL, field.TypeString, value)
+		_node.ImageURL = value
+	}
 	if value, ok := uc.mutation.Password(); ok {
 		_spec.SetField(user.FieldPassword, field.TypeString, value)
 		_node.Password = value
@@ -371,6 +389,24 @@ func (u *UserUpsert) UpdateFullName() *UserUpsert {
 	return u
 }
 
+// SetImageURL sets the "image_url" field.
+func (u *UserUpsert) SetImageURL(v string) *UserUpsert {
+	u.Set(user.FieldImageURL, v)
+	return u
+}
+
+// UpdateImageURL sets the "image_url" field to the value that was provided on create.
+func (u *UserUpsert) UpdateImageURL() *UserUpsert {
+	u.SetExcluded(user.FieldImageURL)
+	return u
+}
+
+// ClearImageURL clears the value of the "image_url" field.
+func (u *UserUpsert) ClearImageURL() *UserUpsert {
+	u.SetNull(user.FieldImageURL)
+	return u
+}
+
 // SetPassword sets the "password" field.
 func (u *UserUpsert) SetPassword(v string) *UserUpsert {
 	u.Set(user.FieldPassword, v)
@@ -481,6 +517,27 @@ func (u *UserUpsertOne) SetFullName(v string) *UserUpsertOne {
 func (u *UserUpsertOne) UpdateFullName() *UserUpsertOne {
 	return u.Update(func(s *UserUpsert) {
 		s.UpdateFullName()
+	})
+}
+
+// SetImageURL sets the "image_url" field.
+func (u *UserUpsertOne) SetImageURL(v string) *UserUpsertOne {
+	return u.Update(func(s *UserUpsert) {
+		s.SetImageURL(v)
+	})
+}
+
+// UpdateImageURL sets the "image_url" field to the value that was provided on create.
+func (u *UserUpsertOne) UpdateImageURL() *UserUpsertOne {
+	return u.Update(func(s *UserUpsert) {
+		s.UpdateImageURL()
+	})
+}
+
+// ClearImageURL clears the value of the "image_url" field.
+func (u *UserUpsertOne) ClearImageURL() *UserUpsertOne {
+	return u.Update(func(s *UserUpsert) {
+		s.ClearImageURL()
 	})
 }
 
@@ -758,6 +815,27 @@ func (u *UserUpsertBulk) SetFullName(v string) *UserUpsertBulk {
 func (u *UserUpsertBulk) UpdateFullName() *UserUpsertBulk {
 	return u.Update(func(s *UserUpsert) {
 		s.UpdateFullName()
+	})
+}
+
+// SetImageURL sets the "image_url" field.
+func (u *UserUpsertBulk) SetImageURL(v string) *UserUpsertBulk {
+	return u.Update(func(s *UserUpsert) {
+		s.SetImageURL(v)
+	})
+}
+
+// UpdateImageURL sets the "image_url" field to the value that was provided on create.
+func (u *UserUpsertBulk) UpdateImageURL() *UserUpsertBulk {
+	return u.Update(func(s *UserUpsert) {
+		s.UpdateImageURL()
+	})
+}
+
+// ClearImageURL clears the value of the "image_url" field.
+func (u *UserUpsertBulk) ClearImageURL() *UserUpsertBulk {
+	return u.Update(func(s *UserUpsert) {
+		s.ClearImageURL()
 	})
 }
 

@@ -24,6 +24,8 @@ const (
 	FieldConfirmed = "confirmed"
 	// FieldFullName holds the string denoting the full_name field in the database.
 	FieldFullName = "full_name"
+	// FieldImageURL holds the string denoting the image_url field in the database.
+	FieldImageURL = "image_url"
 	// FieldPassword holds the string denoting the password field in the database.
 	FieldPassword = "password"
 	// EdgeTrips holds the string denoting the trips edge name in mutations.
@@ -56,6 +58,7 @@ var Columns = []string{
 	FieldPhoneNumber,
 	FieldConfirmed,
 	FieldFullName,
+	FieldImageURL,
 	FieldPassword,
 }
 
@@ -113,6 +116,11 @@ func ByConfirmed(opts ...sql.OrderTermOption) OrderOption {
 // ByFullName orders the results by the full_name field.
 func ByFullName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldFullName, opts...).ToFunc()
+}
+
+// ByImageURL orders the results by the image_url field.
+func ByImageURL(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldImageURL, opts...).ToFunc()
 }
 
 // ByPassword orders the results by the password field.
