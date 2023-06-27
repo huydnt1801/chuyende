@@ -66,10 +66,13 @@ var (
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "start_x", Type: field.TypeFloat64},
 		{Name: "start_y", Type: field.TypeFloat64},
+		{Name: "start_location", Type: field.TypeString},
 		{Name: "end_x", Type: field.TypeFloat64},
 		{Name: "end_y", Type: field.TypeFloat64},
+		{Name: "end_location", Type: field.TypeString},
+		{Name: "distance", Type: field.TypeFloat64},
 		{Name: "price", Type: field.TypeFloat64},
-		{Name: "status", Type: field.TypeEnum, Enums: []string{"pending", "accept", "done", "cancel"}, Default: "pending"},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"pending", "waiting", "accept", "done", "cancel"}, Default: "pending"},
 		{Name: "rate", Type: field.TypeInt, Nullable: true},
 		{Name: "user_id", Type: field.TypeInt},
 		{Name: "driver_id", Type: field.TypeInt, Nullable: true},
@@ -82,13 +85,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "trips_users_trips",
-				Columns:    []*schema.Column{TripsColumns[10]},
+				Columns:    []*schema.Column{TripsColumns[13]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "trips_vehicle_drivers_trips",
-				Columns:    []*schema.Column{TripsColumns[11]},
+				Columns:    []*schema.Column{TripsColumns[14]},
 				RefColumns: []*schema.Column{VehicleDriversColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -102,6 +105,7 @@ var (
 		{Name: "phone_number", Type: field.TypeString, Unique: true, Size: 15},
 		{Name: "confirmed", Type: field.TypeBool, Default: false},
 		{Name: "full_name", Type: field.TypeString},
+		{Name: "image_url", Type: field.TypeString, Nullable: true},
 		{Name: "password", Type: field.TypeString},
 	}
 	// UsersTable holds the schema information for the "users" table.

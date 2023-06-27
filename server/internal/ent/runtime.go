@@ -58,7 +58,7 @@ func init() {
 	// trip.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	trip.UpdateDefaultUpdatedAt = tripDescUpdatedAt.UpdateDefault.(func() time.Time)
 	// tripDescRate is the schema descriptor for rate field.
-	tripDescRate := tripFields[8].Descriptor()
+	tripDescRate := tripFields[11].Descriptor()
 	// trip.RateValidator is a validator for the "rate" field. It is called by the builders before save.
 	trip.RateValidator = func() func(int) error {
 		validators := tripDescRate.Validators

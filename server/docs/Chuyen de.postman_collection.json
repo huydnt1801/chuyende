@@ -16,7 +16,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"userId\": 1,\r\n    \"startX\": 1,\r\n    \"startY\": 1,\r\n    \"endX\": 1,\r\n    \"endY\": 1,\r\n    \"price\": 1\r\n}",
+							"raw": "{\r\n    \"startX\": 1,\r\n    \"startY\": 1,\r\n    \"startLocation\": \"di\",\r\n    \"endX\": 1,\r\n    \"endY\": 1,\r\n    \"endLocation\": \"den\",\r\n    \"distance\": 1.2\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -79,7 +79,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"status\": \"cancel\"\r\n}",
+							"raw": "{\r\n    \"status\": \"waiting\" // \"waiting\", \"cancel\" nếu user đăng nhập, \"accept\",\"done\" nếu driver đăng nhập\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -87,7 +87,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:5000/api/v1/trips/1/status",
+							"raw": "http://localhost:5000/api/v1/trips/3/status",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -97,7 +97,7 @@
 								"api",
 								"v1",
 								"trips",
-								"1",
+								"3",
 								"status"
 							]
 						}
@@ -119,7 +119,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:5000/api/v1/trips/1/rate",
+							"raw": "http://localhost:5000/api/v1/trips/3/rate",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -129,7 +129,7 @@
 								"api",
 								"v1",
 								"trips",
-								"1",
+								"3",
 								"rate"
 							]
 						}
@@ -148,7 +148,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"phoneNumber\": \"0123456788\",\r\n    \"fullName\": \"Huy 88\",\r\n    \"password\": \"12345678\",\r\n    \"password2\": \"12345678\"\r\n}",
+							"raw": "{\r\n    \"phoneNumber\": \"0123456787\",\r\n    \"fullName\": \"Huy 87\",\r\n    \"password\": \"12345678\",\r\n    \"password2\": \"12345678\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -204,13 +204,75 @@
 					"response": []
 				},
 				{
+					"name": "logout",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"phoneNumber\": \"0123456788\",\r\n    \"password\": \"12345678\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/v1/accounts/logout",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"v1",
+								"accounts",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"fullName\": \"Huy 87 test\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/v1/accounts/3",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"v1",
+								"accounts",
+								"3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "register confirm",
 					"request": {
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"token\": \"cmVnOzAxMjM0NTY3ODg7MTY4NzM2MjczNzsxNjg3MzYyNjc3.dfynNnES+5FjTtHQ6Asnhv0XcUI=\",\r\n    \"type\": \"submit-otp\",\r\n    \"otp\": \"036079\"\r\n}",
+							"raw": "{\r\n    \"token\": \"cmVnOzAxMjM0NTY3ODc7MTY4NzgyODQ1NjsxNjg3ODI4Mzk2.IX4thl3tllAagdJnwem8I6Q+QLU=\",\r\n    \"type\": \"submit-otp\",\r\n    \"otp\": \"768743\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -242,7 +304,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"phoneNumber\": \"0123456788\"\r\n}",
+							"raw": "{\r\n    \"phoneNumber\": \"0123456787\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"

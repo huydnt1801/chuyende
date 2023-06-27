@@ -15,6 +15,7 @@ import (
 	"github.com/huydnt1801/chuyende/api/server/middleware/auth"
 	"github.com/huydnt1801/chuyende/internal/config"
 	"github.com/huydnt1801/chuyende/internal/driver"
+	"github.com/huydnt1801/chuyende/internal/session"
 	"github.com/huydnt1801/chuyende/internal/user"
 	"github.com/huydnt1801/chuyende/pkg/log"
 	"github.com/labstack/echo/v4"
@@ -25,6 +26,7 @@ type AccountServer struct {
 	secretKey string
 
 	userSvc   user.Service
+	sessSvc   session.SessionService
 	driverSvc driver.Service
 }
 
@@ -35,6 +37,7 @@ func NewAccountServer(db *sql.DB) *AccountServer {
 		logger:    log.ZapLogger(),
 		secretKey: cfg.SecretKey,
 		userSvc:   svc,
+		sessSvc:   session.NewSessionService(db),
 		driverSvc: driver.NewService(db),
 	}
 	return srv
@@ -131,9 +134,30 @@ type RegisterConfirmResponse struct {
 	Data string `json:"data"`
 }
 
+func (s *AccountServer) Logout(c echo.Context) error {
+	r := c.Request()
+	ctx := r.Context()
+	authInfo, _ := auth.GetAuthInfo(c)
+	err := s.sessSvc.RevokeSession(ctx, authInfo.SessionID)
+	if err != nil {
+		return err
+	}
+	auth.LogoutUser(c)
+	return c.JSON(http.StatusOK, LogoutResponse{Code: http.StatusOK, Data: nil})
+}
+
+type LogoutResponse struct {
+	Code int   `json:"code"`
+	Data *bool `json:"data"`
+}
+
 func (s *AccountServer) Login(c echo.Context) error {
 	r := c.Request()
 	ctx := r.Context()
+	authInfo, loggedIn := auth.GetAuthInfo(c)
+	if loggedIn {
+		return c.JSON(http.StatusOK, LoginResponse{Code: http.StatusOK, Data: authInfo.User})
+	}
 	data := &LoginRequest{}
 	if err := c.Bind(data); err != nil {
 		return err
@@ -141,11 +165,15 @@ func (s *AccountServer) Login(c echo.Context) error {
 	if err := c.Validate(data); err != nil {
 		return err
 	}
-	usr, sessID, err := s.userSvc.Authenticate(ctx, data.PhoneNumber, data.Password)
+	usr, err := s.userSvc.Authenticate(ctx, data.PhoneNumber, data.Password)
 	if err != nil {
 		return err
 	}
-	auth.LoginUser(c, sessID)
+	sessID, err := s.sessSvc.CreateSession(ctx, usr.ID, 0)
+	if err != nil {
+		return err
+	}
+	auth.LoginUser(c, sessID, usr, nil)
 	return c.JSON(http.StatusOK, LoginResponse{Code: http.StatusOK, Data: usr})
 }
 
@@ -155,6 +183,44 @@ type LoginRequest struct {
 }
 
 type LoginResponse struct {
+	Code int        `json:"code"`
+	Data *user.User `json:"data"`
+}
+
+func (s *AccountServer) UpdateInfo(c echo.Context) error {
+	r := c.Request()
+	ctx := r.Context()
+	data := &UpdateInfoRequest{}
+	if err := c.Bind(data); err != nil {
+		return err
+	}
+	if err := c.Validate(data); err != nil {
+		return err
+	}
+	authInfo, loggedIn := auth.GetAuthInfo(c)
+	if loggedIn && authInfo.User.ID != data.UserID {
+		return echo.NewHTTPError(http.StatusForbidden, "Bạn không có quyền chỉnh sửa")
+	}
+	usr, err := s.userSvc.UpdateUser(ctx, &user.UserUpdate{
+		ID:       data.UserID,
+		FullName: data.FullName,
+		Password: data.Password,
+		ImageURL: data.ImageURL,
+	})
+	if err != nil {
+		return err
+	}
+	return c.JSON(http.StatusOK, UpdateInfoResponse{Code: http.StatusOK, Data: usr})
+}
+
+type UpdateInfoRequest struct {
+	UserID   int    `param:"userId" validate:"required,numeric"`
+	Password string `json:"password"`
+	FullName string `json:"fullName"`
+	ImageURL string `json:"imageUrl"`
+}
+
+type UpdateInfoResponse struct {
 	Code int        `json:"code"`
 	Data *user.User `json:"data"`
 }
@@ -169,11 +235,16 @@ func (s *AccountServer) LoginDriver(c echo.Context) error {
 	if err := c.Validate(data); err != nil {
 		return err
 	}
-	usr, err := s.driverSvc.Authenticate(ctx, data.PhoneNumber, data.Password)
+	driv, err := s.driverSvc.Authenticate(ctx, data.PhoneNumber, data.Password)
 	if err != nil {
 		return err
 	}
-	return c.JSON(http.StatusOK, LoginDriverResponse{Code: http.StatusOK, Data: usr})
+	sessID, err := s.sessSvc.CreateSession(ctx, 0, driv.ID)
+	if err != nil {
+		return err
+	}
+	auth.LoginUser(c, sessID, nil, driv)
+	return c.JSON(http.StatusOK, LoginDriverResponse{Code: http.StatusOK, Data: driv})
 }
 
 type LoginDriverRequest struct {
@@ -197,7 +268,7 @@ func (s *AccountServer) CheckPhone(c echo.Context) error {
 		return err
 	}
 	if data.PhoneNumber == "" {
-		return echo.NewHTTPError(http.StatusBadRequest, "Invalid information")
+		return echo.NewHTTPError(http.StatusBadRequest, "Số điện thoại không hợp lệ")
 	}
 	usr, err := s.userSvc.FindUser(ctx, &user.UserParams{PhoneNumber: data.PhoneNumber})
 	if user.IsUserNotFound(err) {

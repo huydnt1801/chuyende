@@ -37,6 +37,7 @@ func (s *ServiceImpl) FindTrip(ctx context.Context, params *TripParams) ([]*Trip
 
 func (s *ServiceImpl) CreateTrip(ctx context.Context, trip *Trip) (*Trip, error) {
 	repo := NewRepo(s.entClient)
+	trip.Price = 20 * trip.Distance
 	return repo.CreateTrip(ctx, trip)
 }
 

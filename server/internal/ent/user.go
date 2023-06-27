@@ -27,6 +27,8 @@ type User struct {
 	Confirmed bool `json:"confirmed,omitempty"`
 	// FullName holds the value of the "full_name" field.
 	FullName string `json:"full_name,omitempty"`
+	// ImageURL holds the value of the "image_url" field.
+	ImageURL string `json:"image_url,omitempty"`
 	// Password holds the value of the "password" field.
 	Password string `json:"password,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -73,7 +75,7 @@ func (*User) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullBool)
 		case user.FieldID:
 			values[i] = new(sql.NullInt64)
-		case user.FieldPhoneNumber, user.FieldFullName, user.FieldPassword:
+		case user.FieldPhoneNumber, user.FieldFullName, user.FieldImageURL, user.FieldPassword:
 			values[i] = new(sql.NullString)
 		case user.FieldCreatedAt, user.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -127,6 +129,12 @@ func (u *User) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field full_name", values[i])
 			} else if value.Valid {
 				u.FullName = value.String
+			}
+		case user.FieldImageURL:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field image_url", values[i])
+			} else if value.Valid {
+				u.ImageURL = value.String
 			}
 		case user.FieldPassword:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -194,6 +202,9 @@ func (u *User) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("full_name=")
 	builder.WriteString(u.FullName)
+	builder.WriteString(", ")
+	builder.WriteString("image_url=")
+	builder.WriteString(u.ImageURL)
 	builder.WriteString(", ")
 	builder.WriteString("password=")
 	builder.WriteString(u.Password)
