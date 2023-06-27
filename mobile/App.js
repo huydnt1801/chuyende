@@ -24,8 +24,8 @@ import TestScreen from "./src/screens/TestScreen";
 const Stack = createNativeStackNavigator();
 
 const screens = [
-    { name: "TestScreen", component: TestScreen },
     { name: "Splash", component: Splash },
+    { name: "TestScreen", component: TestScreen },
     { name: "Home", component: Home },
     { name: "Login", component: Login },
     { name: "Payment", component: Payment },
