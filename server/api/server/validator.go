@@ -18,12 +18,3 @@ func (cv *CustomValidator) Validate(i interface{}) error {
 	}
 	return nil
 }
-
-// Deprecated
-// Only for testing purposes
-// Should use NewTestEchoContext in server.go
-func NewEchoWithDefaultValidator() *echo.Echo {
-	e := echo.New()
-	e.Validator = &CustomValidator{validator: validator.New()}
-	return e
-}

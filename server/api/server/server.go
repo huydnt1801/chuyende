@@ -84,3 +84,9 @@ func CookieStore(secret string) *sessions.CookieStore {
 	sessionStore.Options.Secure = true
 	return sessionStore
 }
+
+func NewTestEchoContext() *echo.Echo {
+	e := echo.New()
+	e.Validator = &CustomValidator{validator: validator.New()}
+	return e
+}
