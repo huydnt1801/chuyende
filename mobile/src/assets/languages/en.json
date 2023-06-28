@@ -29,5 +29,21 @@
     "WrongOTP": "Wrong OTP, please check again",
     "WrongPassword": "Wrong Password",
     "Setting": "Setting",
-    "Logout": "Logout"
+    "Logout": "Logout",
+    "TripSetting": "Trip setting",
+    "SelectLanguage": "Select language",
+    "SetUpUpdatePassword": "Set up/ Update password",
+    "BiometricAuthentication": "Biometric authentication",
+    "SavedLocations": "Saved locations",
+    "PresentMessages": "Present messages",
+    "AddEmergencyContacts": "Add mmergency contacts",
+    "InvoiceInformation": "Invoice information",
+    "CakeByVPBank": "Cake by VPBank",
+    "CreditCardDebitCard": "Credit Card/ Debit Card",
+    "ZaloPay": "ZaloPay",
+    "MoMo": "MoMo",
+    "ShopeePay": "ShopeePay",
+    "ViettelMoney": "Viettel Money",
+    "English": "English",
+    "Vietnamese": "Tiếng Việt"
 }
