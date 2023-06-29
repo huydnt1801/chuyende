@@ -1,6 +1,6 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { } from "nativewind";
+import { StatusBar } from "react-native";
 import { I18nextProvider } from "react-i18next";
 import { Provider } from "react-redux";
 
@@ -11,7 +11,6 @@ import PasswordOTP from "./src/screens/PasswordOTP";
 import Payment from "./src/screens/Payment";
 import Setting from "./src/screens/Setting";
 import TripSetting from "./src/screens/TripSetting";
-import Mapp from "./src/screens/Mapp";
 import SelectLocation from "./src/screens/SelectLocation";
 import SelectLocationOnMap from "./src/screens/SelectLocationOnMap";
 import TripDirection from "./src/screens/TripDirection";
@@ -24,9 +23,9 @@ import TestScreen from "./src/screens/TestScreen";
 const Stack = createNativeStackNavigator();
 
 const screens = [
+    { name: "Home", component: Home },
     { name: "Splash", component: Splash },
     { name: "TestScreen", component: TestScreen },
-    { name: "Home", component: Home },
     { name: "Login", component: Login },
     { name: "Payment", component: Payment },
     { name: "Setting", component: Setting },
@@ -35,25 +34,27 @@ const screens = [
     { name: "SelectLocation", component: SelectLocation },
     { name: "SelectLocationOnMap", component: SelectLocationOnMap },
     { name: "TripDirection", component: TripDirection },
-    { name: "Mapp", component: Mapp },
 ]
 
 const App = () => {
     return (
         <Provider store={store}>
             <I18nextProvider i18n={i18next}>
-                <NavigationContainer>
-                    <Stack.Navigator>
-                        {screens.map(item => (
-                            <Stack.Screen
-                                key={item.name}
-                                name={item.name}
-                                component={item.component}
-                                options={{ headerShown: false }} />
-                        ))}
-                    </Stack.Navigator>
-                </NavigationContainer>
-                <UtilComponents />
+                <>
+                    <StatusBar />
+                    <NavigationContainer>
+                        <Stack.Navigator>
+                            {screens.map(item => (
+                                <Stack.Screen
+                                    key={item.name}
+                                    name={item.name}
+                                    component={item.component}
+                                    options={{ headerShown: false }} />
+                            ))}
+                        </Stack.Navigator>
+                    </NavigationContainer>
+                    <UtilComponents />
+                </>
             </I18nextProvider>
         </Provider>
     );

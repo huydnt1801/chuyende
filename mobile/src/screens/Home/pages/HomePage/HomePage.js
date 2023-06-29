@@ -1,4 +1,4 @@
-import { Text, View, StatusBar, Pressable, Button, ScrollView, Image } from "react-native";
+import { Text, View, Pressable, Button, ScrollView, Image } from "react-native";
 import { useNavigation } from "@react-navigation/native"
 
 import className from "./className";
@@ -14,7 +14,6 @@ const HomePage = () => {
 
     return (
         <View className={className.container}>
-            <StatusBar />
             <View className={className.header}>
                 <Text className={className.welcome}>
                     {`Chào ${account?.full_name}!`}

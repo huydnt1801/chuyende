@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { Text, View, Pressable, TextInput, StatusBar } from "react-native"
+import { Text, View, Pressable, TextInput } from "react-native"
 import { useTranslation } from "react-i18next";
 import { StackActions, useNavigation, useRoute } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -168,7 +168,6 @@ const PasswordOTP = () => {
 
     return (
         <View className={className.container}>
-            <StatusBar />
             <Header
                 border={false}
                 onPressBack={() => navigation.goBack()} />

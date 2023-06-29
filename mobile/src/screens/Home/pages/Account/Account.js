@@ -1,4 +1,4 @@
-import { ScrollView, StatusBar, Text, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useTranslation } from "react-i18next"
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";

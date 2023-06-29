@@ -13,9 +13,13 @@ import { useNavigation } from "@react-navigation/native";
 import { TextInput } from "react-native";
 import { useState, useEffect } from "react";
 import { useDebounce } from "../../hooks";
-import axios from "axios";
-import queryString from "query-string"
 import Header from "../../components/Header";
+import Api from "../../api";
+
+const types = {
+    SELECT_SOURCE: 1,
+    SELECT_DESTINATION: 2
+}
 
 const data_ = [
     {
@@ -50,9 +54,6 @@ const data_ = [
     },
 ]
 
-const API_KEY = 'AIzaSyBuExS3x9vzjyXhmDFxc8ZNWtcXHf5Kulg'
-
-
 const SelectLocation = () => {
 
     const { t } = useTranslation();
@@ -60,20 +61,28 @@ const SelectLocation = () => {
 
     const [data, setData] = useState([
         ...data_
-    ])
+    ]);
+
+    const [suggestPlaces, setSuggestPlaces] = useState([]);
 
     const [searchInput, setSearchInput] = useState("");
     const debounce = useDebounce(searchInput, 500);
 
-    const getData = async () => {
-        const result = await fetch(`https://maps.googleapis.com/maps/api/place/autocomplete/json?key=${API_KEY}&components=country:VN&input=${queryString.stringify(debounce)}`).then(i => i.json());
-        console.log(JSON.stringify(result));
+    const getSuggestPlace = async () => {
+        const result = await Api.google.getSuggestPlace(debounce);
+        if (result.status == "OK") {
+            setSuggestPlaces(result.predictions);
+        }
     }
 
     useEffect(() => {
-        // getData()
-    }, [debounce])
-
+        if (debounce.trim()) {
+            getSuggestPlace();
+        }
+        else {
+            setSuggestPlaces([]);
+        }
+    }, [debounce]);
 
     return (
         <View className={className.container}>
@@ -82,7 +91,8 @@ const SelectLocation = () => {
                 onPressBack={() => navigation.goBack()}
                 componentRight={
                     <TouchableOpacity
-                        activeOpacity={0.5}>
+                        activeOpacity={0.5}
+                        onPress={() => navigation.navigate("SelectLocationOnMap")}>
                         <Text className={className.map}>{t("SelectFromMap")}</Text>
                     </TouchableOpacity>
                 } />
@@ -109,7 +119,7 @@ const SelectLocation = () => {
                 )}
             </View>
             <View className={className.placeSuggest}>
-                {data.map((item, index) => (
+                {suggestPlaces.slice(0, 5).map((item, index) => (
                     <Pressable
                         key={item.id ?? index}
                         className={className.item}>
@@ -119,17 +129,17 @@ const SelectLocation = () => {
                         </View>
                         <View className={className.center}>
                             <Text className={className.textBold}>
-                                {item.text}
+                                {item.structured_formatting?.main_text}
                             </Text>
                             <Text
                                 className={className.textLight}
                                 numberOfLines={1}
                                 lineBreakMode={"tail"}>
-                                {item.value}
+                                {item.description}
                             </Text>
                         </View>
                         <Text className={className.distance}>
-                            {item.distance}
+                            {item.distance ?? `${(Math.random() * 10).toString().slice(0, 3)}KM`}
                         </Text>
                     </Pressable>
                 ))}

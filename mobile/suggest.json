@@ -1,0 +1,304 @@
+{
+    "predictions": [
+        {
+            "description": "192 Phố Lê Thanh Nghị, Đồng Tâm, Hai Bà Trưng, Hà Nội, Việt Nam",
+            "matched_substrings": [
+                {
+                    "length": 3,
+                    "offset": 0
+                },
+                {
+                    "length": 8,
+                    "offset": 8
+                }
+            ],
+            "place_id": "ChIJf8sJKnGsNTERy5eWGiJ4dRE",
+            "reference": "ChIJf8sJKnGsNTERy5eWGiJ4dRE",
+            "structured_formatting": {
+                "main_text": "192 Phố Lê Thanh Nghị",
+                "main_text_matched_substrings": [
+                    {
+                        "length": 3,
+                        "offset": 0
+                    },
+                    {
+                        "length": 8,
+                        "offset": 8
+                    }
+                ],
+                "secondary_text": "Đồng Tâm, Hai Bà Trưng, Hà Nội, Việt Nam"
+            },
+            "terms": [
+                {
+                    "offset": 0,
+                    "value": "192"
+                },
+                {
+                    "offset": 4,
+                    "value": "Phố Lê Thanh Nghị"
+                },
+                {
+                    "offset": 23,
+                    "value": "Đồng Tâm"
+                },
+                {
+                    "offset": 33,
+                    "value": "Hai Bà Trưng"
+                },
+                {
+                    "offset": 47,
+                    "value": "Hà Nội"
+                },
+                {
+                    "offset": 55,
+                    "value": "Việt Nam"
+                }
+            ],
+            "types": [
+                "premise",
+                "geocode"
+            ]
+        },
+        {
+            "description": "192 Đường Lê Thánh Tông, Máy Chai, Ngô Quyền, Hải Phòng, Việt Nam",
+            "matched_substrings": [
+                {
+                    "length": 3,
+                    "offset": 0
+                },
+                {
+                    "length": 8,
+                    "offset": 10
+                }
+            ],
+            "place_id": "ChIJn4_wqsJ6SjERsmPZbTm9Fv4",
+            "reference": "ChIJn4_wqsJ6SjERsmPZbTm9Fv4",
+            "structured_formatting": {
+                "main_text": "192 Đường Lê Thánh Tông",
+                "main_text_matched_substrings": [
+                    {
+                        "length": 3,
+                        "offset": 0
+                    },
+                    {
+                        "length": 8,
+                        "offset": 10
+                    }
+                ],
+                "secondary_text": "Máy Chai, Ngô Quyền, Hải Phòng, Việt Nam"
+            },
+            "terms": [
+                {
+                    "offset": 0,
+                    "value": "192"
+                },
+                {
+                    "offset": 4,
+                    "value": "Đường Lê Thánh Tông"
+                },
+                {
+                    "offset": 25,
+                    "value": "Máy Chai"
+                },
+                {
+                    "offset": 35,
+                    "value": "Ngô Quyền"
+                },
+                {
+                    "offset": 46,
+                    "value": "Hải Phòng"
+                },
+                {
+                    "offset": 57,
+                    "value": "Việt Nam"
+                }
+            ],
+            "types": [
+                "street_address",
+                "geocode"
+            ]
+        },
+        {
+            "description": "192 Lê Thanh Nghị, Hòa Cường, Hòa Cường Bắc, Hải Châu, Đà Nẵng, Việt Nam",
+            "matched_substrings": [
+                {
+                    "length": 3,
+                    "offset": 0
+                },
+                {
+                    "length": 8,
+                    "offset": 4
+                }
+            ],
+            "place_id": "ChIJ2_Gzu-sZQjER-1Ww57-HOdY",
+            "reference": "ChIJ2_Gzu-sZQjER-1Ww57-HOdY",
+            "structured_formatting": {
+                "main_text": "192 Lê Thanh Nghị",
+                "main_text_matched_substrings": [
+                    {
+                        "length": 3,
+                        "offset": 0
+                    },
+                    {
+                        "length": 8,
+                        "offset": 4
+                    }
+                ],
+                "secondary_text": "Hòa Cường, Hòa Cường Bắc, Hải Châu, Đà Nẵng, Việt Nam"
+            },
+            "terms": [
+                {
+                    "offset": 0,
+                    "value": "192"
+                },
+                {
+                    "offset": 4,
+                    "value": "Lê Thanh Nghị"
+                },
+                {
+                    "offset": 19,
+                    "value": "Hòa Cường"
+                },
+                {
+                    "offset": 30,
+                    "value": "Hòa Cường Bắc"
+                },
+                {
+                    "offset": 45,
+                    "value": "Hải Châu"
+                },
+                {
+                    "offset": 55,
+                    "value": "Đà Nẵng"
+                },
+                {
+                    "offset": 64,
+                    "value": "Việt Nam"
+                }
+            ],
+            "types": [
+                "street_address",
+                "geocode"
+            ]
+        },
+        {
+            "description": "192 Lê Thánh Tông, Tân Lợi, Thành phố Buôn Ma Thuột, Đắk Lắk, Việt Nam",
+            "matched_substrings": [
+                {
+                    "length": 3,
+                    "offset": 0
+                },
+                {
+                    "length": 8,
+                    "offset": 4
+                }
+            ],
+            "place_id": "ChIJ6yRxi9n3cTERPjGBeYJtNdc",
+            "reference": "ChIJ6yRxi9n3cTERPjGBeYJtNdc",
+            "structured_formatting": {
+                "main_text": "192 Lê Thánh Tông",
+                "main_text_matched_substrings": [
+                    {
+                        "length": 3,
+                        "offset": 0
+                    },
+                    {
+                        "length": 8,
+                        "offset": 4
+                    }
+                ],
+                "secondary_text": "Tân Lợi, Thành phố Buôn Ma Thuột, Đắk Lắk, Việt Nam"
+            },
+            "terms": [
+                {
+                    "offset": 0,
+                    "value": "192"
+                },
+                {
+                    "offset": 4,
+                    "value": "Lê Thánh Tông"
+                },
+                {
+                    "offset": 19,
+                    "value": "Tân Lợi"
+                },
+                {
+                    "offset": 28,
+                    "value": "Thành phố Buôn Ma Thuột"
+                },
+                {
+                    "offset": 53,
+                    "value": "Đắk Lắk"
+                },
+                {
+                    "offset": 62,
+                    "value": "Việt Nam"
+                }
+            ],
+            "types": [
+                "street_address",
+                "geocode"
+            ]
+        },
+        {
+            "description": "192 Lê Thánh Tông, Đông Vệ, Thành phố Thanh Hóa, Thanh Hoá, Việt Nam",
+            "matched_substrings": [
+                {
+                    "length": 3,
+                    "offset": 0
+                },
+                {
+                    "length": 8,
+                    "offset": 4
+                }
+            ],
+            "place_id": "ChIJGbT5veFXNjERcfbzzF-diug",
+            "reference": "ChIJGbT5veFXNjERcfbzzF-diug",
+            "structured_formatting": {
+                "main_text": "192 Lê Thánh Tông",
+                "main_text_matched_substrings": [
+                    {
+                        "length": 3,
+                        "offset": 0
+                    },
+                    {
+                        "length": 8,
+                        "offset": 4
+                    }
+                ],
+                "secondary_text": "Đông Vệ, Thành phố Thanh Hóa, Thanh Hoá, Việt Nam"
+            },
+            "terms": [
+                {
+                    "offset": 0,
+                    "value": "192"
+                },
+                {
+                    "offset": 4,
+                    "value": "Lê Thánh Tông"
+                },
+                {
+                    "offset": 19,
+                    "value": "Đông Vệ"
+                },
+                {
+                    "offset": 28,
+                    "value": "Thành phố Thanh Hóa"
+                },
+                {
+                    "offset": 49,
+                    "value": "Thanh Hoá"
+                },
+                {
+                    "offset": 60,
+                    "value": "Việt Nam"
+                }
+            ],
+            "types": [
+                "street_address",
+                "geocode"
+            ]
+        }
+    ],
+    "status": "OK"
+}

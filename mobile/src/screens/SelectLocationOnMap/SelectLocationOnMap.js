@@ -4,11 +4,21 @@ import className from "./className"
 import { faCircleXmark, faLocationDot } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { useTranslation } from "react-i18next";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import MarkerSelect from "./components/MarkerSelect";
+import { useRoute } from "@react-navigation/native";
+import { useDebounce } from "../../hooks";
+import Api from "../../api";
 
+
+const types = {
+    SELECT_SOURCE: 1,
+    SELECT_DESTINATION: 2
+}
 
 const SelectLocationOnMap = () => {
+
+    const { type: type_ } = useRoute().params ?? { type: 1 };
 
     const [isChanging, setIsChanging] = useState(false);
 
@@ -17,8 +27,32 @@ const SelectLocationOnMap = () => {
         longitude: 105.8542
     };
 
+    const [location, setLocation] = useState({
+        latitude: 0,
+        longitude: 0
+    });
+
+    const debounce = useDebounce(location, 500);
+
     const { t } = useTranslation();
     const [searchInput, setSearchInput] = useState("");
+
+    const getPlace = async () => {
+        const result = await Api.google.getPositionByLatAndLong(location.latitude, location.longitude);
+        console.log(JSON.stringify(result));
+        if (result.status == "OK") {
+            if (result.results.length > 0) {
+                const tmp = result.results[0];
+                setSearchInput(tmp.formatted_address ?? "");
+            }
+        }
+    }
+
+    useEffect(() => {
+        if (debounce.latitude != 0 && debounce.longitude != 0) {
+            getPlace();
+        }
+    }, [debounce])
 
     return (
         <View className={className.container}>
@@ -35,8 +69,7 @@ const SelectLocationOnMap = () => {
                 showsUserLocation={false}
                 onRegionChangeComplete={(region) => {
                     setIsChanging(false);
-                    console.log(region);
-                    console.log("End change");
+                    setLocation(region);
                 }}
                 onRegionChange={() => {
                     setIsChanging(true);
@@ -56,7 +89,7 @@ const SelectLocationOnMap = () => {
                     <TouchableOpacity
                         style={{ padding: 4 }}
                         activeOpacity={0.5}
-                        onPress={1}>
+                        onPress={() => setSearchInput("")}>
                         <FontAwesomeIcon
                             icon={faCircleXmark}
                             size={18}
@@ -71,3 +104,4 @@ const SelectLocationOnMap = () => {
 }
 
 export default SelectLocationOnMap
+export { types }
