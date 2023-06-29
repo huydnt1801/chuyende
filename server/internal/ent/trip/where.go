@@ -85,6 +85,11 @@ func StartY(v float64) predicate.Trip {
 	return predicate.Trip(sql.FieldEQ(FieldStartY, v))
 }
 
+// StartLocation applies equality check predicate on the "start_location" field. It's identical to StartLocationEQ.
+func StartLocation(v string) predicate.Trip {
+	return predicate.Trip(sql.FieldEQ(FieldStartLocation, v))
+}
+
 // EndX applies equality check predicate on the "end_x" field. It's identical to EndXEQ.
 func EndX(v float64) predicate.Trip {
 	return predicate.Trip(sql.FieldEQ(FieldEndX, v))
@@ -93,6 +98,16 @@ func EndX(v float64) predicate.Trip {
 // EndY applies equality check predicate on the "end_y" field. It's identical to EndYEQ.
 func EndY(v float64) predicate.Trip {
 	return predicate.Trip(sql.FieldEQ(FieldEndY, v))
+}
+
+// EndLocation applies equality check predicate on the "end_location" field. It's identical to EndLocationEQ.
+func EndLocation(v string) predicate.Trip {
+	return predicate.Trip(sql.FieldEQ(FieldEndLocation, v))
+}
+
+// Distance applies equality check predicate on the "distance" field. It's identical to DistanceEQ.
+func Distance(v float64) predicate.Trip {
+	return predicate.Trip(sql.FieldEQ(FieldDistance, v))
 }
 
 // Price applies equality check predicate on the "price" field. It's identical to PriceEQ.
@@ -315,6 +330,71 @@ func StartYLTE(v float64) predicate.Trip {
 	return predicate.Trip(sql.FieldLTE(FieldStartY, v))
 }
 
+// StartLocationEQ applies the EQ predicate on the "start_location" field.
+func StartLocationEQ(v string) predicate.Trip {
+	return predicate.Trip(sql.FieldEQ(FieldStartLocation, v))
+}
+
+// StartLocationNEQ applies the NEQ predicate on the "start_location" field.
+func StartLocationNEQ(v string) predicate.Trip {
+	return predicate.Trip(sql.FieldNEQ(FieldStartLocation, v))
+}
+
+// StartLocationIn applies the In predicate on the "start_location" field.
+func StartLocationIn(vs ...string) predicate.Trip {
+	return predicate.Trip(sql.FieldIn(FieldStartLocation, vs...))
+}
+
+// StartLocationNotIn applies the NotIn predicate on the "start_location" field.
+func StartLocationNotIn(vs ...string) predicate.Trip {
+	return predicate.Trip(sql.FieldNotIn(FieldStartLocation, vs...))
+}
+
+// StartLocationGT applies the GT predicate on the "start_location" field.
+func StartLocationGT(v string) predicate.Trip {
+	return predicate.Trip(sql.FieldGT(FieldStartLocation, v))
+}
+
+// StartLocationGTE applies the GTE predicate on the "start_location" field.
+func StartLocationGTE(v string) predicate.Trip {
+	return predicate.Trip(sql.FieldGTE(FieldStartLocation, v))
+}
+
+// StartLocationLT applies the LT predicate on the "start_location" field.
+func StartLocationLT(v string) predicate.Trip {
+	return predicate.Trip(sql.FieldLT(FieldStartLocation, v))
+}
+
+// StartLocationLTE applies the LTE predicate on the "start_location" field.
+func StartLocationLTE(v string) predicate.Trip {
+	return predicate.Trip(sql.FieldLTE(FieldStartLocation, v))
+}
+
+// StartLocationContains applies the Contains predicate on the "start_location" field.
+func StartLocationContains(v string) predicate.Trip {
+	return predicate.Trip(sql.FieldContains(FieldStartLocation, v))
+}
+
+// StartLocationHasPrefix applies the HasPrefix predicate on the "start_location" field.
+func StartLocationHasPrefix(v string) predicate.Trip {
+	return predicate.Trip(sql.FieldHasPrefix(FieldStartLocation, v))
+}
+
+// StartLocationHasSuffix applies the HasSuffix predicate on the "start_location" field.
+func StartLocationHasSuffix(v string) predicate.Trip {
+	return predicate.Trip(sql.FieldHasSuffix(FieldStartLocation, v))
+}
+
+// StartLocationEqualFold applies the EqualFold predicate on the "start_location" field.
+func StartLocationEqualFold(v string) predicate.Trip {
+	return predicate.Trip(sql.FieldEqualFold(FieldStartLocation, v))
+}
+
+// StartLocationContainsFold applies the ContainsFold predicate on the "start_location" field.
+func StartLocationContainsFold(v string) predicate.Trip {
+	return predicate.Trip(sql.FieldContainsFold(FieldStartLocation, v))
+}
+
 // EndXEQ applies the EQ predicate on the "end_x" field.
 func EndXEQ(v float64) predicate.Trip {
 	return predicate.Trip(sql.FieldEQ(FieldEndX, v))
@@ -393,6 +473,111 @@ func EndYLT(v float64) predicate.Trip {
 // EndYLTE applies the LTE predicate on the "end_y" field.
 func EndYLTE(v float64) predicate.Trip {
 	return predicate.Trip(sql.FieldLTE(FieldEndY, v))
+}
+
+// EndLocationEQ applies the EQ predicate on the "end_location" field.
+func EndLocationEQ(v string) predicate.Trip {
+	return predicate.Trip(sql.FieldEQ(FieldEndLocation, v))
+}
+
+// EndLocationNEQ applies the NEQ predicate on the "end_location" field.
+func EndLocationNEQ(v string) predicate.Trip {
+	return predicate.Trip(sql.FieldNEQ(FieldEndLocation, v))
+}
+
+// EndLocationIn applies the In predicate on the "end_location" field.
+func EndLocationIn(vs ...string) predicate.Trip {
+	return predicate.Trip(sql.FieldIn(FieldEndLocation, vs...))
+}
+
+// EndLocationNotIn applies the NotIn predicate on the "end_location" field.
+func EndLocationNotIn(vs ...string) predicate.Trip {
+	return predicate.Trip(sql.FieldNotIn(FieldEndLocation, vs...))
+}
+
+// EndLocationGT applies the GT predicate on the "end_location" field.
+func EndLocationGT(v string) predicate.Trip {
+	return predicate.Trip(sql.FieldGT(FieldEndLocation, v))
+}
+
+// EndLocationGTE applies the GTE predicate on the "end_location" field.
+func EndLocationGTE(v string) predicate.Trip {
+	return predicate.Trip(sql.FieldGTE(FieldEndLocation, v))
+}
+
+// EndLocationLT applies the LT predicate on the "end_location" field.
+func EndLocationLT(v string) predicate.Trip {
+	return predicate.Trip(sql.FieldLT(FieldEndLocation, v))
+}
+
+// EndLocationLTE applies the LTE predicate on the "end_location" field.
+func EndLocationLTE(v string) predicate.Trip {
+	return predicate.Trip(sql.FieldLTE(FieldEndLocation, v))
+}
+
+// EndLocationContains applies the Contains predicate on the "end_location" field.
+func EndLocationContains(v string) predicate.Trip {
+	return predicate.Trip(sql.FieldContains(FieldEndLocation, v))
+}
+
+// EndLocationHasPrefix applies the HasPrefix predicate on the "end_location" field.
+func EndLocationHasPrefix(v string) predicate.Trip {
+	return predicate.Trip(sql.FieldHasPrefix(FieldEndLocation, v))
+}
+
+// EndLocationHasSuffix applies the HasSuffix predicate on the "end_location" field.
+func EndLocationHasSuffix(v string) predicate.Trip {
+	return predicate.Trip(sql.FieldHasSuffix(FieldEndLocation, v))
+}
+
+// EndLocationEqualFold applies the EqualFold predicate on the "end_location" field.
+func EndLocationEqualFold(v string) predicate.Trip {
+	return predicate.Trip(sql.FieldEqualFold(FieldEndLocation, v))
+}
+
+// EndLocationContainsFold applies the ContainsFold predicate on the "end_location" field.
+func EndLocationContainsFold(v string) predicate.Trip {
+	return predicate.Trip(sql.FieldContainsFold(FieldEndLocation, v))
+}
+
+// DistanceEQ applies the EQ predicate on the "distance" field.
+func DistanceEQ(v float64) predicate.Trip {
+	return predicate.Trip(sql.FieldEQ(FieldDistance, v))
+}
+
+// DistanceNEQ applies the NEQ predicate on the "distance" field.
+func DistanceNEQ(v float64) predicate.Trip {
+	return predicate.Trip(sql.FieldNEQ(FieldDistance, v))
+}
+
+// DistanceIn applies the In predicate on the "distance" field.
+func DistanceIn(vs ...float64) predicate.Trip {
+	return predicate.Trip(sql.FieldIn(FieldDistance, vs...))
+}
+
+// DistanceNotIn applies the NotIn predicate on the "distance" field.
+func DistanceNotIn(vs ...float64) predicate.Trip {
+	return predicate.Trip(sql.FieldNotIn(FieldDistance, vs...))
+}
+
+// DistanceGT applies the GT predicate on the "distance" field.
+func DistanceGT(v float64) predicate.Trip {
+	return predicate.Trip(sql.FieldGT(FieldDistance, v))
+}
+
+// DistanceGTE applies the GTE predicate on the "distance" field.
+func DistanceGTE(v float64) predicate.Trip {
+	return predicate.Trip(sql.FieldGTE(FieldDistance, v))
+}
+
+// DistanceLT applies the LT predicate on the "distance" field.
+func DistanceLT(v float64) predicate.Trip {
+	return predicate.Trip(sql.FieldLT(FieldDistance, v))
+}
+
+// DistanceLTE applies the LTE predicate on the "distance" field.
+func DistanceLTE(v float64) predicate.Trip {
+	return predicate.Trip(sql.FieldLTE(FieldDistance, v))
 }
 
 // PriceEQ applies the EQ predicate on the "price" field.

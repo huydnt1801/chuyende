@@ -84,6 +84,12 @@ func (tc *TripCreate) SetStartY(f float64) *TripCreate {
 	return tc
 }
 
+// SetStartLocation sets the "start_location" field.
+func (tc *TripCreate) SetStartLocation(s string) *TripCreate {
+	tc.mutation.SetStartLocation(s)
+	return tc
+}
+
 // SetEndX sets the "end_x" field.
 func (tc *TripCreate) SetEndX(f float64) *TripCreate {
 	tc.mutation.SetEndX(f)
@@ -93,6 +99,18 @@ func (tc *TripCreate) SetEndX(f float64) *TripCreate {
 // SetEndY sets the "end_y" field.
 func (tc *TripCreate) SetEndY(f float64) *TripCreate {
 	tc.mutation.SetEndY(f)
+	return tc
+}
+
+// SetEndLocation sets the "end_location" field.
+func (tc *TripCreate) SetEndLocation(s string) *TripCreate {
+	tc.mutation.SetEndLocation(s)
+	return tc
+}
+
+// SetDistance sets the "distance" field.
+func (tc *TripCreate) SetDistance(f float64) *TripCreate {
+	tc.mutation.SetDistance(f)
 	return tc
 }
 
@@ -206,11 +224,20 @@ func (tc *TripCreate) check() error {
 	if _, ok := tc.mutation.StartY(); !ok {
 		return &ValidationError{Name: "start_y", err: errors.New(`ent: missing required field "Trip.start_y"`)}
 	}
+	if _, ok := tc.mutation.StartLocation(); !ok {
+		return &ValidationError{Name: "start_location", err: errors.New(`ent: missing required field "Trip.start_location"`)}
+	}
 	if _, ok := tc.mutation.EndX(); !ok {
 		return &ValidationError{Name: "end_x", err: errors.New(`ent: missing required field "Trip.end_x"`)}
 	}
 	if _, ok := tc.mutation.EndY(); !ok {
 		return &ValidationError{Name: "end_y", err: errors.New(`ent: missing required field "Trip.end_y"`)}
+	}
+	if _, ok := tc.mutation.EndLocation(); !ok {
+		return &ValidationError{Name: "end_location", err: errors.New(`ent: missing required field "Trip.end_location"`)}
+	}
+	if _, ok := tc.mutation.Distance(); !ok {
+		return &ValidationError{Name: "distance", err: errors.New(`ent: missing required field "Trip.distance"`)}
 	}
 	if _, ok := tc.mutation.Price(); !ok {
 		return &ValidationError{Name: "price", err: errors.New(`ent: missing required field "Trip.price"`)}
@@ -274,6 +301,10 @@ func (tc *TripCreate) createSpec() (*Trip, *sqlgraph.CreateSpec) {
 		_spec.SetField(trip.FieldStartY, field.TypeFloat64, value)
 		_node.StartY = value
 	}
+	if value, ok := tc.mutation.StartLocation(); ok {
+		_spec.SetField(trip.FieldStartLocation, field.TypeString, value)
+		_node.StartLocation = value
+	}
 	if value, ok := tc.mutation.EndX(); ok {
 		_spec.SetField(trip.FieldEndX, field.TypeFloat64, value)
 		_node.EndX = value
@@ -281,6 +312,14 @@ func (tc *TripCreate) createSpec() (*Trip, *sqlgraph.CreateSpec) {
 	if value, ok := tc.mutation.EndY(); ok {
 		_spec.SetField(trip.FieldEndY, field.TypeFloat64, value)
 		_node.EndY = value
+	}
+	if value, ok := tc.mutation.EndLocation(); ok {
+		_spec.SetField(trip.FieldEndLocation, field.TypeString, value)
+		_node.EndLocation = value
+	}
+	if value, ok := tc.mutation.Distance(); ok {
+		_spec.SetField(trip.FieldDistance, field.TypeFloat64, value)
+		_node.Distance = value
 	}
 	if value, ok := tc.mutation.Price(); ok {
 		_spec.SetField(trip.FieldPrice, field.TypeFloat64, value)
@@ -458,6 +497,18 @@ func (u *TripUpsert) AddStartY(v float64) *TripUpsert {
 	return u
 }
 
+// SetStartLocation sets the "start_location" field.
+func (u *TripUpsert) SetStartLocation(v string) *TripUpsert {
+	u.Set(trip.FieldStartLocation, v)
+	return u
+}
+
+// UpdateStartLocation sets the "start_location" field to the value that was provided on create.
+func (u *TripUpsert) UpdateStartLocation() *TripUpsert {
+	u.SetExcluded(trip.FieldStartLocation)
+	return u
+}
+
 // SetEndX sets the "end_x" field.
 func (u *TripUpsert) SetEndX(v float64) *TripUpsert {
 	u.Set(trip.FieldEndX, v)
@@ -491,6 +542,36 @@ func (u *TripUpsert) UpdateEndY() *TripUpsert {
 // AddEndY adds v to the "end_y" field.
 func (u *TripUpsert) AddEndY(v float64) *TripUpsert {
 	u.Add(trip.FieldEndY, v)
+	return u
+}
+
+// SetEndLocation sets the "end_location" field.
+func (u *TripUpsert) SetEndLocation(v string) *TripUpsert {
+	u.Set(trip.FieldEndLocation, v)
+	return u
+}
+
+// UpdateEndLocation sets the "end_location" field to the value that was provided on create.
+func (u *TripUpsert) UpdateEndLocation() *TripUpsert {
+	u.SetExcluded(trip.FieldEndLocation)
+	return u
+}
+
+// SetDistance sets the "distance" field.
+func (u *TripUpsert) SetDistance(v float64) *TripUpsert {
+	u.Set(trip.FieldDistance, v)
+	return u
+}
+
+// UpdateDistance sets the "distance" field to the value that was provided on create.
+func (u *TripUpsert) UpdateDistance() *TripUpsert {
+	u.SetExcluded(trip.FieldDistance)
+	return u
+}
+
+// AddDistance adds v to the "distance" field.
+func (u *TripUpsert) AddDistance(v float64) *TripUpsert {
+	u.Add(trip.FieldDistance, v)
 	return u
 }
 
@@ -684,6 +765,20 @@ func (u *TripUpsertOne) UpdateStartY() *TripUpsertOne {
 	})
 }
 
+// SetStartLocation sets the "start_location" field.
+func (u *TripUpsertOne) SetStartLocation(v string) *TripUpsertOne {
+	return u.Update(func(s *TripUpsert) {
+		s.SetStartLocation(v)
+	})
+}
+
+// UpdateStartLocation sets the "start_location" field to the value that was provided on create.
+func (u *TripUpsertOne) UpdateStartLocation() *TripUpsertOne {
+	return u.Update(func(s *TripUpsert) {
+		s.UpdateStartLocation()
+	})
+}
+
 // SetEndX sets the "end_x" field.
 func (u *TripUpsertOne) SetEndX(v float64) *TripUpsertOne {
 	return u.Update(func(s *TripUpsert) {
@@ -723,6 +818,41 @@ func (u *TripUpsertOne) AddEndY(v float64) *TripUpsertOne {
 func (u *TripUpsertOne) UpdateEndY() *TripUpsertOne {
 	return u.Update(func(s *TripUpsert) {
 		s.UpdateEndY()
+	})
+}
+
+// SetEndLocation sets the "end_location" field.
+func (u *TripUpsertOne) SetEndLocation(v string) *TripUpsertOne {
+	return u.Update(func(s *TripUpsert) {
+		s.SetEndLocation(v)
+	})
+}
+
+// UpdateEndLocation sets the "end_location" field to the value that was provided on create.
+func (u *TripUpsertOne) UpdateEndLocation() *TripUpsertOne {
+	return u.Update(func(s *TripUpsert) {
+		s.UpdateEndLocation()
+	})
+}
+
+// SetDistance sets the "distance" field.
+func (u *TripUpsertOne) SetDistance(v float64) *TripUpsertOne {
+	return u.Update(func(s *TripUpsert) {
+		s.SetDistance(v)
+	})
+}
+
+// AddDistance adds v to the "distance" field.
+func (u *TripUpsertOne) AddDistance(v float64) *TripUpsertOne {
+	return u.Update(func(s *TripUpsert) {
+		s.AddDistance(v)
+	})
+}
+
+// UpdateDistance sets the "distance" field to the value that was provided on create.
+func (u *TripUpsertOne) UpdateDistance() *TripUpsertOne {
+	return u.Update(func(s *TripUpsert) {
+		s.UpdateDistance()
 	})
 }
 
@@ -1087,6 +1217,20 @@ func (u *TripUpsertBulk) UpdateStartY() *TripUpsertBulk {
 	})
 }
 
+// SetStartLocation sets the "start_location" field.
+func (u *TripUpsertBulk) SetStartLocation(v string) *TripUpsertBulk {
+	return u.Update(func(s *TripUpsert) {
+		s.SetStartLocation(v)
+	})
+}
+
+// UpdateStartLocation sets the "start_location" field to the value that was provided on create.
+func (u *TripUpsertBulk) UpdateStartLocation() *TripUpsertBulk {
+	return u.Update(func(s *TripUpsert) {
+		s.UpdateStartLocation()
+	})
+}
+
 // SetEndX sets the "end_x" field.
 func (u *TripUpsertBulk) SetEndX(v float64) *TripUpsertBulk {
 	return u.Update(func(s *TripUpsert) {
@@ -1126,6 +1270,41 @@ func (u *TripUpsertBulk) AddEndY(v float64) *TripUpsertBulk {
 func (u *TripUpsertBulk) UpdateEndY() *TripUpsertBulk {
 	return u.Update(func(s *TripUpsert) {
 		s.UpdateEndY()
+	})
+}
+
+// SetEndLocation sets the "end_location" field.
+func (u *TripUpsertBulk) SetEndLocation(v string) *TripUpsertBulk {
+	return u.Update(func(s *TripUpsert) {
+		s.SetEndLocation(v)
+	})
+}
+
+// UpdateEndLocation sets the "end_location" field to the value that was provided on create.
+func (u *TripUpsertBulk) UpdateEndLocation() *TripUpsertBulk {
+	return u.Update(func(s *TripUpsert) {
+		s.UpdateEndLocation()
+	})
+}
+
+// SetDistance sets the "distance" field.
+func (u *TripUpsertBulk) SetDistance(v float64) *TripUpsertBulk {
+	return u.Update(func(s *TripUpsert) {
+		s.SetDistance(v)
+	})
+}
+
+// AddDistance adds v to the "distance" field.
+func (u *TripUpsertBulk) AddDistance(v float64) *TripUpsertBulk {
+	return u.Update(func(s *TripUpsert) {
+		s.AddDistance(v)
+	})
+}
+
+// UpdateDistance sets the "distance" field to the value that was provided on create.
+func (u *TripUpsertBulk) UpdateDistance() *TripUpsertBulk {
+	return u.Update(func(s *TripUpsert) {
+		s.UpdateDistance()
 	})
 }
 

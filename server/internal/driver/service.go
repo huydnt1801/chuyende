@@ -36,21 +36,21 @@ func (s *ServiceImpl) Authenticate(ctx context.Context, phoneNumber, password st
 	if !isValidPhoneNumber(phoneNumber) {
 		return nil, InvalidPhoneError{}
 	}
-	user, err := repo.FindDriver(ctx, phoneNumber)
+	driver, err := repo.FindDriver(ctx, phoneNumber)
 	if err != nil {
 		if IsDriverNotFound(err) {
 			return nil, DriverNotFoundError{}
 		} else {
-			return nil, fmt.Errorf("failed querying user from DB: %w", err)
+			return nil, fmt.Errorf("failed querying driver from DB: %w", err)
 		}
 
 	}
 
-	if password != user.Password {
+	if password != driver.Password {
 		return nil, InvalidPasswordError{}
 	}
-
-	return user, nil
+	driver.Password = ""
+	return driver, nil
 }
 
 func isValidPhoneNumber(phoneNumber string) bool {

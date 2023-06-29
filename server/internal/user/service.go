@@ -15,7 +15,8 @@ import (
 
 type Service interface {
 	CreateUser(ctx context.Context, user *User, password string) (*User, time.Time, error)
-	Authenticate(ctx context.Context, username, password string) (*User, string, error)
+	UpdateUser(ctx context.Context, params *UserUpdate) (*User, error)
+	Authenticate(ctx context.Context, username, password string) (*User, error)
 	Confirm(ctx context.Context, user *User, otp string) error
 	FindUser(ctx context.Context, params *UserParams) (*User, error)
 	SendConfirmationToken(ctx context.Context, user *User) (time.Time, error)
@@ -26,7 +27,6 @@ type ServiceImpl struct {
 	entClient      *ent.Client
 	passwordHasher PasswordHasher
 	otpSender      OTPService
-	sessionSvc     SessionService
 }
 
 func NewService(db *sql.DB) *ServiceImpl {
@@ -36,7 +36,6 @@ func NewService(db *sql.DB) *ServiceImpl {
 		entClient:      client,
 		passwordHasher: &BcryptPasswordHasher{},
 		otpSender:      NewOTPService(db),
-		sessionSvc:     NewSessionService(db),
 	}
 	return s
 }
@@ -66,32 +65,66 @@ func (s *ServiceImpl) CreateUser(ctx context.Context, user *User, password strin
 	return u, nextTime, nil
 }
 
-func (s *ServiceImpl) Authenticate(ctx context.Context, phoneNumber, password string) (*User, string, error) {
+func (s *ServiceImpl) UpdateUser(ctx context.Context, params *UserUpdate) (*User, error) {
+	repo := NewRepo(s.entClient)
+	if password := params.Password; password != "" {
+		if err := DefaultPasswordComplexity.ValidatePassword(password); err != nil {
+			return nil, err
+		}
+		hashedPw, err := s.passwordHasher.HashPassword(password)
+		if err != nil {
+			return nil, fmt.Errorf("failed hashing password: %w", err)
+		}
+		params.Password = hashedPw
+	}
+	user, err := s.FindUser(ctx, &UserParams{
+		ID: params.ID,
+	})
+	if err != nil {
+		return nil, err
+	}
+	err = repo.UpdateUser(ctx, user, params)
+	if err != nil {
+		return nil, err
+	}
+	if params.FullName != "" {
+		user.FullName = params.FullName
+	}
+	if params.ImageURL != "" {
+		user.FullName = params.ImageURL
+	}
+	return user, nil
+}
+
+func (s *ServiceImpl) Authenticate(ctx context.Context, phoneNumber, password string) (*User, error) {
 	repo := NewRepo(s.entClient)
 
 	if !isValidPhoneNumber(phoneNumber) {
-		return nil, "", InvalidPhoneError{}
+		return nil, InvalidPhoneError{}
 	}
 	user, err := repo.FindUser(ctx, &UserParams{PhoneNumber: phoneNumber})
 	if err != nil {
 		if IsUserNotFound(err) {
-			return nil, "", UserNotFoundError{}
+			return nil, UserNotFoundError{}
 		} else {
-			return nil, "", fmt.Errorf("failed querying user from DB: %w", err)
+			return nil, fmt.Errorf("failed querying user from DB: %w", err)
 		}
 
 	}
 
 	if !s.passwordHasher.CheckPasswordHash(password, user.Password) {
-		return nil, "", InvalidPasswordError{}
-	}
-	user.Password = ""
-	sessID, err := s.sessionSvc.CreateSession(ctx, user, 0)
-	if err != nil {
-		return nil, "", err
+		return nil, InvalidPasswordError{}
 	}
 
-	return user, sessID, nil
+	if !user.Confirmed {
+		return nil, ConfirmError{}
+	}
+	user.Password = ""
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
 }
 
 func (s *ServiceImpl) Confirm(ctx context.Context, usr *User, otp string) error {

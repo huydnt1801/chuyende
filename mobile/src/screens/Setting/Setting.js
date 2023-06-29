@@ -30,8 +30,8 @@ const Setting = () => {
 
                 <ButtonRow
                     classNames={`mt-2`}
-                    title={t("SellectLanguage")}
-                    onPress={() => Utils.toast("Coming Soon!")}
+                    title={t("SelectLanguage")}
+                    onPress={() => navigation.navigate("Language")}
                     iconLeft={
                         <FontAwesomeIcon
                             icon={faLanguage}
@@ -44,7 +44,7 @@ const Setting = () => {
                 />
                 <ButtonRow
                     classNames={`mt-2`}
-                    title={t("SettingUpdatePassword")}
+                    title={t("SetUpUpdatePassword")}
                     onPress={() => Utils.toast("Coming Soon!")}
                     iconLeft={
                         <FontAwesomeIcon
