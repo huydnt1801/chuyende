@@ -94,7 +94,7 @@ func (s *AccountServer) RegisterConfirm(c echo.Context) error {
 		return err
 	}
 	if phoneNumber == "" {
-		return echo.NewHTTPError(http.StatusBadRequest, "Invalid information")
+		return echo.NewHTTPError(http.StatusBadRequest, "Sai thông tin")
 	}
 	usr, err := s.userSvc.FindUser(ctx, &user.UserParams{PhoneNumber: phoneNumber})
 	if err != nil {
@@ -106,7 +106,7 @@ func (s *AccountServer) RegisterConfirm(c echo.Context) error {
 		if err != nil {
 			return err
 		}
-		return c.JSON(http.StatusNoContent, RegisterConfirmResponse{Code: http.StatusOK})
+		return c.JSON(http.StatusOK, RegisterConfirmResponse{Code: http.StatusOK})
 	case "resend-otp":
 		if time.Now().Before(nextOTPSend) {
 			return user.OTPIntervalError{}

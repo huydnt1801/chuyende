@@ -69,13 +69,13 @@ func (s *TripServer) ListTrip(c echo.Context) error {
 }
 
 type CreateTripRequest struct {
-	StartX        float64 `json:"startX" validate:"required"`
-	StartY        float64 `json:"startY" validate:"required"`
+	StartX        float64 `json:"startX" validate:"required,numeric"`
+	StartY        float64 `json:"startY" validate:"required,numeric"`
 	StartLocation string  `json:"startLocation" validate:"required"`
-	EndX          float64 `json:"endX" validate:"required"`
-	EndY          float64 `json:"endY" validate:"required"`
+	EndX          float64 `json:"endX" validate:"required,numeric"`
+	EndY          float64 `json:"endY" validate:"required,numeric"`
 	EndLocation   string  `json:"endLocation" validate:"required"`
-	Distance      float64 `json:"distance" validate:"required"`
+	Distance      float64 `json:"distance" validate:"required,numeric"`
 }
 
 type CreateTripResponse struct {
