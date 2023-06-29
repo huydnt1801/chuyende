@@ -62,6 +62,26 @@ func (uu *UserUpdate) SetFullName(s string) *UserUpdate {
 	return uu
 }
 
+// SetImageURL sets the "image_url" field.
+func (uu *UserUpdate) SetImageURL(s string) *UserUpdate {
+	uu.mutation.SetImageURL(s)
+	return uu
+}
+
+// SetNillableImageURL sets the "image_url" field if the given value is not nil.
+func (uu *UserUpdate) SetNillableImageURL(s *string) *UserUpdate {
+	if s != nil {
+		uu.SetImageURL(*s)
+	}
+	return uu
+}
+
+// ClearImageURL clears the value of the "image_url" field.
+func (uu *UserUpdate) ClearImageURL() *UserUpdate {
+	uu.mutation.ClearImageURL()
+	return uu
+}
+
 // SetPassword sets the "password" field.
 func (uu *UserUpdate) SetPassword(s string) *UserUpdate {
 	uu.mutation.SetPassword(s)
@@ -215,6 +235,12 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := uu.mutation.FullName(); ok {
 		_spec.SetField(user.FieldFullName, field.TypeString, value)
 	}
+	if value, ok := uu.mutation.ImageURL(); ok {
+		_spec.SetField(user.FieldImageURL, field.TypeString, value)
+	}
+	if uu.mutation.ImageURLCleared() {
+		_spec.ClearField(user.FieldImageURL, field.TypeString)
+	}
 	if value, ok := uu.mutation.Password(); ok {
 		_spec.SetField(user.FieldPassword, field.TypeString, value)
 	}
@@ -357,6 +383,26 @@ func (uuo *UserUpdateOne) SetNillableConfirmed(b *bool) *UserUpdateOne {
 // SetFullName sets the "full_name" field.
 func (uuo *UserUpdateOne) SetFullName(s string) *UserUpdateOne {
 	uuo.mutation.SetFullName(s)
+	return uuo
+}
+
+// SetImageURL sets the "image_url" field.
+func (uuo *UserUpdateOne) SetImageURL(s string) *UserUpdateOne {
+	uuo.mutation.SetImageURL(s)
+	return uuo
+}
+
+// SetNillableImageURL sets the "image_url" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableImageURL(s *string) *UserUpdateOne {
+	if s != nil {
+		uuo.SetImageURL(*s)
+	}
+	return uuo
+}
+
+// ClearImageURL clears the value of the "image_url" field.
+func (uuo *UserUpdateOne) ClearImageURL() *UserUpdateOne {
+	uuo.mutation.ClearImageURL()
 	return uuo
 }
 
@@ -542,6 +588,12 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 	}
 	if value, ok := uuo.mutation.FullName(); ok {
 		_spec.SetField(user.FieldFullName, field.TypeString, value)
+	}
+	if value, ok := uuo.mutation.ImageURL(); ok {
+		_spec.SetField(user.FieldImageURL, field.TypeString, value)
+	}
+	if uuo.mutation.ImageURLCleared() {
+		_spec.ClearField(user.FieldImageURL, field.TypeString)
 	}
 	if value, ok := uuo.mutation.Password(); ok {
 		_spec.SetField(user.FieldPassword, field.TypeString, value)

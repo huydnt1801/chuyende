@@ -55,6 +55,9 @@ func (r *RepoImpl) UpdateUser(ctx context.Context, u *User, updated *UserUpdate)
 	if v := updated.Password; v != "" {
 		q.SetPassword(v)
 	}
+	if v := updated.ImageURL; v != "" {
+		q.SetImageURL(v)
+	}
 	if v := updated.Confirmed; v != nil {
 		q.SetConfirmed(*v)
 	}

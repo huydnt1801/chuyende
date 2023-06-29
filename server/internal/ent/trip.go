@@ -31,10 +31,16 @@ type Trip struct {
 	StartX float64 `json:"start_x,omitempty"`
 	// StartY holds the value of the "start_y" field.
 	StartY float64 `json:"start_y,omitempty"`
+	// StartLocation holds the value of the "start_location" field.
+	StartLocation string `json:"start_location,omitempty"`
 	// EndX holds the value of the "end_x" field.
 	EndX float64 `json:"end_x,omitempty"`
 	// EndY holds the value of the "end_y" field.
 	EndY float64 `json:"end_y,omitempty"`
+	// EndLocation holds the value of the "end_location" field.
+	EndLocation string `json:"end_location,omitempty"`
+	// Distance holds the value of the "distance" field.
+	Distance float64 `json:"distance,omitempty"`
 	// Price holds the value of the "price" field.
 	Price float64 `json:"price,omitempty"`
 	// Status holds the value of the "status" field.
@@ -89,11 +95,11 @@ func (*Trip) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case trip.FieldStartX, trip.FieldStartY, trip.FieldEndX, trip.FieldEndY, trip.FieldPrice:
+		case trip.FieldStartX, trip.FieldStartY, trip.FieldEndX, trip.FieldEndY, trip.FieldDistance, trip.FieldPrice:
 			values[i] = new(sql.NullFloat64)
 		case trip.FieldID, trip.FieldUserID, trip.FieldDriverID, trip.FieldRate:
 			values[i] = new(sql.NullInt64)
-		case trip.FieldStatus:
+		case trip.FieldStartLocation, trip.FieldEndLocation, trip.FieldStatus:
 			values[i] = new(sql.NullString)
 		case trip.FieldCreatedAt, trip.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -154,6 +160,12 @@ func (t *Trip) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				t.StartY = value.Float64
 			}
+		case trip.FieldStartLocation:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field start_location", values[i])
+			} else if value.Valid {
+				t.StartLocation = value.String
+			}
 		case trip.FieldEndX:
 			if value, ok := values[i].(*sql.NullFloat64); !ok {
 				return fmt.Errorf("unexpected type %T for field end_x", values[i])
@@ -165,6 +177,18 @@ func (t *Trip) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field end_y", values[i])
 			} else if value.Valid {
 				t.EndY = value.Float64
+			}
+		case trip.FieldEndLocation:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field end_location", values[i])
+			} else if value.Valid {
+				t.EndLocation = value.String
+			}
+		case trip.FieldDistance:
+			if value, ok := values[i].(*sql.NullFloat64); !ok {
+				return fmt.Errorf("unexpected type %T for field distance", values[i])
+			} else if value.Valid {
+				t.Distance = value.Float64
 			}
 		case trip.FieldPrice:
 			if value, ok := values[i].(*sql.NullFloat64); !ok {
@@ -248,11 +272,20 @@ func (t *Trip) String() string {
 	builder.WriteString("start_y=")
 	builder.WriteString(fmt.Sprintf("%v", t.StartY))
 	builder.WriteString(", ")
+	builder.WriteString("start_location=")
+	builder.WriteString(t.StartLocation)
+	builder.WriteString(", ")
 	builder.WriteString("end_x=")
 	builder.WriteString(fmt.Sprintf("%v", t.EndX))
 	builder.WriteString(", ")
 	builder.WriteString("end_y=")
 	builder.WriteString(fmt.Sprintf("%v", t.EndY))
+	builder.WriteString(", ")
+	builder.WriteString("end_location=")
+	builder.WriteString(t.EndLocation)
+	builder.WriteString(", ")
+	builder.WriteString("distance=")
+	builder.WriteString(fmt.Sprintf("%v", t.Distance))
 	builder.WriteString(", ")
 	builder.WriteString("price=")
 	builder.WriteString(fmt.Sprintf("%v", t.Price))

@@ -5,16 +5,19 @@ import (
 )
 
 type Trip struct {
-	ID      int         `json:"id"`
-	UserID  int         `json:"userId"`
-	DriveID string      `json:"driveId,omitempty" mapstructure:",omitempty"`
-	StartX  float64     `json:"startX"`
-	StartY  float64     `json:"startY"`
-	EndX    float64     `json:"endX"`
-	EndY    float64     `json:"endY"`
-	Price   float64     `json:"price"`
-	Status  trip.Status `json:"status,omitempty" mapstructure:",omitempty"`
-	Rate    int         `json:"rate,omitempty" mapstructure:",omitempty"`
+	ID            int         `json:"id"`
+	UserID        int         `json:"userId"`
+	DriveID       int         `json:"driveId,omitempty" mapstructure:",omitempty"`
+	StartX        float64     `json:"startX"`
+	StartY        float64     `json:"startY"`
+	StartLocation string      `json:"startLocation"`
+	EndX          float64     `json:"endX"`
+	EndY          float64     `json:"endY"`
+	EndLocation   string      `json:"endLocation"`
+	Distance      float64     `json:"distance"`
+	Price         float64     `json:"price"`
+	Status        trip.Status `json:"status,omitempty" mapstructure:",omitempty"`
+	Rate          int         `json:"rate,omitempty" mapstructure:",omitempty"`
 }
 
 type TripParams struct {

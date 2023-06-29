@@ -27,10 +27,16 @@ const (
 	FieldStartX = "start_x"
 	// FieldStartY holds the string denoting the start_y field in the database.
 	FieldStartY = "start_y"
+	// FieldStartLocation holds the string denoting the start_location field in the database.
+	FieldStartLocation = "start_location"
 	// FieldEndX holds the string denoting the end_x field in the database.
 	FieldEndX = "end_x"
 	// FieldEndY holds the string denoting the end_y field in the database.
 	FieldEndY = "end_y"
+	// FieldEndLocation holds the string denoting the end_location field in the database.
+	FieldEndLocation = "end_location"
+	// FieldDistance holds the string denoting the distance field in the database.
+	FieldDistance = "distance"
 	// FieldPrice holds the string denoting the price field in the database.
 	FieldPrice = "price"
 	// FieldStatus holds the string denoting the status field in the database.
@@ -68,8 +74,11 @@ var Columns = []string{
 	FieldDriverID,
 	FieldStartX,
 	FieldStartY,
+	FieldStartLocation,
 	FieldEndX,
 	FieldEndY,
+	FieldEndLocation,
+	FieldDistance,
 	FieldPrice,
 	FieldStatus,
 	FieldRate,
@@ -105,6 +114,7 @@ const DefaultStatus = StatusPending
 // Status values.
 const (
 	StatusPending Status = "pending"
+	StatusWaiting Status = "waiting"
 	StatusAccept  Status = "accept"
 	StatusDone    Status = "done"
 	StatusCancel  Status = "cancel"
@@ -117,7 +127,7 @@ func (s Status) String() string {
 // StatusValidator is a validator for the "status" field enum values. It is called by the builders before save.
 func StatusValidator(s Status) error {
 	switch s {
-	case StatusPending, StatusAccept, StatusDone, StatusCancel:
+	case StatusPending, StatusWaiting, StatusAccept, StatusDone, StatusCancel:
 		return nil
 	default:
 		return fmt.Errorf("trip: invalid enum value for status field: %q", s)
@@ -162,6 +172,11 @@ func ByStartY(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldStartY, opts...).ToFunc()
 }
 
+// ByStartLocation orders the results by the start_location field.
+func ByStartLocation(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldStartLocation, opts...).ToFunc()
+}
+
 // ByEndX orders the results by the end_x field.
 func ByEndX(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldEndX, opts...).ToFunc()
@@ -170,6 +185,16 @@ func ByEndX(opts ...sql.OrderTermOption) OrderOption {
 // ByEndY orders the results by the end_y field.
 func ByEndY(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldEndY, opts...).ToFunc()
+}
+
+// ByEndLocation orders the results by the end_location field.
+func ByEndLocation(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldEndLocation, opts...).ToFunc()
+}
+
+// ByDistance orders the results by the distance field.
+func ByDistance(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDistance, opts...).ToFunc()
 }
 
 // ByPrice orders the results by the price field.

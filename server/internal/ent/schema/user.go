@@ -26,6 +26,8 @@ func (User) Fields() []ent.Field {
 		field.Bool("confirmed").
 			Default(false),
 		field.String("full_name"),
+		field.String("image_url").
+			Optional(),
 		field.String("password"),
 	}
 }

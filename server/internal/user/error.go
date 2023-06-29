@@ -7,7 +7,7 @@ import (
 )
 
 type InvalidPhoneError struct {
-	http.NotFoundError
+	http.BadRequestError
 }
 
 func (InvalidPhoneError) Error() string {
@@ -47,11 +47,19 @@ func IsUserNotFound(err error) bool {
 }
 
 type InvalidPasswordError struct {
-	http.UnauthorizedError
+	http.BadRequestError
 }
 
 func (InvalidPasswordError) Error() string {
 	return "Mật khẩu không đúng"
+}
+
+type ConfirmError struct {
+	http.UnauthorizedError
+}
+
+func (ConfirmError) Error() string {
+	return "Tài khoản chưa được xác nhận"
 }
 
 type PasswordComplexityError struct {
