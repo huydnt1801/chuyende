@@ -48,6 +48,10 @@ const TestScreen = () => {
                     title="Đường đi (TripDirection)"
                     onPress={() => navigation.navigate("TripDirection")} />
                 <View style={{ height: 12 }}></View>
+                <Button
+                    title="Ngôn ngữ (Language)"
+                    onPress={() => navigation.navigate("Language")} />
+                <View style={{ height: 12 }}></View>
             </ScrollView>
         </View>
     );

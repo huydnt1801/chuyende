@@ -17,9 +17,9 @@ import SelectLocationOnMap from "./src/screens/SelectLocationOnMap";
 import TripDirection from "./src/screens/TripDirection";
 import store from "./src/store";
 import i18next from "./src/share/Language";
-
 import { UtilComponents } from "./src/share/Utils";
 import TestScreen from "./src/screens/TestScreen";
+import Language from "./src/screens/Language";
 
 const Stack = createNativeStackNavigator();
 
@@ -36,6 +36,8 @@ const screens = [
     { name: "SelectLocationOnMap", component: SelectLocationOnMap },
     { name: "TripDirection", component: TripDirection },
     { name: "Mapp", component: Mapp },
+    { name: "Language", component: Language},
+
 ]
 
 const App = () => {
