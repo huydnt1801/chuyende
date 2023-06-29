@@ -37,6 +37,9 @@ func (r *RepoImpl) CreateUser(ctx context.Context, user *User) (*User, error) {
 		q.SetFullName(s)
 	}
 	u, err := q.Save(ctx)
+	if ent.IsConstraintError(err) {
+		return nil, UserExistError{}
+	}
 	if err != nil {
 		return nil, fmt.Errorf("failed creating user: %w", err)
 	}
@@ -62,6 +65,9 @@ func (r *RepoImpl) UpdateUser(ctx context.Context, u *User, updated *UserUpdate)
 		q.SetConfirmed(*v)
 	}
 	_, err := q.Save(ctx)
+	if ent.IsNotFound(err) {
+		return UserNotFoundError{}
+	}
 	return err
 }
 
