@@ -28,6 +28,12 @@ func Middleware(db *sql.DB) echo.MiddlewareFunc {
 			r := c.Request()
 			ctx := r.Context()
 
+			if strings.HasPrefix(r.URL.Path, "/api/v1/accounts/register") ||
+				strings.HasPrefix(r.URL.Path, "/api/v1/accounts/login") ||
+				strings.HasPrefix(r.URL.Path, "/api/v1/accounts/phone") {
+				LogoutUser(c)
+				return next(c)
+			}
 			sess := getSession(c)
 			val, found := sess.Values["sessionId"]
 			if found {
@@ -37,11 +43,6 @@ func Middleware(db *sql.DB) echo.MiddlewareFunc {
 					return err
 				}
 				LoginUser(c, sessID, usr, driv)
-				return next(c)
-			}
-			if strings.HasPrefix(r.URL.Path, "/api/v1/accounts/register") ||
-				strings.HasPrefix(r.URL.Path, "/api/v1/accounts/login") ||
-				strings.HasPrefix(r.URL.Path, "/api/v1/accounts/phone") {
 				return next(c)
 			}
 			return echo.NewHTTPError(http.StatusUnauthorized, "Yêu cầu đăng nhập")
@@ -54,11 +55,7 @@ func LoginUser(c echo.Context, sessionId string, usr *user.User, driv *driver.Dr
 	sess.Values["sessionId"] = sessionId
 
 	saveSession(c)
-	c.Set(authInfoKey, AuthInfo{
-		User:      usr,
-		Driver:    driv,
-		SessionID: sessionId,
-	})
+	SetAuthInfo(c, usr, driv, sessionId)
 }
 
 func LogoutUser(c echo.Context) {
@@ -89,6 +86,14 @@ func saveSession(c echo.Context) {
 
 }
 
+func SetAuthInfo(c echo.Context, usr *user.User, driv *driver.Driver, sessionId string) {
+	c.Set(authInfoKey, AuthInfo{
+		User:      usr,
+		Driver:    driv,
+		SessionID: sessionId,
+	})
+
+}
 func GetAuthInfo(c echo.Context) (AuthInfo, bool) {
 	val := c.Get(authInfoKey)
 	if val == nil {

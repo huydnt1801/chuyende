@@ -6,6 +6,7 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/huydnt1801/chuyende/api/server/middleware/auth"
+	entTrip "github.com/huydnt1801/chuyende/internal/ent/trip"
 	"github.com/huydnt1801/chuyende/internal/trip"
 	"github.com/huydnt1801/chuyende/pkg/log"
 	"github.com/labstack/echo/v4"
@@ -75,6 +76,7 @@ type CreateTripRequest struct {
 	EndX          float64 `json:"endX" validate:"required,numeric"`
 	EndY          float64 `json:"endY" validate:"required,numeric"`
 	EndLocation   string  `json:"endLocation" validate:"required"`
+	Type          string  `json:"type" validate:"required"`
 	Distance      float64 `json:"distance" validate:"required,numeric"`
 }
 
@@ -87,6 +89,9 @@ func (s *TripServer) CreateTrip(c echo.Context) error {
 	r := c.Request()
 	ctx := r.Context()
 	authInfo, _ := auth.GetAuthInfo(c)
+	if authInfo.User == nil {
+		return echo.NewHTTPError(http.StatusUnauthorized, "Yêu cầu đăng nhập")
+	}
 	data := &CreateTripRequest{}
 	if err := c.Bind(data); err != nil {
 		return err
@@ -100,9 +105,6 @@ func (s *TripServer) CreateTrip(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	if authInfo.User == nil {
-		return echo.NewHTTPError(http.StatusUnauthorized, "Yêu cầu đăng nhập")
-	}
 	createParams.UserID = authInfo.User.ID
 	trip, err := s.svc.CreateTrip(ctx, createParams)
 	if err != nil {
@@ -113,7 +115,7 @@ func (s *TripServer) CreateTrip(c echo.Context) error {
 
 type UpdateStatusTripRequest struct {
 	TripID int    `param:"tripId" validate:"required,numeric"`
-	Status string `json:"status"`
+	Status string `json:"status" validate:"required"`
 }
 
 type UpdateStatusTripResponse struct {
@@ -138,21 +140,37 @@ func (s *TripServer) UpdateStatusTrip(c echo.Context) error {
 	if err != nil {
 		return err
 	}
+	if updateParams.Status == nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "Trạng thái không hợp lệ")
+	}
 	tripParams := &trip.TripParams{
 		TripID: &data.TripID,
 	}
 	if authInfo.User != nil {
+		if *updateParams.Status != entTrip.StatusWaiting && *updateParams.Status != entTrip.StatusCancel {
+			return echo.NewHTTPError(http.StatusBadRequest, "Trạng thái không hợp lệ")
+		}
 		tripParams.UserID = &authInfo.User.ID
+	} else {
+		if authInfo.Driver == nil {
+			return echo.NewHTTPError(http.StatusUnauthorized, "Yêu cầu đăng nhập")
+		}
 	}
 	tripFounds, err := s.svc.FindTrip(ctx, tripParams)
 	if err != nil {
 		return err
 	}
 	if len(tripFounds) != 1 {
-		return echo.NewHTTPError(http.StatusBadRequest, "Bạn không có quyền chỉnh sửa")
-	}
-	if authInfo.Driver != nil && tripFounds[0].DriveID != 0 && authInfo.Driver.ID != tripFounds[0].DriveID {
 		return echo.NewHTTPError(http.StatusForbidden, "Bạn không có quyền chỉnh sửa")
+	}
+	if authInfo.Driver != nil {
+		if tripFounds[0].DriveID != 0 && authInfo.Driver.ID != tripFounds[0].DriveID {
+			return echo.NewHTTPError(http.StatusForbidden, "Bạn không có quyền chỉnh sửa")
+		}
+		if *updateParams.Status != entTrip.StatusDone && *updateParams.Status != entTrip.StatusAccept {
+			return echo.NewHTTPError(http.StatusBadRequest, "Trạng thái không hợp lệ")
+		}
+		updateParams.DriveID = &authInfo.Driver.ID
 	}
 	trip, err := s.svc.UpdateTrip(ctx, data.TripID, updateParams)
 	if err != nil {
@@ -163,7 +181,7 @@ func (s *TripServer) UpdateStatusTrip(c echo.Context) error {
 
 type RateTripRequest struct {
 	TripID int `param:"tripId" validate:"required,numeric"`
-	Rate   int `json:"rate"`
+	Rate   int `json:"rate" validate:"required,numeric"`
 }
 
 type RateTripResponse struct {
@@ -176,7 +194,7 @@ func (s *TripServer) RateTrip(c echo.Context) error {
 	ctx := r.Context()
 	authInfo, _ := auth.GetAuthInfo(c)
 	if authInfo.User == nil {
-		echo.NewHTTPError(http.StatusForbidden, "Bạn không có quyền đánh giá")
+		return echo.NewHTTPError(http.StatusUnauthorized, "Yêu cầu đăng nhập")
 	}
 	data := &RateTripRequest{}
 	if err := c.Bind(data); err != nil {
@@ -199,7 +217,7 @@ func (s *TripServer) RateTrip(c echo.Context) error {
 		return err
 	}
 	if len(tripFounds) != 1 {
-		return echo.NewHTTPError(http.StatusBadRequest, "Bạn không có quyền đánh giá")
+		return echo.NewHTTPError(http.StatusForbidden, "Bạn không có quyền đánh giá")
 	}
 	trip, err := s.svc.UpdateTrip(ctx, data.TripID, updateParams)
 	if err != nil {

@@ -65,9 +65,13 @@ func (r *RepoImpl) CreateTrip(ctx context.Context, trip *Trip) (*Trip, error) {
 		SetEndX(trip.EndX).
 		SetEndY(trip.EndY).
 		SetEndLocation(trip.EndLocation).
+		SetType(trip.Type).
 		SetPrice(trip.Price).
 		SetDistance(trip.Distance)
 	u, err := q.Save(ctx)
+	if ent.IsValidationError(err) {
+		return nil, InvalidTripError{}
+	}
 	if err != nil {
 		return nil, fmt.Errorf("failed creating Trip: %w", err)
 	}

@@ -32,6 +32,8 @@ func (Trip) Fields() []ent.Field {
 		field.String("end_location"),
 		field.Float("distance"),
 		field.Float("price"),
+		field.Enum("type").
+			Values("motor", "car"),
 		field.Enum("status").
 			Values("pending", "waiting", "accept", "done", "cancel").
 			Default("pending"),

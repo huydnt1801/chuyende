@@ -18,7 +18,7 @@ func mockUsers(client *ent.Client, len int) []*ent.User {
 	var ret []*ent.User
 	for idx := 1; idx <= len; idx++ {
 		user := &ent.User{
-			PhoneNumber: "0123456789",
+			PhoneNumber: "012345678" + fmt.Sprint(idx),
 			Confirmed:   true,
 			FullName:    "test user " + fmt.Sprint(idx),
 			Password:    "testuser",
@@ -45,7 +45,7 @@ func mockDrivers(client *ent.Client, len int) []*ent.VehicleDriver {
 	var ret []*ent.VehicleDriver
 	for idx := 1; idx <= len; idx++ {
 		user := &ent.VehicleDriver{
-			PhoneNumber: "0987654321",
+			PhoneNumber: "098765432" + fmt.Sprint(idx),
 			FullName:    "test driver " + fmt.Sprint(idx),
 			Password:    "testdriver",
 		}

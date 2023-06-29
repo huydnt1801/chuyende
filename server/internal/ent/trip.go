@@ -43,6 +43,8 @@ type Trip struct {
 	Distance float64 `json:"distance,omitempty"`
 	// Price holds the value of the "price" field.
 	Price float64 `json:"price,omitempty"`
+	// Type holds the value of the "type" field.
+	Type trip.Type `json:"type,omitempty"`
 	// Status holds the value of the "status" field.
 	Status trip.Status `json:"status,omitempty"`
 	// Rate holds the value of the "rate" field.
@@ -99,7 +101,7 @@ func (*Trip) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullFloat64)
 		case trip.FieldID, trip.FieldUserID, trip.FieldDriverID, trip.FieldRate:
 			values[i] = new(sql.NullInt64)
-		case trip.FieldStartLocation, trip.FieldEndLocation, trip.FieldStatus:
+		case trip.FieldStartLocation, trip.FieldEndLocation, trip.FieldType, trip.FieldStatus:
 			values[i] = new(sql.NullString)
 		case trip.FieldCreatedAt, trip.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -196,6 +198,12 @@ func (t *Trip) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				t.Price = value.Float64
 			}
+		case trip.FieldType:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field type", values[i])
+			} else if value.Valid {
+				t.Type = trip.Type(value.String)
+			}
 		case trip.FieldStatus:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field status", values[i])
@@ -289,6 +297,9 @@ func (t *Trip) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("price=")
 	builder.WriteString(fmt.Sprintf("%v", t.Price))
+	builder.WriteString(", ")
+	builder.WriteString("type=")
+	builder.WriteString(fmt.Sprintf("%v", t.Type))
 	builder.WriteString(", ")
 	builder.WriteString("status=")
 	builder.WriteString(fmt.Sprintf("%v", t.Status))
