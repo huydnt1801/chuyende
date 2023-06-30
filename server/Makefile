@@ -21,3 +21,6 @@ build:
 
 run:
 	go run $(GO_CMD_MAIN)
+
+run-test:
+	go test --tags=integration ./api/server -count=1 -cover -race -v

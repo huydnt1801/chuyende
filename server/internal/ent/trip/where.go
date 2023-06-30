@@ -620,6 +620,26 @@ func PriceLTE(v float64) predicate.Trip {
 	return predicate.Trip(sql.FieldLTE(FieldPrice, v))
 }
 
+// TypeEQ applies the EQ predicate on the "type" field.
+func TypeEQ(v Type) predicate.Trip {
+	return predicate.Trip(sql.FieldEQ(FieldType, v))
+}
+
+// TypeNEQ applies the NEQ predicate on the "type" field.
+func TypeNEQ(v Type) predicate.Trip {
+	return predicate.Trip(sql.FieldNEQ(FieldType, v))
+}
+
+// TypeIn applies the In predicate on the "type" field.
+func TypeIn(vs ...Type) predicate.Trip {
+	return predicate.Trip(sql.FieldIn(FieldType, vs...))
+}
+
+// TypeNotIn applies the NotIn predicate on the "type" field.
+func TypeNotIn(vs ...Type) predicate.Trip {
+	return predicate.Trip(sql.FieldNotIn(FieldType, vs...))
+}
+
 // StatusEQ applies the EQ predicate on the "status" field.
 func StatusEQ(v Status) predicate.Trip {
 	return predicate.Trip(sql.FieldEQ(FieldStatus, v))

@@ -152,6 +152,12 @@ func (tu *TripUpdate) AddPrice(f float64) *TripUpdate {
 	return tu
 }
 
+// SetType sets the "type" field.
+func (tu *TripUpdate) SetType(t trip.Type) *TripUpdate {
+	tu.mutation.SetType(t)
+	return tu
+}
+
 // SetStatus sets the "status" field.
 func (tu *TripUpdate) SetStatus(t trip.Status) *TripUpdate {
 	tu.mutation.SetStatus(t)
@@ -258,6 +264,11 @@ func (tu *TripUpdate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (tu *TripUpdate) check() error {
+	if v, ok := tu.mutation.GetType(); ok {
+		if err := trip.TypeValidator(v); err != nil {
+			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "Trip.type": %w`, err)}
+		}
+	}
 	if v, ok := tu.mutation.Status(); ok {
 		if err := trip.StatusValidator(v); err != nil {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Trip.status": %w`, err)}
@@ -330,6 +341,9 @@ func (tu *TripUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := tu.mutation.AddedPrice(); ok {
 		_spec.AddField(trip.FieldPrice, field.TypeFloat64, value)
+	}
+	if value, ok := tu.mutation.GetType(); ok {
+		_spec.SetField(trip.FieldType, field.TypeEnum, value)
 	}
 	if value, ok := tu.mutation.Status(); ok {
 		_spec.SetField(trip.FieldStatus, field.TypeEnum, value)
@@ -543,6 +557,12 @@ func (tuo *TripUpdateOne) AddPrice(f float64) *TripUpdateOne {
 	return tuo
 }
 
+// SetType sets the "type" field.
+func (tuo *TripUpdateOne) SetType(t trip.Type) *TripUpdateOne {
+	tuo.mutation.SetType(t)
+	return tuo
+}
+
 // SetStatus sets the "status" field.
 func (tuo *TripUpdateOne) SetStatus(t trip.Status) *TripUpdateOne {
 	tuo.mutation.SetStatus(t)
@@ -662,6 +682,11 @@ func (tuo *TripUpdateOne) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (tuo *TripUpdateOne) check() error {
+	if v, ok := tuo.mutation.GetType(); ok {
+		if err := trip.TypeValidator(v); err != nil {
+			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "Trip.type": %w`, err)}
+		}
+	}
 	if v, ok := tuo.mutation.Status(); ok {
 		if err := trip.StatusValidator(v); err != nil {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Trip.status": %w`, err)}
@@ -751,6 +776,9 @@ func (tuo *TripUpdateOne) sqlSave(ctx context.Context) (_node *Trip, err error) 
 	}
 	if value, ok := tuo.mutation.AddedPrice(); ok {
 		_spec.AddField(trip.FieldPrice, field.TypeFloat64, value)
+	}
+	if value, ok := tuo.mutation.GetType(); ok {
+		_spec.SetField(trip.FieldType, field.TypeEnum, value)
 	}
 	if value, ok := tuo.mutation.Status(); ok {
 		_spec.SetField(trip.FieldStatus, field.TypeEnum, value)

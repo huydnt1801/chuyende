@@ -39,6 +39,8 @@ const (
 	FieldDistance = "distance"
 	// FieldPrice holds the string denoting the price field in the database.
 	FieldPrice = "price"
+	// FieldType holds the string denoting the type field in the database.
+	FieldType = "type"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
 	// FieldRate holds the string denoting the rate field in the database.
@@ -80,6 +82,7 @@ var Columns = []string{
 	FieldEndLocation,
 	FieldDistance,
 	FieldPrice,
+	FieldType,
 	FieldStatus,
 	FieldRate,
 }
@@ -104,6 +107,29 @@ var (
 	// RateValidator is a validator for the "rate" field. It is called by the builders before save.
 	RateValidator func(int) error
 )
+
+// Type defines the type for the "type" enum field.
+type Type string
+
+// Type values.
+const (
+	TypeMotor Type = "motor"
+	TypeCar   Type = "car"
+)
+
+func (_type Type) String() string {
+	return string(_type)
+}
+
+// TypeValidator is a validator for the "type" field enum values. It is called by the builders before save.
+func TypeValidator(_type Type) error {
+	switch _type {
+	case TypeMotor, TypeCar:
+		return nil
+	default:
+		return fmt.Errorf("trip: invalid enum value for type field: %q", _type)
+	}
+}
 
 // Status defines the type for the "status" enum field.
 type Status string
@@ -200,6 +226,11 @@ func ByDistance(opts ...sql.OrderTermOption) OrderOption {
 // ByPrice orders the results by the price field.
 func ByPrice(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldPrice, opts...).ToFunc()
+}
+
+// ByType orders the results by the type field.
+func ByType(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldType, opts...).ToFunc()
 }
 
 // ByStatus orders the results by the status field.

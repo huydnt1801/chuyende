@@ -1283,6 +1283,7 @@ type TripMutation struct {
 	adddistance    *float64
 	price          *float64
 	addprice       *float64
+	_type          *trip.Type
 	status         *trip.Status
 	rate           *int
 	addrate        *int
@@ -1959,6 +1960,42 @@ func (m *TripMutation) ResetPrice() {
 	m.addprice = nil
 }
 
+// SetType sets the "type" field.
+func (m *TripMutation) SetType(t trip.Type) {
+	m._type = &t
+}
+
+// GetType returns the value of the "type" field in the mutation.
+func (m *TripMutation) GetType() (r trip.Type, exists bool) {
+	v := m._type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldType returns the old "type" field's value of the Trip entity.
+// If the Trip object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TripMutation) OldType(ctx context.Context) (v trip.Type, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldType is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldType requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldType: %w", err)
+	}
+	return oldValue.Type, nil
+}
+
+// ResetType resets all changes to the "type" field.
+func (m *TripMutation) ResetType() {
+	m._type = nil
+}
+
 // SetStatus sets the "status" field.
 func (m *TripMutation) SetStatus(t trip.Status) {
 	m.status = &t
@@ -2151,7 +2188,7 @@ func (m *TripMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *TripMutation) Fields() []string {
-	fields := make([]string, 0, 14)
+	fields := make([]string, 0, 15)
 	if m.created_at != nil {
 		fields = append(fields, trip.FieldCreatedAt)
 	}
@@ -2187,6 +2224,9 @@ func (m *TripMutation) Fields() []string {
 	}
 	if m.price != nil {
 		fields = append(fields, trip.FieldPrice)
+	}
+	if m._type != nil {
+		fields = append(fields, trip.FieldType)
 	}
 	if m.status != nil {
 		fields = append(fields, trip.FieldStatus)
@@ -2226,6 +2266,8 @@ func (m *TripMutation) Field(name string) (ent.Value, bool) {
 		return m.Distance()
 	case trip.FieldPrice:
 		return m.Price()
+	case trip.FieldType:
+		return m.GetType()
 	case trip.FieldStatus:
 		return m.Status()
 	case trip.FieldRate:
@@ -2263,6 +2305,8 @@ func (m *TripMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldDistance(ctx)
 	case trip.FieldPrice:
 		return m.OldPrice(ctx)
+	case trip.FieldType:
+		return m.OldType(ctx)
 	case trip.FieldStatus:
 		return m.OldStatus(ctx)
 	case trip.FieldRate:
@@ -2359,6 +2403,13 @@ func (m *TripMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetPrice(v)
+		return nil
+	case trip.FieldType:
+		v, ok := value.(trip.Type)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetType(v)
 		return nil
 	case trip.FieldStatus:
 		v, ok := value.(trip.Status)
@@ -2560,6 +2611,9 @@ func (m *TripMutation) ResetField(name string) error {
 		return nil
 	case trip.FieldPrice:
 		m.ResetPrice()
+		return nil
+	case trip.FieldType:
+		m.ResetType()
 		return nil
 	case trip.FieldStatus:
 		m.ResetStatus()

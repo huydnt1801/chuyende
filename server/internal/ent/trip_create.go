@@ -120,6 +120,12 @@ func (tc *TripCreate) SetPrice(f float64) *TripCreate {
 	return tc
 }
 
+// SetType sets the "type" field.
+func (tc *TripCreate) SetType(t trip.Type) *TripCreate {
+	tc.mutation.SetType(t)
+	return tc
+}
+
 // SetStatus sets the "status" field.
 func (tc *TripCreate) SetStatus(t trip.Status) *TripCreate {
 	tc.mutation.SetStatus(t)
@@ -242,6 +248,14 @@ func (tc *TripCreate) check() error {
 	if _, ok := tc.mutation.Price(); !ok {
 		return &ValidationError{Name: "price", err: errors.New(`ent: missing required field "Trip.price"`)}
 	}
+	if _, ok := tc.mutation.GetType(); !ok {
+		return &ValidationError{Name: "type", err: errors.New(`ent: missing required field "Trip.type"`)}
+	}
+	if v, ok := tc.mutation.GetType(); ok {
+		if err := trip.TypeValidator(v); err != nil {
+			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "Trip.type": %w`, err)}
+		}
+	}
 	if _, ok := tc.mutation.Status(); !ok {
 		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "Trip.status"`)}
 	}
@@ -324,6 +338,10 @@ func (tc *TripCreate) createSpec() (*Trip, *sqlgraph.CreateSpec) {
 	if value, ok := tc.mutation.Price(); ok {
 		_spec.SetField(trip.FieldPrice, field.TypeFloat64, value)
 		_node.Price = value
+	}
+	if value, ok := tc.mutation.GetType(); ok {
+		_spec.SetField(trip.FieldType, field.TypeEnum, value)
+		_node.Type = value
 	}
 	if value, ok := tc.mutation.Status(); ok {
 		_spec.SetField(trip.FieldStatus, field.TypeEnum, value)
@@ -590,6 +608,18 @@ func (u *TripUpsert) UpdatePrice() *TripUpsert {
 // AddPrice adds v to the "price" field.
 func (u *TripUpsert) AddPrice(v float64) *TripUpsert {
 	u.Add(trip.FieldPrice, v)
+	return u
+}
+
+// SetType sets the "type" field.
+func (u *TripUpsert) SetType(v trip.Type) *TripUpsert {
+	u.Set(trip.FieldType, v)
+	return u
+}
+
+// UpdateType sets the "type" field to the value that was provided on create.
+func (u *TripUpsert) UpdateType() *TripUpsert {
+	u.SetExcluded(trip.FieldType)
 	return u
 }
 
@@ -874,6 +904,20 @@ func (u *TripUpsertOne) AddPrice(v float64) *TripUpsertOne {
 func (u *TripUpsertOne) UpdatePrice() *TripUpsertOne {
 	return u.Update(func(s *TripUpsert) {
 		s.UpdatePrice()
+	})
+}
+
+// SetType sets the "type" field.
+func (u *TripUpsertOne) SetType(v trip.Type) *TripUpsertOne {
+	return u.Update(func(s *TripUpsert) {
+		s.SetType(v)
+	})
+}
+
+// UpdateType sets the "type" field to the value that was provided on create.
+func (u *TripUpsertOne) UpdateType() *TripUpsertOne {
+	return u.Update(func(s *TripUpsert) {
+		s.UpdateType()
 	})
 }
 
@@ -1326,6 +1370,20 @@ func (u *TripUpsertBulk) AddPrice(v float64) *TripUpsertBulk {
 func (u *TripUpsertBulk) UpdatePrice() *TripUpsertBulk {
 	return u.Update(func(s *TripUpsert) {
 		s.UpdatePrice()
+	})
+}
+
+// SetType sets the "type" field.
+func (u *TripUpsertBulk) SetType(v trip.Type) *TripUpsertBulk {
+	return u.Update(func(s *TripUpsert) {
+		s.SetType(v)
+	})
+}
+
+// UpdateType sets the "type" field to the value that was provided on create.
+func (u *TripUpsertBulk) UpdateType() *TripUpsertBulk {
+	return u.Update(func(s *TripUpsert) {
+		s.UpdateType()
 	})
 }
 
