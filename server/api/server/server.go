@@ -65,6 +65,7 @@ func (s *Server) initRoutes() *echo.Echo {
 	accountG.POST("/logout", s.accSrv.Logout)
 
 	tripG := api.Group("/trips")
+	tripG.GET("/price", s.tripSrv.GetPriceTrip)
 	tripG.GET("", s.tripSrv.ListTrip)
 	tripG.POST("", s.tripSrv.CreateTrip)
 	tripG.PATCH("/:tripId/status", s.tripSrv.UpdateStatusTrip)
