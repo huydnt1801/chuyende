@@ -72,6 +72,7 @@ var (
 		{Name: "end_location", Type: field.TypeString},
 		{Name: "distance", Type: field.TypeFloat64},
 		{Name: "price", Type: field.TypeFloat64},
+		{Name: "type", Type: field.TypeEnum, Enums: []string{"motor", "car"}},
 		{Name: "status", Type: field.TypeEnum, Enums: []string{"pending", "waiting", "accept", "done", "cancel"}, Default: "pending"},
 		{Name: "rate", Type: field.TypeInt, Nullable: true},
 		{Name: "user_id", Type: field.TypeInt},
@@ -85,13 +86,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "trips_users_trips",
-				Columns:    []*schema.Column{TripsColumns[13]},
+				Columns:    []*schema.Column{TripsColumns[14]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "trips_vehicle_drivers_trips",
-				Columns:    []*schema.Column{TripsColumns[14]},
+				Columns:    []*schema.Column{TripsColumns[15]},
 				RefColumns: []*schema.Column{VehicleDriversColumns[0]},
 				OnDelete:   schema.SetNull,
 			},

@@ -21,3 +21,11 @@ func IsTripNotFound(err error) bool {
 	notfoundErr := &TripNotFoundError{}
 	return errors.As(err, notfoundErr) || errors.As(err, &notfoundErr)
 }
+
+type InvalidTripError struct {
+	http.BadRequestError
+}
+
+func (InvalidTripError) Error() string {
+	return "Thông tin chuyến đi không hợp lệ"
+}
