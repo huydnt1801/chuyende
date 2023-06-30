@@ -30,10 +30,14 @@ func NewTripServer(db *sql.DB) *TripServer {
 type GetPriceTripRequest struct {
 	Distance float64 `query:"distance" validate:"required,numeric"`
 }
+type TypeResponse struct {
+	Motor float64 `json:"motor"`
+	Car   float64 `json:"car"`
+}
 
 type GetPriceTripResponse struct {
-	Code int     `json:"code"`
-	Data float64 `json:"data"`
+	Code int           `json:"code"`
+	Data *TypeResponse `json:"data"`
 }
 
 func (s *TripServer) GetPriceTrip(c echo.Context) error {
@@ -45,7 +49,7 @@ func (s *TripServer) GetPriceTrip(c echo.Context) error {
 		return err
 	}
 
-	return c.JSON(http.StatusOK, GetPriceTripResponse{Code: http.StatusOK, Data: data.Distance * 20})
+	return c.JSON(http.StatusOK, GetPriceTripResponse{Code: http.StatusOK, Data: &TypeResponse{Motor: data.Distance * 20, Car: data.Distance * 30}})
 }
 
 type ListTripRequest struct {

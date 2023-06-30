@@ -24,6 +24,8 @@ func Middleware(db *sql.DB) echo.MiddlewareFunc {
 
 			if strings.HasPrefix(r.URL.Path, "/api/v1/accounts/register") ||
 				strings.HasPrefix(r.URL.Path, "/api/v1/accounts/login") ||
+				strings.HasPrefix(r.URL.Path, "/api/v1/accounts/confirm") ||
+				strings.HasPrefix(r.URL.Path, "/api/v1/accounts/resend") ||
 				strings.HasPrefix(r.URL.Path, "/api/v1/accounts/phone") {
 				return next(c)
 			}

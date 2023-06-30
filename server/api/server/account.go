@@ -76,6 +76,34 @@ type RegisterResponse struct {
 	Data string `json:"data"`
 }
 
+func (s *AccountServer) ResendOTP(c echo.Context) error {
+	r := c.Request()
+	ctx := r.Context()
+	data := &ResendOTPRequest{}
+	if err := c.Bind(data); err != nil {
+		return err
+	}
+	if err := c.Validate(data); err != nil {
+		return err
+	}
+	usr, err := s.userSvc.FindUser(ctx, &user.UserParams{PhoneNumber: data.PhoneNumber})
+	nextOTPSend, err := s.userSvc.SendConfirmationToken(ctx, usr)
+	if err != nil {
+		return err
+	}
+	token := s.signConfirmInfo("reg", data.PhoneNumber, nextOTPSend)
+	return c.JSON(http.StatusCreated, RegisterResponse{Code: http.StatusOK, Data: token})
+}
+
+type ResendOTPRequest struct {
+	PhoneNumber string `json:"phoneNumber" validate:"required"`
+}
+
+type ResendOTPResponse struct {
+	Code int    `json:"code"`
+	Data string `json:"data"`
+}
+
 func (s *AccountServer) RegisterConfirm(c echo.Context) error {
 	r := c.Request()
 	ctx := r.Context()
@@ -103,6 +131,7 @@ func (s *AccountServer) RegisterConfirm(c echo.Context) error {
 		if err != nil {
 			return err
 		}
+		auth.LoginUser(c, usr.ID, 0)
 		return c.JSON(http.StatusOK, RegisterConfirmResponse{Code: http.StatusOK})
 	case "resend-otp":
 		if time.Now().Before(nextOTPSend) {

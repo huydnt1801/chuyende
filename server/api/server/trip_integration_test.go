@@ -74,7 +74,10 @@ func TestGetPriceTrip(t *testing.T) {
 				},
 				output: &GetPriceTripResponse{
 					Code: http.StatusOK,
-					Data: 20,
+					Data: &TypeResponse{
+						Motor: 20,
+						Car:   30,
+					},
 				},
 			},
 		},
@@ -306,7 +309,7 @@ func TestCreateTrip(t *testing.T) {
 		info *TestCreateTripInfo
 	}{
 		{
-			name: "[CreateTrip][Success] Return 200 - Return created trip",
+			name: "[CreateTrip][Success] Return 200 - Return created trip with motor",
 			info: &TestCreateTripInfo{
 				authInfo: &auth.AuthInfo{
 					UserID: mockUsers[0].ID,
@@ -326,6 +329,31 @@ func TestCreateTrip(t *testing.T) {
 					Data: &trip.Trip{
 						Status: "waiting",
 						Price:  24,
+					},
+				},
+			},
+		},
+		{
+			name: "[CreateTrip][Success] Return 200 - Return created trip with car",
+			info: &TestCreateTripInfo{
+				authInfo: &auth.AuthInfo{
+					UserID: mockUsers[0].ID,
+				},
+				body: map[string]interface{}{
+					"startX":        1,
+					"startY":        1,
+					"startLocation": "di",
+					"endX":          1,
+					"endY":          1,
+					"endLocation":   "den",
+					"type":          "car",
+					"distance":      1.2,
+				},
+				output: &CreateTripResponse{
+					Code: http.StatusOK,
+					Data: &trip.Trip{
+						Status: "waiting",
+						Price:  36,
 					},
 				},
 			},

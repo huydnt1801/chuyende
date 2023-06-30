@@ -6,6 +6,7 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/huydnt1801/chuyende/internal/ent"
+	entTrip "github.com/huydnt1801/chuyende/internal/ent/trip"
 	entutil "github.com/huydnt1801/chuyende/internal/utils/ent"
 	"github.com/huydnt1801/chuyende/pkg/log"
 )
@@ -37,7 +38,11 @@ func (s *ServiceImpl) FindTrip(ctx context.Context, params *TripParams) ([]*Trip
 
 func (s *ServiceImpl) CreateTrip(ctx context.Context, trip *Trip) (*Trip, error) {
 	repo := NewRepo(s.entClient)
-	trip.Price = 20 * trip.Distance
+	if trip.Type == entTrip.TypeMotor {
+		trip.Price = 20 * trip.Distance
+	} else {
+		trip.Price = 30 * trip.Distance
+	}
 	return repo.CreateTrip(ctx, trip)
 }
 
