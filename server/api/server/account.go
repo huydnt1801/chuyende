@@ -223,6 +223,7 @@ func (s *AccountServer) LoginDriver(c echo.Context) error {
 	if err != nil {
 		return err
 	}
+	driv.Password = ""
 	auth.LoginUser(c, 0, driv.ID)
 	return c.JSON(http.StatusOK, LoginDriverResponse{Code: http.StatusOK, Data: driv})
 }

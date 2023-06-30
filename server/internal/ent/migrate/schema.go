@@ -73,7 +73,7 @@ var (
 		{Name: "distance", Type: field.TypeFloat64},
 		{Name: "price", Type: field.TypeFloat64},
 		{Name: "type", Type: field.TypeEnum, Enums: []string{"motor", "car"}},
-		{Name: "status", Type: field.TypeEnum, Enums: []string{"pending", "waiting", "accept", "done", "cancel"}, Default: "pending"},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"waiting", "accept", "done", "cancel"}, Default: "waiting"},
 		{Name: "rate", Type: field.TypeInt, Nullable: true},
 		{Name: "user_id", Type: field.TypeInt},
 		{Name: "driver_id", Type: field.TypeInt, Nullable: true},
@@ -123,6 +123,7 @@ var (
 		{Name: "phone_number", Type: field.TypeString, Unique: true, Size: 15},
 		{Name: "full_name", Type: field.TypeString},
 		{Name: "password", Type: field.TypeString},
+		{Name: "license", Type: field.TypeEnum, Enums: []string{"motor", "car"}},
 	}
 	// VehicleDriversTable holds the schema information for the "vehicle_drivers" table.
 	VehicleDriversTable = &schema.Table{

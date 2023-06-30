@@ -3576,6 +3576,7 @@ type VehicleDriverMutation struct {
 	phone_number    *string
 	full_name       *string
 	password        *string
+	license         *vehicledriver.License
 	clearedFields   map[string]struct{}
 	trips           map[int]struct{}
 	removedtrips    map[int]struct{}
@@ -3866,6 +3867,42 @@ func (m *VehicleDriverMutation) ResetPassword() {
 	m.password = nil
 }
 
+// SetLicense sets the "license" field.
+func (m *VehicleDriverMutation) SetLicense(v vehicledriver.License) {
+	m.license = &v
+}
+
+// License returns the value of the "license" field in the mutation.
+func (m *VehicleDriverMutation) License() (r vehicledriver.License, exists bool) {
+	v := m.license
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLicense returns the old "license" field's value of the VehicleDriver entity.
+// If the VehicleDriver object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *VehicleDriverMutation) OldLicense(ctx context.Context) (v vehicledriver.License, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLicense is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLicense requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLicense: %w", err)
+	}
+	return oldValue.License, nil
+}
+
+// ResetLicense resets all changes to the "license" field.
+func (m *VehicleDriverMutation) ResetLicense() {
+	m.license = nil
+}
+
 // AddTripIDs adds the "trips" edge to the Trip entity by ids.
 func (m *VehicleDriverMutation) AddTripIDs(ids ...int) {
 	if m.trips == nil {
@@ -4008,7 +4045,7 @@ func (m *VehicleDriverMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *VehicleDriverMutation) Fields() []string {
-	fields := make([]string, 0, 5)
+	fields := make([]string, 0, 6)
 	if m.created_at != nil {
 		fields = append(fields, vehicledriver.FieldCreatedAt)
 	}
@@ -4023,6 +4060,9 @@ func (m *VehicleDriverMutation) Fields() []string {
 	}
 	if m.password != nil {
 		fields = append(fields, vehicledriver.FieldPassword)
+	}
+	if m.license != nil {
+		fields = append(fields, vehicledriver.FieldLicense)
 	}
 	return fields
 }
@@ -4042,6 +4082,8 @@ func (m *VehicleDriverMutation) Field(name string) (ent.Value, bool) {
 		return m.FullName()
 	case vehicledriver.FieldPassword:
 		return m.Password()
+	case vehicledriver.FieldLicense:
+		return m.License()
 	}
 	return nil, false
 }
@@ -4061,6 +4103,8 @@ func (m *VehicleDriverMutation) OldField(ctx context.Context, name string) (ent.
 		return m.OldFullName(ctx)
 	case vehicledriver.FieldPassword:
 		return m.OldPassword(ctx)
+	case vehicledriver.FieldLicense:
+		return m.OldLicense(ctx)
 	}
 	return nil, fmt.Errorf("unknown VehicleDriver field %s", name)
 }
@@ -4104,6 +4148,13 @@ func (m *VehicleDriverMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetPassword(v)
+		return nil
+	case vehicledriver.FieldLicense:
+		v, ok := value.(vehicledriver.License)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLicense(v)
 		return nil
 	}
 	return fmt.Errorf("unknown VehicleDriver field %s", name)
@@ -4168,6 +4219,9 @@ func (m *VehicleDriverMutation) ResetField(name string) error {
 		return nil
 	case vehicledriver.FieldPassword:
 		m.ResetPassword()
+		return nil
+	case vehicledriver.FieldLicense:
+		m.ResetLicense()
 		return nil
 	}
 	return fmt.Errorf("unknown VehicleDriver field %s", name)
