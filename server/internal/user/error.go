@@ -70,3 +70,11 @@ type PasswordComplexityError struct {
 func (PasswordComplexityError) Error() string {
 	return "Mật khẩu không hợp lệ"
 }
+
+type UserExistError struct {
+	http.ConflictError
+}
+
+func (UserExistError) Error() string {
+	return "Người dùng đã tồn tại"
+}

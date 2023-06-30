@@ -11,6 +11,7 @@ func DecodeTrip(input *ent.Trip) (*Trip, error) {
 	if err != nil {
 		return nil, err
 	}
+	u.DriveID = input.DriverID
 	return u, nil
 }
 
