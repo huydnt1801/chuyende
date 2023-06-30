@@ -104,4 +104,4 @@ const SelectLocationOnMap = () => {
 }
 
 export default SelectLocationOnMap
-export { types }
+export { types as mapTypes }

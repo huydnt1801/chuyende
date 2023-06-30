@@ -17,6 +17,7 @@ import className from "./className";
 import Utils from "../../share/Utils";
 import Api from "../../api";
 import { types } from "../PasswordOTP"
+import { useEffect } from "react";
 /**
  * A text component can be clickable
  * @typedef props
@@ -60,6 +61,8 @@ const Login = () => {
     const { t } = useTranslation();
     const navigation = useNavigation();
 
+    const ref = useRef();
+
     const [phone, setPhone] = useState("");
 
     const handleClick = async () => {
@@ -88,6 +91,11 @@ const Login = () => {
         return false;
     })();
 
+    useEffect(() => {
+        ref.current?.blur()
+        ref.current?.focus()
+    }, [])
+
     return (
         <View className={className.container}>
             <View className={className.main}>
@@ -102,6 +110,7 @@ const Login = () => {
                         {"+84"}
                     </Text>
                     <TextInput
+                        ref={ref}
                         placeholder={t("YourPhone")}
                         className={className.phone + (phone.length > 0 && " text-lg font-bold tracking-widest")}
                         value={phone}

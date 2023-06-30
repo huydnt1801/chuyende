@@ -23,8 +23,8 @@ import Language from "./src/screens/Language";
 const Stack = createNativeStackNavigator();
 
 const screens = [
-    { name: "Home", component: Home },
     { name: "Splash", component: Splash },
+    { name: "Home", component: Home },
     { name: "TestScreen", component: TestScreen },
     { name: "Login", component: Login },
     { name: "Payment", component: Payment },
@@ -34,12 +34,8 @@ const screens = [
     { name: "SelectLocation", component: SelectLocation },
     { name: "SelectLocationOnMap", component: SelectLocationOnMap },
     { name: "TripDirection", component: TripDirection },
-<<<<<<< HEAD
-=======
-    { name: "Mapp", component: Mapp },
-    { name: "Language", component: Language},
+    { name: "Language", component: Language },
 
->>>>>>> d082a8f3365361ce7db1bc1b7e15fcfcb85aeafc
 ]
 
 const App = () => {

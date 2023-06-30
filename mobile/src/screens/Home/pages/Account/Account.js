@@ -19,8 +19,8 @@ const Account = () => {
         <View className={className.container}>
             <ScrollView>
                 <Avatar
-                    name={account?.full_name}
-                    phone={`+84 ${account?.phone_number?.slice(1)}`}
+                    name={account?.fullName}
+                    phone={`+84 ${account?.phoneNumber?.slice(1)}`}
                     rate={4.8}
                     onPress={() => 1} />
                 <ButtonRow

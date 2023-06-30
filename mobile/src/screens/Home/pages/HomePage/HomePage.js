@@ -1,10 +1,12 @@
 import { Text, View, Pressable, Button, ScrollView, Image } from "react-native";
-import { useNavigation } from "@react-navigation/native"
+import { useNavigation } from "@react-navigation/native";
 
 import className from "./className";
 import Banner from "./components/Banner/Banner";
 import { blitzcrank } from "../../../../components/Image";
 import { useSelector } from "react-redux";
+import { locationTypes } from "../../../SelectLocation";
+import Api from "../../../../api";
 
 const HomePage = () => {
 
@@ -16,7 +18,7 @@ const HomePage = () => {
         <View className={className.container}>
             <View className={className.header}>
                 <Text className={className.welcome}>
-                    {`Chào ${account?.full_name}!`}
+                    {`Chào ${account?.fullName}!`}
                 </Text>
                 <Pressable>
 
@@ -24,7 +26,7 @@ const HomePage = () => {
             </View>
             <ScrollView>
                 <Banner
-                    onPress={() => navigation.navigate("SelectLocation")} />
+                    onPress={() => navigation.navigate("SelectLocation", { type: locationTypes.SELECT_DESTINATION })} />
                 <View className={className.action}>
                     <Pressable className={className.button}>
                         <Image
@@ -39,6 +41,12 @@ const HomePage = () => {
                         <Text className={className.textButton}>{"Thuê tài xế"}</Text>
                     </Pressable>
                 </View>
+                <Button
+                    title="call api"
+                    onPress={async () => {
+                        const result = await Api.trip.getList();
+                        console.log(JSON.stringify(result));
+                    }} />
             </ScrollView>
         </View>
     );

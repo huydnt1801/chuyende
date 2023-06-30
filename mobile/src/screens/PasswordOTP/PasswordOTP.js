@@ -10,6 +10,7 @@ import Header from "../../components/Header";
 import Utils from "../../share/Utils";
 import Api from "../../api";
 import { setAccount } from "../../slices/Account";
+import { useEffect } from "react";
 
 const types = {
     ONLY_PASSWORD: 1,
@@ -21,7 +22,7 @@ const types = {
 /**
  * @typedef prop
  * @property {String | undefined} value
- * @property {() => void | undefined} onChangText
+ * @property {((Number) => void) | undefined} onChangText
  * @param {prop} param
  * @returns 
  */
@@ -34,6 +35,11 @@ const InputRow = ({ value, onChangText, ref }) => {
     }
 
     const _ref = ref ?? useRef(null);
+
+    useEffect(() => {
+        _ref.current?.blur()
+        _ref.current?.focus()
+    }, []);
 
     return (
         <View className={className.inputWrapper}>
@@ -150,6 +156,7 @@ const PasswordOTP = () => {
             await Utils.wait(300);
             if (login.result == Api.ResultCode.SUCCESS) {
                 dispatch(setAccount(login.data.data));
+                Utils.data["cookie"] = login.headers["set-cookie"] ?? null;
                 try {
                     await AsyncStorage.setItem("account", JSON.stringify(login.data.data))
                 } catch (error) { }
@@ -180,6 +187,7 @@ const PasswordOTP = () => {
                         <InputRow
                             value={passwordOrOTP}
                             onChangText={e => {
+                                e
                                 setPasswordOrOTP(
                                     e.replace(",", "")
                                         .replace(" ", "")
