@@ -1081,7 +1081,7 @@ func doRateTrip(t *testing.T, info *TestRateTripInfo, db *sql.DB) {
 	rec := httptest.NewRecorder()
 	c := NewTestEchoContext().NewContext(req, rec)
 	if info.authInfo != nil {
-		auth.SetAuthInfo(c, info.authInfo.User, info.authInfo.Driver, info.authInfo.SessionID)
+		auth.SetAuthInfo(c, info.authInfo.UserID, info.authInfo.DriverID)
 	}
 	if v, ok := info.urlParams["tripId"]; ok {
 		c.SetParamNames("tripId")
