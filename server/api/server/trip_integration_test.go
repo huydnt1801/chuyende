@@ -14,11 +14,9 @@ import (
 	"testing"
 
 	"github.com/huydnt1801/chuyende/api/server/middleware/auth"
-	"github.com/huydnt1801/chuyende/internal/driver"
 	"github.com/huydnt1801/chuyende/internal/ent"
 	entTrip "github.com/huydnt1801/chuyende/internal/ent/trip"
 	"github.com/huydnt1801/chuyende/internal/trip"
-	"github.com/huydnt1801/chuyende/internal/user"
 	"github.com/huydnt1801/chuyende/test"
 	"github.com/stretchr/testify/assert"
 	"github.com/testcontainers/testcontainers-go"
@@ -82,9 +80,7 @@ func TestListTrips(t *testing.T) {
 			name: "[ListTrips][Success] Return 200 - Return trips of user[0]",
 			info: &TestListTripsInfo{
 				authInfo: &auth.AuthInfo{
-					User: &user.User{
-						ID: mockUsers[0].ID,
-					},
+					UserID: mockUsers[0].ID,
 				},
 				queryParams: map[string]string{},
 				output: &ListTripResponse{
@@ -97,9 +93,7 @@ func TestListTrips(t *testing.T) {
 			name: "[ListTrips][Success] Return 200 - Return trips of user[1]",
 			info: &TestListTripsInfo{
 				authInfo: &auth.AuthInfo{
-					User: &user.User{
-						ID: mockUsers[1].ID,
-					},
+					UserID: mockUsers[1].ID,
 				},
 				queryParams: map[string]string{},
 				output: &ListTripResponse{
@@ -109,17 +103,15 @@ func TestListTrips(t *testing.T) {
 			},
 		},
 		{
-			name: "[ListTrips][Success] Return 200 - Return trips of driver[0]",
+			name: "[ListTrips][Success] Return 200 - Return trips waiting",
 			info: &TestListTripsInfo{
 				authInfo: &auth.AuthInfo{
-					Driver: &driver.Driver{
-						ID: mockDrivers[0].ID,
-					},
+					DriverID: mockDrivers[0].ID,
 				},
 				queryParams: map[string]string{},
 				output: &ListTripResponse{
 					Code: http.StatusOK,
-					Data: respData,
+					Data: []*trip.Trip{},
 				},
 			},
 		},
@@ -127,9 +119,7 @@ func TestListTrips(t *testing.T) {
 			name: "[ListTrips][Success] Return 200 - Return trips of user[0] where id=trip[0]",
 			info: &TestListTripsInfo{
 				authInfo: &auth.AuthInfo{
-					User: &user.User{
-						ID: mockUsers[0].ID,
-					},
+					UserID: mockUsers[0].ID,
 				},
 				queryParams: map[string]string{
 					"tripId": fmt.Sprint(mockTrips[0].ID),
@@ -144,9 +134,7 @@ func TestListTrips(t *testing.T) {
 			name: "[ListTrips][Success] Return 200 - Return trips of user[0] where status='pending'",
 			info: &TestListTripsInfo{
 				authInfo: &auth.AuthInfo{
-					User: &user.User{
-						ID: mockUsers[0].ID,
-					},
+					UserID: mockUsers[0].ID,
 				},
 				queryParams: map[string]string{
 					"status": "pending",
@@ -161,9 +149,7 @@ func TestListTrips(t *testing.T) {
 			name: "[ListTrips][Success] Return 200 - Return trips of user[0] where rate=2",
 			info: &TestListTripsInfo{
 				authInfo: &auth.AuthInfo{
-					User: &user.User{
-						ID: mockUsers[0].ID,
-					},
+					UserID: mockUsers[0].ID,
 				},
 				queryParams: map[string]string{
 					"rate": "2",
@@ -188,7 +174,7 @@ func doListTrips(t *testing.T, info *TestListTripsInfo, db *sql.DB) {
 	rec := httptest.NewRecorder()
 	c := NewTestEchoContext().NewContext(req, rec)
 	if info.authInfo != nil {
-		auth.SetAuthInfo(c, info.authInfo.User, info.authInfo.Driver, info.authInfo.SessionID)
+		auth.SetAuthInfo(c, info.authInfo.UserID, info.authInfo.DriverID)
 	}
 
 	tripSrv := NewTripServer(db)
@@ -231,9 +217,7 @@ func TestCreateTrip(t *testing.T) {
 			name: "[CreateTrip][Success] Return 200 - Return created trip",
 			info: &TestCreateTripInfo{
 				authInfo: &auth.AuthInfo{
-					User: &user.User{
-						ID: mockUsers[0].ID,
-					},
+					UserID: mockUsers[0].ID,
 				},
 				body: map[string]interface{}{
 					"startX":        1,
@@ -258,9 +242,7 @@ func TestCreateTrip(t *testing.T) {
 			name: "[CreateTrip][Fail] Return 400 - Error startX not a number",
 			info: &TestCreateTripInfo{
 				authInfo: &auth.AuthInfo{
-					User: &user.User{
-						ID: mockUsers[0].ID,
-					},
+					UserID: mockUsers[0].ID,
 				},
 				body: map[string]interface{}{
 					"startX":        "test",
@@ -281,9 +263,7 @@ func TestCreateTrip(t *testing.T) {
 			name: "[CreateTrip][Fail] Return 400 - Error startY not a number",
 			info: &TestCreateTripInfo{
 				authInfo: &auth.AuthInfo{
-					User: &user.User{
-						ID: mockUsers[0].ID,
-					},
+					UserID: mockUsers[0].ID,
 				},
 				body: map[string]interface{}{
 					"startX":        1,
@@ -304,9 +284,7 @@ func TestCreateTrip(t *testing.T) {
 			name: "[CreateTrip][Fail] Return 400 - Error endX not a number",
 			info: &TestCreateTripInfo{
 				authInfo: &auth.AuthInfo{
-					User: &user.User{
-						ID: mockUsers[0].ID,
-					},
+					UserID: mockUsers[0].ID,
 				},
 				body: map[string]interface{}{
 					"startX":        1,
@@ -327,9 +305,7 @@ func TestCreateTrip(t *testing.T) {
 			name: "[CreateTrip][Fail] Return 400 - Error endY not a number",
 			info: &TestCreateTripInfo{
 				authInfo: &auth.AuthInfo{
-					User: &user.User{
-						ID: mockUsers[0].ID,
-					},
+					UserID: mockUsers[0].ID,
 				},
 				body: map[string]interface{}{
 					"startX":        1,
@@ -350,9 +326,7 @@ func TestCreateTrip(t *testing.T) {
 			name: "[CreateTrip][Fail] Return 400 - Error price not a number",
 			info: &TestCreateTripInfo{
 				authInfo: &auth.AuthInfo{
-					User: &user.User{
-						ID: mockUsers[0].ID,
-					},
+					UserID: mockUsers[0].ID,
 				},
 				body: map[string]interface{}{
 					"startX":        1,
@@ -373,9 +347,7 @@ func TestCreateTrip(t *testing.T) {
 			name: "[CreateTrip][Fail] Return 400 - invalid type",
 			info: &TestCreateTripInfo{
 				authInfo: &auth.AuthInfo{
-					User: &user.User{
-						ID: mockUsers[0].ID,
-					},
+					UserID: mockUsers[0].ID,
 				},
 				body: map[string]interface{}{
 					"startX":        1,
@@ -396,9 +368,7 @@ func TestCreateTrip(t *testing.T) {
 			name: "[CreateTrip][Fail] Return 400 - missing require field type",
 			info: &TestCreateTripInfo{
 				authInfo: &auth.AuthInfo{
-					User: &user.User{
-						ID: mockUsers[0].ID,
-					},
+					UserID: mockUsers[0].ID,
 				},
 				body: map[string]interface{}{
 					"startX":        1,
@@ -418,9 +388,7 @@ func TestCreateTrip(t *testing.T) {
 			name: "[CreateTrip][Fail] Return 400 - missing require field startX",
 			info: &TestCreateTripInfo{
 				authInfo: &auth.AuthInfo{
-					User: &user.User{
-						ID: mockUsers[0].ID,
-					},
+					UserID: mockUsers[0].ID,
 				},
 				body: map[string]interface{}{
 					"startY":        1,
@@ -440,9 +408,7 @@ func TestCreateTrip(t *testing.T) {
 			name: "[CreateTrip][Fail] Return 400 - missing require field startY",
 			info: &TestCreateTripInfo{
 				authInfo: &auth.AuthInfo{
-					User: &user.User{
-						ID: mockUsers[0].ID,
-					},
+					UserID: mockUsers[0].ID,
 				},
 				body: map[string]interface{}{
 					"startX":        1,
@@ -462,9 +428,7 @@ func TestCreateTrip(t *testing.T) {
 			name: "[CreateTrip][Fail] Return 400 - missing require field startLocation",
 			info: &TestCreateTripInfo{
 				authInfo: &auth.AuthInfo{
-					User: &user.User{
-						ID: mockUsers[0].ID,
-					},
+					UserID: mockUsers[0].ID,
 				},
 				body: map[string]interface{}{
 					"startX":      1,
@@ -484,9 +448,7 @@ func TestCreateTrip(t *testing.T) {
 			name: "[CreateTrip][Fail] Return 400 - missing require field endX",
 			info: &TestCreateTripInfo{
 				authInfo: &auth.AuthInfo{
-					User: &user.User{
-						ID: mockUsers[0].ID,
-					},
+					UserID: mockUsers[0].ID,
 				},
 				body: map[string]interface{}{
 					"startX":        1,
@@ -506,9 +468,7 @@ func TestCreateTrip(t *testing.T) {
 			name: "[CreateTrip][Fail] Return 400 - missing require field endY",
 			info: &TestCreateTripInfo{
 				authInfo: &auth.AuthInfo{
-					User: &user.User{
-						ID: mockUsers[0].ID,
-					},
+					UserID: mockUsers[0].ID,
 				},
 				body: map[string]interface{}{
 					"startX":        1,
@@ -528,9 +488,7 @@ func TestCreateTrip(t *testing.T) {
 			name: "[CreateTrip][Fail] Return 400 - missing require field endLocation",
 			info: &TestCreateTripInfo{
 				authInfo: &auth.AuthInfo{
-					User: &user.User{
-						ID: mockUsers[0].ID,
-					},
+					UserID: mockUsers[0].ID,
 				},
 				body: map[string]interface{}{
 					"startX":        1,
@@ -550,9 +508,7 @@ func TestCreateTrip(t *testing.T) {
 			name: "[CreateTrip][Fail] Return 400 - missing require field distance",
 			info: &TestCreateTripInfo{
 				authInfo: &auth.AuthInfo{
-					User: &user.User{
-						ID: mockUsers[0].ID,
-					},
+					UserID: mockUsers[0].ID,
 				},
 				body: map[string]interface{}{
 					"startX":        1,
@@ -600,7 +556,7 @@ func doCreateTrip(t *testing.T, info *TestCreateTripInfo, db *sql.DB) {
 	rec := httptest.NewRecorder()
 	c := NewTestEchoContext().NewContext(req, rec)
 	if info.authInfo != nil {
-		auth.SetAuthInfo(c, info.authInfo.User, info.authInfo.Driver, info.authInfo.SessionID)
+		auth.SetAuthInfo(c, info.authInfo.UserID, info.authInfo.DriverID)
 	}
 
 	tripSrv := NewTripServer(db)
@@ -647,9 +603,7 @@ func TestUpdateStatusTrip(t *testing.T) {
 			name: "[UpdateStatusTrip][Success] Return 200 - user update status waiting success",
 			info: &TestUpdateStatusTripInfo{
 				authInfo: &auth.AuthInfo{
-					User: &user.User{
-						ID: mockUsers[0].ID,
-					},
+					UserID: mockUsers[0].ID,
 				},
 				urlParams: map[string]int{
 					"tripId": mockTrips[0].ID,
@@ -669,9 +623,7 @@ func TestUpdateStatusTrip(t *testing.T) {
 			name: "[UpdateStatusTrip][Success] Return 200 - user update status cancel success",
 			info: &TestUpdateStatusTripInfo{
 				authInfo: &auth.AuthInfo{
-					User: &user.User{
-						ID: mockUsers[0].ID,
-					},
+					UserID: mockUsers[0].ID,
 				},
 				urlParams: map[string]int{
 					"tripId": mockTrips[0].ID,
@@ -691,9 +643,7 @@ func TestUpdateStatusTrip(t *testing.T) {
 			name: "[UpdateStatusTrip][Success] Return 200 - driver update status accept success",
 			info: &TestUpdateStatusTripInfo{
 				authInfo: &auth.AuthInfo{
-					Driver: &driver.Driver{
-						ID: mockDrivers[0].ID,
-					},
+					DriverID: mockDrivers[0].ID,
 				},
 				urlParams: map[string]int{
 					"tripId": mockTrips[0].ID,
@@ -714,9 +664,7 @@ func TestUpdateStatusTrip(t *testing.T) {
 			name: "[UpdateStatusTrip][Success] Return 200 - driver update status done success",
 			info: &TestUpdateStatusTripInfo{
 				authInfo: &auth.AuthInfo{
-					Driver: &driver.Driver{
-						ID: mockDrivers[0].ID,
-					},
+					DriverID: mockDrivers[0].ID,
 				},
 				urlParams: map[string]int{
 					"tripId": mockTrips[0].ID,
@@ -737,9 +685,7 @@ func TestUpdateStatusTrip(t *testing.T) {
 			name: "[UpdateStatusTrip][Fail] Return 400 - missing require field",
 			info: &TestUpdateStatusTripInfo{
 				authInfo: &auth.AuthInfo{
-					Driver: &driver.Driver{
-						ID: mockDrivers[0].ID,
-					},
+					DriverID: mockDrivers[0].ID,
 				},
 				urlParams: map[string]int{
 					"tripId": mockTrips[0].ID,
@@ -754,9 +700,7 @@ func TestUpdateStatusTrip(t *testing.T) {
 			name: "[UpdateStatusTrip][Fail] Return 403 - driver can not update he does not have",
 			info: &TestUpdateStatusTripInfo{
 				authInfo: &auth.AuthInfo{
-					Driver: &driver.Driver{
-						ID: mockDrivers[1].ID,
-					},
+					DriverID: mockDrivers[1].ID,
 				},
 				urlParams: map[string]int{
 					"tripId": mockTrips[0].ID,
@@ -773,9 +717,7 @@ func TestUpdateStatusTrip(t *testing.T) {
 			name: "[UpdateStatusTrip][Fail] Return 403 - user can not update he does not have",
 			info: &TestUpdateStatusTripInfo{
 				authInfo: &auth.AuthInfo{
-					User: &user.User{
-						ID: mockUsers[1].ID,
-					},
+					UserID: mockUsers[1].ID,
 				},
 				urlParams: map[string]int{
 					"tripId": mockTrips[0].ID,
@@ -792,9 +734,7 @@ func TestUpdateStatusTrip(t *testing.T) {
 			name: "[UpdateStatusTrip][Fail] Return 400 - user can not update done",
 			info: &TestUpdateStatusTripInfo{
 				authInfo: &auth.AuthInfo{
-					User: &user.User{
-						ID: mockUsers[0].ID,
-					},
+					UserID: mockUsers[0].ID,
 				},
 				urlParams: map[string]int{
 					"tripId": mockTrips[0].ID,
@@ -811,9 +751,7 @@ func TestUpdateStatusTrip(t *testing.T) {
 			name: "[UpdateStatusTrip][Fail] Return 400 - user can not update accept",
 			info: &TestUpdateStatusTripInfo{
 				authInfo: &auth.AuthInfo{
-					User: &user.User{
-						ID: mockUsers[0].ID,
-					},
+					UserID: mockUsers[0].ID,
 				},
 				urlParams: map[string]int{
 					"tripId": mockTrips[0].ID,
@@ -830,9 +768,7 @@ func TestUpdateStatusTrip(t *testing.T) {
 			name: "[UpdateStatusTrip][Fail] Return 400 - user can not update strange status",
 			info: &TestUpdateStatusTripInfo{
 				authInfo: &auth.AuthInfo{
-					User: &user.User{
-						ID: mockUsers[0].ID,
-					},
+					UserID: mockUsers[0].ID,
 				},
 				urlParams: map[string]int{
 					"tripId": mockTrips[0].ID,
@@ -849,9 +785,7 @@ func TestUpdateStatusTrip(t *testing.T) {
 			name: "[UpdateStatusTrip][Fail] Return 400 - user can not update waiting",
 			info: &TestUpdateStatusTripInfo{
 				authInfo: &auth.AuthInfo{
-					Driver: &driver.Driver{
-						ID: mockDrivers[0].ID,
-					},
+					DriverID: mockDrivers[0].ID,
 				},
 				urlParams: map[string]int{
 					"tripId": mockTrips[0].ID,
@@ -868,9 +802,7 @@ func TestUpdateStatusTrip(t *testing.T) {
 			name: "[UpdateStatusTrip][Fail] Return 400 - user can not update cancel",
 			info: &TestUpdateStatusTripInfo{
 				authInfo: &auth.AuthInfo{
-					Driver: &driver.Driver{
-						ID: mockDrivers[0].ID,
-					},
+					DriverID: mockDrivers[0].ID,
 				},
 				urlParams: map[string]int{
 					"tripId": mockTrips[0].ID,
@@ -887,9 +819,7 @@ func TestUpdateStatusTrip(t *testing.T) {
 			name: "[UpdateStatusTrip][Fail] Return 400 - user can not update strange status",
 			info: &TestUpdateStatusTripInfo{
 				authInfo: &auth.AuthInfo{
-					Driver: &driver.Driver{
-						ID: mockDrivers[0].ID,
-					},
+					DriverID: mockDrivers[0].ID,
 				},
 				urlParams: map[string]int{
 					"tripId": mockTrips[0].ID,
@@ -930,7 +860,7 @@ func doUpdateStatusTrip(t *testing.T, info *TestUpdateStatusTripInfo, db *sql.DB
 	rec := httptest.NewRecorder()
 	c := NewTestEchoContext().NewContext(req, rec)
 	if info.authInfo != nil {
-		auth.SetAuthInfo(c, info.authInfo.User, info.authInfo.Driver, info.authInfo.SessionID)
+		auth.SetAuthInfo(c, info.authInfo.UserID, info.authInfo.DriverID)
 	}
 	if v, ok := info.urlParams["tripId"]; ok {
 		c.SetParamNames("tripId")
@@ -980,9 +910,7 @@ func TestRateTrip(t *testing.T) {
 			name: "[RateTrip][Success] Return 200 - user rate success",
 			info: &TestRateTripInfo{
 				authInfo: &auth.AuthInfo{
-					User: &user.User{
-						ID: mockUsers[0].ID,
-					},
+					UserID: mockUsers[0].ID,
 				},
 				urlParams: map[string]int{
 					"tripId": mockTrips[0].ID,
@@ -1002,9 +930,7 @@ func TestRateTrip(t *testing.T) {
 			name: "[RateTrip][Fail] Return 403 - user can not update user does not have",
 			info: &TestRateTripInfo{
 				authInfo: &auth.AuthInfo{
-					User: &user.User{
-						ID: mockUsers[1].ID,
-					},
+					UserID: mockUsers[1].ID,
 				},
 				urlParams: map[string]int{
 					"tripId": mockTrips[0].ID,
@@ -1035,9 +961,7 @@ func TestRateTrip(t *testing.T) {
 			name: "[RateTrip][Fail] Return 400 - rate not a number",
 			info: &TestRateTripInfo{
 				authInfo: &auth.AuthInfo{
-					User: &user.User{
-						ID: mockUsers[1].ID,
-					},
+					UserID: mockUsers[1].ID,
 				},
 				urlParams: map[string]int{
 					"tripId": mockTrips[0].ID,
@@ -1054,9 +978,7 @@ func TestRateTrip(t *testing.T) {
 			name: "[RateTrip][Fail] Return 400 - missing require field",
 			info: &TestRateTripInfo{
 				authInfo: &auth.AuthInfo{
-					User: &user.User{
-						ID: mockUsers[1].ID,
-					},
+					UserID: mockUsers[1].ID,
 				},
 				urlParams: map[string]int{
 					"tripId": mockTrips[0].ID,

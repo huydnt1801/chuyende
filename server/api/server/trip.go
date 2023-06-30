@@ -59,7 +59,10 @@ func (s *TripServer) ListTrip(c echo.Context) error {
 		params.UserID = &authInfo.UserID
 	}
 	if authInfo.DriverID != 0 {
-		params.DriveID = &authInfo.DriverID
+		waiting := entTrip.StatusWaiting
+		params = &trip.TripParams{
+			Status: &waiting,
+		}
 	}
 	trip, err := s.svc.FindTrip(ctx, params)
 	if err != nil {

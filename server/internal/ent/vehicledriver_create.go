@@ -70,6 +70,12 @@ func (vdc *VehicleDriverCreate) SetPassword(s string) *VehicleDriverCreate {
 	return vdc
 }
 
+// SetLicense sets the "license" field.
+func (vdc *VehicleDriverCreate) SetLicense(v vehicledriver.License) *VehicleDriverCreate {
+	vdc.mutation.SetLicense(v)
+	return vdc
+}
+
 // AddTripIDs adds the "trips" edge to the Trip entity by IDs.
 func (vdc *VehicleDriverCreate) AddTripIDs(ids ...int) *VehicleDriverCreate {
 	vdc.mutation.AddTripIDs(ids...)
@@ -167,6 +173,14 @@ func (vdc *VehicleDriverCreate) check() error {
 	if _, ok := vdc.mutation.Password(); !ok {
 		return &ValidationError{Name: "password", err: errors.New(`ent: missing required field "VehicleDriver.password"`)}
 	}
+	if _, ok := vdc.mutation.License(); !ok {
+		return &ValidationError{Name: "license", err: errors.New(`ent: missing required field "VehicleDriver.license"`)}
+	}
+	if v, ok := vdc.mutation.License(); ok {
+		if err := vehicledriver.LicenseValidator(v); err != nil {
+			return &ValidationError{Name: "license", err: fmt.Errorf(`ent: validator failed for field "VehicleDriver.license": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -213,6 +227,10 @@ func (vdc *VehicleDriverCreate) createSpec() (*VehicleDriver, *sqlgraph.CreateSp
 	if value, ok := vdc.mutation.Password(); ok {
 		_spec.SetField(vehicledriver.FieldPassword, field.TypeString, value)
 		_node.Password = value
+	}
+	if value, ok := vdc.mutation.License(); ok {
+		_spec.SetField(vehicledriver.FieldLicense, field.TypeEnum, value)
+		_node.License = value
 	}
 	if nodes := vdc.mutation.TripsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -346,6 +364,18 @@ func (u *VehicleDriverUpsert) UpdatePassword() *VehicleDriverUpsert {
 	return u
 }
 
+// SetLicense sets the "license" field.
+func (u *VehicleDriverUpsert) SetLicense(v vehicledriver.License) *VehicleDriverUpsert {
+	u.Set(vehicledriver.FieldLicense, v)
+	return u
+}
+
+// UpdateLicense sets the "license" field to the value that was provided on create.
+func (u *VehicleDriverUpsert) UpdateLicense() *VehicleDriverUpsert {
+	u.SetExcluded(vehicledriver.FieldLicense)
+	return u
+}
+
 // UpdateNewValues updates the mutable fields using the new values that were set on create.
 // Using this option is equivalent to using:
 //
@@ -444,6 +474,20 @@ func (u *VehicleDriverUpsertOne) SetPassword(v string) *VehicleDriverUpsertOne {
 func (u *VehicleDriverUpsertOne) UpdatePassword() *VehicleDriverUpsertOne {
 	return u.Update(func(s *VehicleDriverUpsert) {
 		s.UpdatePassword()
+	})
+}
+
+// SetLicense sets the "license" field.
+func (u *VehicleDriverUpsertOne) SetLicense(v vehicledriver.License) *VehicleDriverUpsertOne {
+	return u.Update(func(s *VehicleDriverUpsert) {
+		s.SetLicense(v)
+	})
+}
+
+// UpdateLicense sets the "license" field to the value that was provided on create.
+func (u *VehicleDriverUpsertOne) UpdateLicense() *VehicleDriverUpsertOne {
+	return u.Update(func(s *VehicleDriverUpsert) {
+		s.UpdateLicense()
 	})
 }
 
@@ -707,6 +751,20 @@ func (u *VehicleDriverUpsertBulk) SetPassword(v string) *VehicleDriverUpsertBulk
 func (u *VehicleDriverUpsertBulk) UpdatePassword() *VehicleDriverUpsertBulk {
 	return u.Update(func(s *VehicleDriverUpsert) {
 		s.UpdatePassword()
+	})
+}
+
+// SetLicense sets the "license" field.
+func (u *VehicleDriverUpsertBulk) SetLicense(v vehicledriver.License) *VehicleDriverUpsertBulk {
+	return u.Update(func(s *VehicleDriverUpsert) {
+		s.SetLicense(v)
+	})
+}
+
+// UpdateLicense sets the "license" field to the value that was provided on create.
+func (u *VehicleDriverUpsertBulk) UpdateLicense() *VehicleDriverUpsertBulk {
+	return u.Update(func(s *VehicleDriverUpsert) {
+		s.UpdateLicense()
 	})
 }
 

@@ -355,6 +355,26 @@ func PasswordContainsFold(v string) predicate.VehicleDriver {
 	return predicate.VehicleDriver(sql.FieldContainsFold(FieldPassword, v))
 }
 
+// LicenseEQ applies the EQ predicate on the "license" field.
+func LicenseEQ(v License) predicate.VehicleDriver {
+	return predicate.VehicleDriver(sql.FieldEQ(FieldLicense, v))
+}
+
+// LicenseNEQ applies the NEQ predicate on the "license" field.
+func LicenseNEQ(v License) predicate.VehicleDriver {
+	return predicate.VehicleDriver(sql.FieldNEQ(FieldLicense, v))
+}
+
+// LicenseIn applies the In predicate on the "license" field.
+func LicenseIn(vs ...License) predicate.VehicleDriver {
+	return predicate.VehicleDriver(sql.FieldIn(FieldLicense, vs...))
+}
+
+// LicenseNotIn applies the NotIn predicate on the "license" field.
+func LicenseNotIn(vs ...License) predicate.VehicleDriver {
+	return predicate.VehicleDriver(sql.FieldNotIn(FieldLicense, vs...))
+}
+
 // HasTrips applies the HasEdge predicate on the "trips" edge.
 func HasTrips() predicate.VehicleDriver {
 	return predicate.VehicleDriver(func(s *sql.Selector) {

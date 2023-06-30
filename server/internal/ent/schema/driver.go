@@ -23,6 +23,8 @@ func (VehicleDriver) Fields() []ent.Field {
 			MaxLen(15),
 		field.String("full_name"),
 		field.String("password"),
+		field.Enum("license").
+			Values("motor", "car"),
 	}
 }
 
