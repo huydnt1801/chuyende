@@ -49,7 +49,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"userId\": 1,\r\n    \"startX\": 1,\r\n    \"startY\": 1,\r\n    \"endX\": 1,\r\n    \"endY\": 1,\r\n    \"price\": 1\r\n}",
+							"raw": "",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -73,6 +73,46 @@
 					"response": []
 				},
 				{
+					"name": "get price",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/v1/trips/price?distance=1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"v1",
+								"trips",
+								"price"
+							],
+							"query": [
+								{
+									"key": "distance",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "status",
 					"request": {
 						"method": "PATCH",
@@ -87,7 +127,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:5000/api/v1/trips/3/status",
+							"raw": "http://localhost:5000/api/v1/trips/4/status",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -97,7 +137,7 @@
 								"api",
 								"v1",
 								"trips",
-								"3",
+								"4",
 								"status"
 							]
 						}
@@ -148,7 +188,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"phoneNumber\": \"0123456787\",\r\n    \"fullName\": \"Huy 87\",\r\n    \"password\": \"12345678\",\r\n    \"password2\": \"12345678\"\r\n}",
+							"raw": "{\r\n    \"phoneNumber\": \"0123456782\",\r\n    \"fullName\": \"Huy 81\",\r\n    \"password\": \"123456\",\r\n    \"password2\": \"123456\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -179,7 +219,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"phoneNumber\": \"0123456788\",\r\n    \"password\": \"12345678\"\r\n}",
+							"raw": "{\r\n    \"phoneNumber\": \"0123456782\",\r\n    \"password\": \"123456\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -198,6 +238,69 @@
 								"v1",
 								"accounts",
 								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "resend",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"phoneNumber\": \"0123456782\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/v1/accounts/resend",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"v1",
+								"accounts",
+								"resend"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login driver",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"phoneNumber\": \"0123456786\",\r\n    \"password\": \"123456\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/v1/accounts/login/driver",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"v1",
+								"accounts",
+								"login",
+								"driver"
 							]
 						}
 					},
@@ -241,7 +344,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"fullName\": \"Huy 87 test\"\r\n}",
+							"raw": "{\r\n    \"fullName\": \"Huy 81 test\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -249,7 +352,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:5000/api/v1/accounts/3",
+							"raw": "http://localhost:5000/api/v1/accounts/7",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -259,20 +362,20 @@
 								"api",
 								"v1",
 								"accounts",
-								"3"
+								"7"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "register confirm",
+					"name": "confirm",
 					"request": {
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"token\": \"cmVnOzAxMjM0NTY3ODc7MTY4NzgyODQ1NjsxNjg3ODI4Mzk2.IX4thl3tllAagdJnwem8I6Q+QLU=\",\r\n    \"type\": \"submit-otp\",\r\n    \"otp\": \"768743\"\r\n}",
+							"raw": "{\r\n    \"token\": \"cmVnOzAxMjM0NTY3ODI7MTY4ODE0MjAzMDsxNjg4MTQxOTcw.cijHe/XN71elDbqOLNjgvAs11qU=\",\r\n    \"type\": \"submit-otp\",\r\n    \"otp\": \"337056\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -280,7 +383,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:5000/api/v1/accounts/register/confirm",
+							"raw": "http://localhost:5000/api/v1/accounts/confirm",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -290,7 +393,6 @@
 								"api",
 								"v1",
 								"accounts",
-								"register",
 								"confirm"
 							]
 						}
