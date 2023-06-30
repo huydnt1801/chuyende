@@ -27,6 +27,27 @@ func NewTripServer(db *sql.DB) *TripServer {
 	return srv
 }
 
+type GetPriceTripRequest struct {
+	Distance float64 `query:"distance" validate:"required,numeric"`
+}
+
+type GetPriceTripResponse struct {
+	Code int     `json:"code"`
+	Data float64 `json:"data"`
+}
+
+func (s *TripServer) GetPriceTrip(c echo.Context) error {
+	data := &GetPriceTripRequest{}
+	if err := c.Bind(data); err != nil {
+		return err
+	}
+	if err := c.Validate(data); err != nil {
+		return err
+	}
+
+	return c.JSON(http.StatusOK, GetPriceTripResponse{Code: http.StatusOK, Data: data.Distance * 20})
+}
+
 type ListTripRequest struct {
 	TripID *int    `query:"tripId"`
 	Status *string `query:"status"`

@@ -42,6 +42,98 @@ func TestMain(m *testing.M) {
 	os.Exit(exitCode)
 }
 
+type TestGetPriceTripInfo struct {
+	authInfo    *auth.AuthInfo
+	queryParams map[string]string
+	output      *GetPriceTripResponse
+}
+
+func TestGetPriceTrip(t *testing.T) {
+	// Create env
+	env := test.NewTestEnv(t, container, "TestGetPriceTrip")
+	assert.NotNil(t, env)
+
+	client := env.Client
+	db := env.Database
+
+	// Mock mysql data
+	mockUsers := mockUsers(client, 2)
+
+	tests := []struct {
+		name string
+		info *TestGetPriceTripInfo
+	}{
+		{
+			name: "[GetPriceTrip][Success] Return 200 - Return price of trip",
+			info: &TestGetPriceTripInfo{
+				authInfo: &auth.AuthInfo{
+					UserID: mockUsers[0].ID,
+				},
+				queryParams: map[string]string{
+					"distance": "1",
+				},
+				output: &GetPriceTripResponse{
+					Code: http.StatusOK,
+					Data: 20,
+				},
+			},
+		},
+		{
+			name: "[GetPriceTrip][Fail] Return 400 - missing distance",
+			info: &TestGetPriceTripInfo{
+				authInfo: &auth.AuthInfo{
+					UserID: mockUsers[0].ID,
+				},
+				queryParams: map[string]string{},
+				output: &GetPriceTripResponse{
+					Code: http.StatusBadRequest,
+				},
+			},
+		},
+		{
+			name: "[GetPriceTrip][Fail] Return 400 - distance is not number",
+			info: &TestGetPriceTripInfo{
+				authInfo: &auth.AuthInfo{
+					UserID: mockUsers[0].ID,
+				},
+				queryParams: map[string]string{},
+				output: &GetPriceTripResponse{
+					Code: http.StatusBadRequest,
+				},
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			doGetPriceTrip(t, tc.info, db)
+		})
+	}
+}
+
+func doGetPriceTrip(t *testing.T, info *TestGetPriceTripInfo, db *sql.DB) {
+	req := test.BuildGetQuery(TripEndpoint, info.queryParams)
+	rec := httptest.NewRecorder()
+	c := NewTestEchoContext().NewContext(req, rec)
+	if info.authInfo != nil {
+		auth.SetAuthInfo(c, info.authInfo.UserID, info.authInfo.DriverID)
+	}
+
+	tripSrv := NewTripServer(db)
+	err := tripSrv.GetPriceTrip(c)
+
+	if info.output.Code == http.StatusOK {
+		assert.Nil(t, err)
+		var actual *GetPriceTripResponse
+		err := json.NewDecoder(rec.Body).Decode(&actual)
+		assert.Nil(t, err)
+		assert.Equal(t, info.output.Code, actual.Code)
+		assert.Equal(t, info.output.Data, actual.Data)
+	} else {
+		assert.Equal(t, info.output.Code, GetErrorCode(err))
+	}
+}
+
 type TestListTripsInfo struct {
 	authInfo    *auth.AuthInfo
 	queryParams map[string]string
@@ -111,7 +203,7 @@ func TestListTrips(t *testing.T) {
 				queryParams: map[string]string{},
 				output: &ListTripResponse{
 					Code: http.StatusOK,
-					Data: []*trip.Trip{},
+					Data: respData,
 				},
 			},
 		},
@@ -131,13 +223,13 @@ func TestListTrips(t *testing.T) {
 			},
 		},
 		{
-			name: "[ListTrips][Success] Return 200 - Return trips of user[0] where status='pending'",
+			name: "[ListTrips][Success] Return 200 - Return trips of user[0] where status='waiting'",
 			info: &TestListTripsInfo{
 				authInfo: &auth.AuthInfo{
 					UserID: mockUsers[0].ID,
 				},
 				queryParams: map[string]string{
-					"status": "pending",
+					"status": "waiting",
 				},
 				output: &ListTripResponse{
 					Code: http.StatusOK,
@@ -232,7 +324,7 @@ func TestCreateTrip(t *testing.T) {
 				output: &CreateTripResponse{
 					Code: http.StatusOK,
 					Data: &trip.Trip{
-						Status: "pending",
+						Status: "waiting",
 						Price:  24,
 					},
 				},

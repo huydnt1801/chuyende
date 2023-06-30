@@ -13,6 +13,7 @@ import (
 	"testing"
 
 	"github.com/huydnt1801/chuyende/internal/ent"
+	"github.com/huydnt1801/chuyende/internal/ent/vehicledriver"
 	"github.com/huydnt1801/chuyende/internal/user"
 	"github.com/huydnt1801/chuyende/test"
 	"github.com/stretchr/testify/assert"
@@ -57,6 +58,7 @@ func mockDrivers(client *ent.Client, len int) []*ent.VehicleDriver {
 			PhoneNumber: "098765432" + fmt.Sprint(idx),
 			FullName:    "test driver " + fmt.Sprint(idx),
 			Password:    "testdriver",
+			License:     vehicledriver.LicenseMotor,
 		}
 		ret = append(ret, user)
 	}
@@ -66,7 +68,8 @@ func mockDrivers(client *ent.Client, len int) []*ent.VehicleDriver {
 		q := client.VehicleDriver.Create().
 			SetFullName(user.FullName).
 			SetPhoneNumber(user.PhoneNumber).
-			SetPassword(user.Password)
+			SetPassword(user.Password).
+			SetLicense(user.License)
 		bulk = append(bulk, q)
 	}
 
