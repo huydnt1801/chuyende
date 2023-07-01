@@ -27,6 +27,8 @@ type VehicleDriver struct {
 	FullName string `json:"full_name,omitempty"`
 	// Password holds the value of the "password" field.
 	Password string `json:"password,omitempty"`
+	// License holds the value of the "license" field.
+	License vehicledriver.License `json:"license,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the VehicleDriverQuery when eager-loading is set.
 	Edges        VehicleDriverEdges `json:"edges"`
@@ -69,7 +71,7 @@ func (*VehicleDriver) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case vehicledriver.FieldID:
 			values[i] = new(sql.NullInt64)
-		case vehicledriver.FieldPhoneNumber, vehicledriver.FieldFullName, vehicledriver.FieldPassword:
+		case vehicledriver.FieldPhoneNumber, vehicledriver.FieldFullName, vehicledriver.FieldPassword, vehicledriver.FieldLicense:
 			values[i] = new(sql.NullString)
 		case vehicledriver.FieldCreatedAt, vehicledriver.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -123,6 +125,12 @@ func (vd *VehicleDriver) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field password", values[i])
 			} else if value.Valid {
 				vd.Password = value.String
+			}
+		case vehicledriver.FieldLicense:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field license", values[i])
+			} else if value.Valid {
+				vd.License = vehicledriver.License(value.String)
 			}
 		default:
 			vd.selectValues.Set(columns[i], values[i])
@@ -184,6 +192,9 @@ func (vd *VehicleDriver) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("password=")
 	builder.WriteString(vd.Password)
+	builder.WriteString(", ")
+	builder.WriteString("license=")
+	builder.WriteString(fmt.Sprintf("%v", vd.License))
 	builder.WriteByte(')')
 	return builder.String()
 }

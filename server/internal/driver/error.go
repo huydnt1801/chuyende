@@ -23,7 +23,7 @@ type DriverNotFoundError struct {
 }
 
 func (DriverNotFoundError) Error() string {
-	return "Không tìm thấy người dùng"
+	return "Không tìm thấy tài xế"
 }
 
 func IsDriverNotFound(err error) bool {

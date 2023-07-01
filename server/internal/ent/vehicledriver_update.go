@@ -54,6 +54,12 @@ func (vdu *VehicleDriverUpdate) SetPassword(s string) *VehicleDriverUpdate {
 	return vdu
 }
 
+// SetLicense sets the "license" field.
+func (vdu *VehicleDriverUpdate) SetLicense(v vehicledriver.License) *VehicleDriverUpdate {
+	vdu.mutation.SetLicense(v)
+	return vdu
+}
+
 // AddTripIDs adds the "trips" edge to the Trip entity by IDs.
 func (vdu *VehicleDriverUpdate) AddTripIDs(ids ...int) *VehicleDriverUpdate {
 	vdu.mutation.AddTripIDs(ids...)
@@ -174,6 +180,11 @@ func (vdu *VehicleDriverUpdate) check() error {
 			return &ValidationError{Name: "phone_number", err: fmt.Errorf(`ent: validator failed for field "VehicleDriver.phone_number": %w`, err)}
 		}
 	}
+	if v, ok := vdu.mutation.License(); ok {
+		if err := vehicledriver.LicenseValidator(v); err != nil {
+			return &ValidationError{Name: "license", err: fmt.Errorf(`ent: validator failed for field "VehicleDriver.license": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -200,6 +211,9 @@ func (vdu *VehicleDriverUpdate) sqlSave(ctx context.Context) (n int, err error) 
 	}
 	if value, ok := vdu.mutation.Password(); ok {
 		_spec.SetField(vehicledriver.FieldPassword, field.TypeString, value)
+	}
+	if value, ok := vdu.mutation.License(); ok {
+		_spec.SetField(vehicledriver.FieldLicense, field.TypeEnum, value)
 	}
 	if vdu.mutation.TripsCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -332,6 +346,12 @@ func (vduo *VehicleDriverUpdateOne) SetFullName(s string) *VehicleDriverUpdateOn
 // SetPassword sets the "password" field.
 func (vduo *VehicleDriverUpdateOne) SetPassword(s string) *VehicleDriverUpdateOne {
 	vduo.mutation.SetPassword(s)
+	return vduo
+}
+
+// SetLicense sets the "license" field.
+func (vduo *VehicleDriverUpdateOne) SetLicense(v vehicledriver.License) *VehicleDriverUpdateOne {
+	vduo.mutation.SetLicense(v)
 	return vduo
 }
 
@@ -468,6 +488,11 @@ func (vduo *VehicleDriverUpdateOne) check() error {
 			return &ValidationError{Name: "phone_number", err: fmt.Errorf(`ent: validator failed for field "VehicleDriver.phone_number": %w`, err)}
 		}
 	}
+	if v, ok := vduo.mutation.License(); ok {
+		if err := vehicledriver.LicenseValidator(v); err != nil {
+			return &ValidationError{Name: "license", err: fmt.Errorf(`ent: validator failed for field "VehicleDriver.license": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -511,6 +536,9 @@ func (vduo *VehicleDriverUpdateOne) sqlSave(ctx context.Context) (_node *Vehicle
 	}
 	if value, ok := vduo.mutation.Password(); ok {
 		_spec.SetField(vehicledriver.FieldPassword, field.TypeString, value)
+	}
+	if value, ok := vduo.mutation.License(); ok {
+		_spec.SetField(vehicledriver.FieldLicense, field.TypeEnum, value)
 	}
 	if vduo.mutation.TripsCleared() {
 		edge := &sqlgraph.EdgeSpec{

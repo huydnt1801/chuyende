@@ -35,8 +35,8 @@ func (Trip) Fields() []ent.Field {
 		field.Enum("type").
 			Values("motor", "car"),
 		field.Enum("status").
-			Values("pending", "waiting", "accept", "done", "cancel").
-			Default("pending"),
+			Values("waiting", "accept", "done", "cancel").
+			Default("waiting"),
 		field.Int("rate").
 			Min(1).
 			Max(5).
