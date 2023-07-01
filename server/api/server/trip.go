@@ -27,6 +27,31 @@ func NewTripServer(db *sql.DB) *TripServer {
 	return srv
 }
 
+type GetPriceTripRequest struct {
+	Distance float64 `query:"distance" validate:"required,numeric"`
+}
+type TypeResponse struct {
+	Motor float64 `json:"motor"`
+	Car   float64 `json:"car"`
+}
+
+type GetPriceTripResponse struct {
+	Code int           `json:"code"`
+	Data *TypeResponse `json:"data"`
+}
+
+func (s *TripServer) GetPriceTrip(c echo.Context) error {
+	data := &GetPriceTripRequest{}
+	if err := c.Bind(data); err != nil {
+		return err
+	}
+	if err := c.Validate(data); err != nil {
+		return err
+	}
+
+	return c.JSON(http.StatusOK, GetPriceTripResponse{Code: http.StatusOK, Data: &TypeResponse{Motor: data.Distance * 20, Car: data.Distance * 30}})
+}
+
 type ListTripRequest struct {
 	TripID *int    `query:"tripId"`
 	Status *string `query:"status"`
@@ -55,11 +80,14 @@ func (s *TripServer) ListTrip(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	if authInfo.User != nil {
-		params.UserID = &authInfo.User.ID
+	if authInfo.UserID != 0 {
+		params.UserID = &authInfo.UserID
 	}
-	if authInfo.Driver != nil {
-		params.DriveID = &authInfo.Driver.ID
+	if authInfo.DriverID != 0 {
+		waiting := entTrip.StatusWaiting
+		params = &trip.TripParams{
+			Status: &waiting,
+		}
 	}
 	trip, err := s.svc.FindTrip(ctx, params)
 	if err != nil {
@@ -89,7 +117,7 @@ func (s *TripServer) CreateTrip(c echo.Context) error {
 	r := c.Request()
 	ctx := r.Context()
 	authInfo, _ := auth.GetAuthInfo(c)
-	if authInfo.User == nil {
+	if authInfo.UserID == 0 {
 		return echo.NewHTTPError(http.StatusUnauthorized, "Yêu cầu đăng nhập")
 	}
 	data := &CreateTripRequest{}
@@ -105,7 +133,7 @@ func (s *TripServer) CreateTrip(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	createParams.UserID = authInfo.User.ID
+	createParams.UserID = authInfo.UserID
 	trip, err := s.svc.CreateTrip(ctx, createParams)
 	if err != nil {
 		return err
@@ -146,13 +174,13 @@ func (s *TripServer) UpdateStatusTrip(c echo.Context) error {
 	tripParams := &trip.TripParams{
 		TripID: &data.TripID,
 	}
-	if authInfo.User != nil {
+	if authInfo.UserID != 0 {
 		if *updateParams.Status != entTrip.StatusWaiting && *updateParams.Status != entTrip.StatusCancel {
 			return echo.NewHTTPError(http.StatusBadRequest, "Trạng thái không hợp lệ")
 		}
-		tripParams.UserID = &authInfo.User.ID
+		tripParams.UserID = &authInfo.UserID
 	} else {
-		if authInfo.Driver == nil {
+		if authInfo.DriverID == 0 {
 			return echo.NewHTTPError(http.StatusUnauthorized, "Yêu cầu đăng nhập")
 		}
 	}
@@ -163,14 +191,14 @@ func (s *TripServer) UpdateStatusTrip(c echo.Context) error {
 	if len(tripFounds) != 1 {
 		return echo.NewHTTPError(http.StatusForbidden, "Bạn không có quyền chỉnh sửa")
 	}
-	if authInfo.Driver != nil {
-		if tripFounds[0].DriveID != 0 && authInfo.Driver.ID != tripFounds[0].DriveID {
+	if authInfo.DriverID != 0 {
+		if tripFounds[0].DriveID != 0 && authInfo.DriverID != tripFounds[0].DriveID {
 			return echo.NewHTTPError(http.StatusForbidden, "Bạn không có quyền chỉnh sửa")
 		}
 		if *updateParams.Status != entTrip.StatusDone && *updateParams.Status != entTrip.StatusAccept {
 			return echo.NewHTTPError(http.StatusBadRequest, "Trạng thái không hợp lệ")
 		}
-		updateParams.DriveID = &authInfo.Driver.ID
+		updateParams.DriveID = &authInfo.DriverID
 	}
 	trip, err := s.svc.UpdateTrip(ctx, data.TripID, updateParams)
 	if err != nil {
@@ -193,7 +221,7 @@ func (s *TripServer) RateTrip(c echo.Context) error {
 	r := c.Request()
 	ctx := r.Context()
 	authInfo, _ := auth.GetAuthInfo(c)
-	if authInfo.User == nil {
+	if authInfo.UserID == 0 {
 		return echo.NewHTTPError(http.StatusUnauthorized, "Yêu cầu đăng nhập")
 	}
 	data := &RateTripRequest{}
@@ -211,7 +239,7 @@ func (s *TripServer) RateTrip(c echo.Context) error {
 	}
 	tripFounds, err := s.svc.FindTrip(ctx, &trip.TripParams{
 		TripID: &data.TripID,
-		UserID: &authInfo.User.ID,
+		UserID: &authInfo.UserID,
 	})
 	if err != nil {
 		return err

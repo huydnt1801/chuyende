@@ -15,7 +15,6 @@ import (
 	"github.com/huydnt1801/chuyende/api/server/middleware/auth"
 	"github.com/huydnt1801/chuyende/internal/config"
 	"github.com/huydnt1801/chuyende/internal/driver"
-	"github.com/huydnt1801/chuyende/internal/session"
 	"github.com/huydnt1801/chuyende/internal/user"
 	"github.com/huydnt1801/chuyende/pkg/log"
 	"github.com/labstack/echo/v4"
@@ -26,7 +25,6 @@ type AccountServer struct {
 	secretKey string
 
 	userSvc   user.Service
-	sessSvc   session.SessionService
 	driverSvc driver.Service
 }
 
@@ -37,7 +35,6 @@ func NewAccountServer(db *sql.DB) *AccountServer {
 		logger:    log.ZapLogger(),
 		secretKey: cfg.SecretKey,
 		userSvc:   svc,
-		sessSvc:   session.NewSessionService(db),
 		driverSvc: driver.NewService(db),
 	}
 	return srv
@@ -79,6 +76,34 @@ type RegisterResponse struct {
 	Data string `json:"data"`
 }
 
+func (s *AccountServer) ResendOTP(c echo.Context) error {
+	r := c.Request()
+	ctx := r.Context()
+	data := &ResendOTPRequest{}
+	if err := c.Bind(data); err != nil {
+		return err
+	}
+	if err := c.Validate(data); err != nil {
+		return err
+	}
+	usr, err := s.userSvc.FindUser(ctx, &user.UserParams{PhoneNumber: data.PhoneNumber})
+	nextOTPSend, err := s.userSvc.SendConfirmationToken(ctx, usr)
+	if err != nil {
+		return err
+	}
+	token := s.signConfirmInfo("reg", data.PhoneNumber, nextOTPSend)
+	return c.JSON(http.StatusCreated, RegisterResponse{Code: http.StatusOK, Data: token})
+}
+
+type ResendOTPRequest struct {
+	PhoneNumber string `json:"phoneNumber" validate:"required"`
+}
+
+type ResendOTPResponse struct {
+	Code int    `json:"code"`
+	Data string `json:"data"`
+}
+
 func (s *AccountServer) RegisterConfirm(c echo.Context) error {
 	r := c.Request()
 	ctx := r.Context()
@@ -106,6 +131,7 @@ func (s *AccountServer) RegisterConfirm(c echo.Context) error {
 		if err != nil {
 			return err
 		}
+		auth.LoginUser(c, usr.ID, 0)
 		return c.JSON(http.StatusOK, RegisterConfirmResponse{Code: http.StatusOK})
 	case "resend-otp":
 		if time.Now().Before(nextOTPSend) {
@@ -135,13 +161,6 @@ type RegisterConfirmResponse struct {
 }
 
 func (s *AccountServer) Logout(c echo.Context) error {
-	r := c.Request()
-	ctx := r.Context()
-	authInfo, _ := auth.GetAuthInfo(c)
-	err := s.sessSvc.RevokeSession(ctx, authInfo.SessionID)
-	if err != nil {
-		return err
-	}
 	auth.LogoutUser(c)
 	return c.JSON(http.StatusOK, LogoutResponse{Code: http.StatusOK, Data: nil})
 }
@@ -154,10 +173,6 @@ type LogoutResponse struct {
 func (s *AccountServer) Login(c echo.Context) error {
 	r := c.Request()
 	ctx := r.Context()
-	authInfo, loggedIn := auth.GetAuthInfo(c)
-	if loggedIn {
-		return c.JSON(http.StatusOK, LoginResponse{Code: http.StatusOK, Data: authInfo.User})
-	}
 	data := &LoginRequest{}
 	if err := c.Bind(data); err != nil {
 		return err
@@ -169,11 +184,9 @@ func (s *AccountServer) Login(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	sessID, err := s.sessSvc.CreateSession(ctx, usr.ID, 0)
-	if err != nil {
+	if err := auth.LoginUser(c, usr.ID, 0); err != nil {
 		return err
 	}
-	auth.LoginUser(c, sessID, usr, nil)
 	return c.JSON(http.StatusOK, LoginResponse{Code: http.StatusOK, Data: usr})
 }
 
@@ -198,7 +211,7 @@ func (s *AccountServer) UpdateInfo(c echo.Context) error {
 		return err
 	}
 	authInfo, loggedIn := auth.GetAuthInfo(c)
-	if loggedIn && authInfo.User.ID != data.UserID {
+	if loggedIn && authInfo.UserID != data.UserID {
 		return echo.NewHTTPError(http.StatusForbidden, "Bạn không có quyền chỉnh sửa")
 	}
 	usr, err := s.userSvc.UpdateUser(ctx, &user.UserUpdate{
@@ -239,11 +252,8 @@ func (s *AccountServer) LoginDriver(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	sessID, err := s.sessSvc.CreateSession(ctx, 0, driv.ID)
-	if err != nil {
-		return err
-	}
-	auth.LoginUser(c, sessID, nil, driv)
+	driv.Password = ""
+	auth.LoginUser(c, 0, driv.ID)
 	return c.JSON(http.StatusOK, LoginDriverResponse{Code: http.StatusOK, Data: driv})
 }
 

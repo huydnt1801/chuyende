@@ -3,6 +3,7 @@
 package vehicledriver
 
 import (
+	"fmt"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
@@ -24,6 +25,8 @@ const (
 	FieldFullName = "full_name"
 	// FieldPassword holds the string denoting the password field in the database.
 	FieldPassword = "password"
+	// FieldLicense holds the string denoting the license field in the database.
+	FieldLicense = "license"
 	// EdgeTrips holds the string denoting the trips edge name in mutations.
 	EdgeTrips = "trips"
 	// EdgeSessions holds the string denoting the sessions edge name in mutations.
@@ -54,6 +57,7 @@ var Columns = []string{
 	FieldPhoneNumber,
 	FieldFullName,
 	FieldPassword,
+	FieldLicense,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -76,6 +80,29 @@ var (
 	// PhoneNumberValidator is a validator for the "phone_number" field. It is called by the builders before save.
 	PhoneNumberValidator func(string) error
 )
+
+// License defines the type for the "license" enum field.
+type License string
+
+// License values.
+const (
+	LicenseMotor License = "motor"
+	LicenseCar   License = "car"
+)
+
+func (l License) String() string {
+	return string(l)
+}
+
+// LicenseValidator is a validator for the "license" field enum values. It is called by the builders before save.
+func LicenseValidator(l License) error {
+	switch l {
+	case LicenseMotor, LicenseCar:
+		return nil
+	default:
+		return fmt.Errorf("vehicledriver: invalid enum value for license field: %q", l)
+	}
+}
 
 // OrderOption defines the ordering options for the VehicleDriver queries.
 type OrderOption func(*sql.Selector)
@@ -108,6 +135,11 @@ func ByFullName(opts ...sql.OrderTermOption) OrderOption {
 // ByPassword orders the results by the password field.
 func ByPassword(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldPassword, opts...).ToFunc()
+}
+
+// ByLicense orders the results by the license field.
+func ByLicense(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldLicense, opts...).ToFunc()
 }
 
 // ByTripsCount orders the results by trips count.

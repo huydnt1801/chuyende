@@ -11,7 +11,7 @@ func DecodeDriver(input *ent.VehicleDriver) (*Driver, error) {
 	if err != nil {
 		return nil, err
 	}
-	u.Password = ""
+	u.Password = input.Password
 	return u, nil
 }
 
