@@ -2,6 +2,7 @@ import { Image, Pressable, Text, View } from "react-native";
 
 import className from "./className";
 import { blitzcrank } from "../../../../../../components/Image";
+import { beuseravatar } from "../../../../../../components/Image";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faStar } from "@fortawesome/free-solid-svg-icons";
 
@@ -14,7 +15,7 @@ const Avatar = ({ name, phone, rate, onPress }) => {
             <View className={className.imageBorder}>
                 <Image
                     className={className.avatar}
-                    source={blitzcrank} />
+                    source={beuseravatar} />
             </View>
             <Text className={className.name}>{name}</Text>
             <View className={className.infor}>
