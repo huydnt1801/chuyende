@@ -1,7 +1,9 @@
 package trip
 
 import (
+	"github.com/huydnt1801/chuyende/internal/driver"
 	"github.com/huydnt1801/chuyende/internal/ent"
+	"github.com/huydnt1801/chuyende/internal/user"
 	"github.com/mitchellh/mapstructure"
 )
 
@@ -11,7 +13,13 @@ func DecodeTrip(input *ent.Trip) (*Trip, error) {
 	if err != nil {
 		return nil, err
 	}
-	u.DriveID = input.DriverID
+	if input.Edges.Driver != nil {
+		u.Drive = driver.MustDecodeDriver(input.Edges.Driver)
+	}
+	if input.Edges.User != nil {
+		u.User = user.MustDecodeUser(input.Edges.User)
+	}
+	u.CreatedAt = input.CreatedAt
 	return u, nil
 }
 

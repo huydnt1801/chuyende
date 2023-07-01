@@ -49,7 +49,7 @@ func (s *TripServer) GetPriceTrip(c echo.Context) error {
 		return err
 	}
 
-	return c.JSON(http.StatusOK, GetPriceTripResponse{Code: http.StatusOK, Data: &TypeResponse{Motor: data.Distance * 20, Car: data.Distance * 30}})
+	return c.JSON(http.StatusOK, GetPriceTripResponse{Code: http.StatusOK, Data: &TypeResponse{Motor: data.Distance * 20 * 1000, Car: data.Distance * 30 * 1000}})
 }
 
 type ListTripRequest struct {

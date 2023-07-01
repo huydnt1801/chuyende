@@ -87,6 +87,9 @@ func (s *AccountServer) ResendOTP(c echo.Context) error {
 		return err
 	}
 	usr, err := s.userSvc.FindUser(ctx, &user.UserParams{PhoneNumber: data.PhoneNumber})
+	if err != nil {
+		return err
+	}
 	nextOTPSend, err := s.userSvc.SendConfirmationToken(ctx, usr)
 	if err != nil {
 		return err
