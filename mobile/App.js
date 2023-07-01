@@ -20,6 +20,7 @@ import i18next from "./src/share/Language";
 import { UtilComponents } from "./src/share/Utils";
 import TestScreen from "./src/screens/TestScreen";
 import Language from "./src/screens/Language";
+import ChangePassword from "./src/screens/ChangePassword";
 
 const Stack = createNativeStackNavigator();
 
@@ -37,6 +38,7 @@ const screens = [
     { name: "TripDirection", component: TripDirection },
     { name: "Mapp", component: Mapp },
     { name: "Language", component: Language},
+    { name: "ChangePassword", component: ChangePassword },
 
 ]
 
