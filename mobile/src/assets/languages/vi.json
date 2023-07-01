@@ -45,5 +45,10 @@
     "ShopeePay": "ShopeePay",
     "ViettelMoney": "Viettel Money",
     "English": "English",
-    "Vietnamese": "Tiếng Việt"
+    "Vietnamese": "Tiếng Việt",
+    "TripHistory": "Lịch sử chuyến đi",
+    "ChangePassword": "Đổi mật khẩu",
+    "EnterOldPassword": "Nhập mật khẩu cũ",
+    "EnterANewPassword" : "Nhập mật khẩu mới",
+    "EnterYourNewPassword" : "Nhập lại mật khẩu mới"
 }

@@ -19,12 +19,13 @@ import { iconCake, iconMomo, iconShoppeePay, iconViettelMoney, iconZaloPay } fro
 const Payment = () => {
 
     const { t } = useTranslation();
-
+    const navigation = useNavigation();
 
     return (
         <View style={{ flex: 1 }}>
             <Header
-                title={t("Payment")} />
+                title={t("Payment")}
+                onPressBack={() => navigation.goBack()} />
 
             <ScrollView>
             <View>
