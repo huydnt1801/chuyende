@@ -1,5 +1,5 @@
 import { Button } from "react-native";
-import { Text, View} from "react-native";
+import { Text, View } from "react-native";
 import { useDispatch } from "react-redux";
 import { setAccount } from "../../slices/Account";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -12,7 +12,7 @@ import { useTranslation } from "react-i18next";
 import className from "./className";
 import ButtonRow from "./ButtonRow";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faFingerprint,faKeyboard, faLanguage, faPowerOff,} from "@fortawesome/free-solid-svg-icons";
+import { faFingerprint, faKeyboard, faLanguage, faPowerOff, } from "@fortawesome/free-solid-svg-icons";
 import Utils from "../../share/Utils";
 
 const Setting = () => {
@@ -83,6 +83,7 @@ const Setting = () => {
                         dispatch(setAccount(null));
                         try {
                             await AsyncStorage.removeItem("account");
+                            await AsyncStorage.removeItem("cookie");
                         } catch (error) {
                         }
                         navigation.dispatch(StackActions.replace("Splash"));

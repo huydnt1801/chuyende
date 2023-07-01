@@ -1,11 +1,11 @@
 import accountApi from "./Account"
 import google from "./Google"
-import trip from "./Trip"
+import tripApi from "./Trip"
 import { Result } from "./baseApi"
 
 const Api = {
     account: accountApi,
-    trip: trip,
+    trip: tripApi,
     google: google,
     ResultCode: Result
 }

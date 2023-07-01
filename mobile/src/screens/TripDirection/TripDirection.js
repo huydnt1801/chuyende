@@ -7,6 +7,12 @@ import { faHeart, faL, faPersonFalling } from "@fortawesome/free-solid-svg-icons
 import MapViewDirections from "react-native-maps-directions";
 import { useSelector } from "react-redux";
 import { useState } from "react";
+import { useRef } from "react";
+import BottomSheet from "./components/BottomSheet";
+import Api from "../../api";
+import Utils from "../../share/Utils";
+import ModalFinding from "./components/ModalFinding";
+import { memo } from "react";
 
 const MarkerType = {
     START: 1,
@@ -44,9 +50,25 @@ const CustomMarker = ({ type = MarkerType.START, place }) => {
     );
 }
 
+const Direction = memo(({ source, destination }) => {
+
+    console.log("re-render");
+
+    return (
+        <MapViewDirections
+            origin={source}
+            destination={destination}
+            apikey={"AIzaSyBt5Cp2LUkwqb8wq-wgDDjIN1KZTeHebY4"}
+            strokeWidth={4}
+            strokeColor="#111111"
+        />
+    )
+});
+
 
 const TripDirection = () => {
 
+    const { t } = useTranslation();
     const { source, destination } = useSelector(state => state.trip)
 
     const defaultPosition = {
@@ -54,26 +76,29 @@ const TripDirection = () => {
         longitude: (source.longitude + destination.longitude) / 2
     };
 
-    console.log(defaultPosition);
-    // const defaultPosition = {
-    //     latitude: 21.0285,
-    //     longitude: 105.8542
-    // };
+    const [vehicle, setVehicle] = useState("motor");
+    const [showModalFinding, setShowModalFinding] = useState(false);
 
-    const start = {
-        latitude: 21.03429931508327,
-        longitude: 105.8507011685404
+    console.log(Utils.data["cookie"]);
+
+    const handleClickOrder = async () => {
+        Utils.showLoading();
+        const result = await Api.trip.createTrip({
+            startX: source.latitude,
+            startY: source.latitude,
+            startLocation: source.description,
+            endX: destination.latitude,
+            endY: destination.latitude,
+            endLocation: destination.description,
+            distance: 10,
+            type: vehicle
+        });
+        await Utils.wait(500);
+        Utils.hideLoading();
+        console.log(result);
+        await Utils.wait(1000);
+        setShowModalFinding(true);
     }
-    const end = {
-        latitude: 21.01826747575612,
-        longitude: 105.85388186669118
-    }
-
-    const x = [1, 2, 3]
-    console.log(x);
-    console.log(x.slice(2, 5));
-
-    const { t } = useTranslation();
 
     return (
         <View className={className.container}>
@@ -95,7 +120,8 @@ const TripDirection = () => {
                     />
                 </Marker>
                 <Marker
-                    coordinate={destination}>
+                    coordinate={destination}
+                    la>
                     <CustomMarker
                         type={MarkerType.DESTINATION}
                         place={destination.place}
@@ -109,6 +135,20 @@ const TripDirection = () => {
                     strokeColor="#111111"
                 />
             </MapView>
+            <BottomSheet
+                vehicle={vehicle}
+                onChangeVehicle={vehicle => setVehicle(vehicle)} />
+            <View className={className.bottom}>
+                <TouchableOpacity
+                    activeOpacity={0.7}
+                    className={className.buttonOrder}
+                    onPress={handleClickOrder}>
+                    <Text className={className.buttonText}>{"Tìm tài xế"}</Text>
+                </TouchableOpacity>
+            </View>
+            <ModalFinding
+                show={showModalFinding}
+                onPressCancel={() => setShowModalFinding(false)} />
         </View>
     )
 }

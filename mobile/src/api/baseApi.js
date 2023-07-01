@@ -12,6 +12,7 @@ const baseApi = axios.create({
     baseURL: `${env.API_BASE_URL}/api/v1`,
     headers: {
         "content-type": "application/json",
+        // cookie: Utils.data["cookie"]
     }
 });
 

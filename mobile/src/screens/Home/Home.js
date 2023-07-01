@@ -9,6 +9,7 @@ import Account from "./pages/Account";
 import History from "./pages/History";
 import Reward from "./pages/Reward";
 import { useSelector } from "react-redux";
+import Utils from "../../share/Utils";
 
 const Tab = createBottomTabNavigator();
 
@@ -45,6 +46,7 @@ const Home = () => {
 
     const { account } = useSelector(state => state.account);
     console.log(account);
+    console.log(typeof (Utils.data["cookie"]));
 
     return (
         <Tab.Navigator

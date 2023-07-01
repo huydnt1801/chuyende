@@ -9,7 +9,7 @@ import className from "./className";
 import Header from "../../components/Header";
 import Utils from "../../share/Utils";
 import Api from "../../api";
-import { setAccount } from "../../slices/Account";
+import { setAccount, setCookie } from "../../slices/Account";
 import { useEffect } from "react";
 
 const types = {
@@ -135,9 +135,12 @@ const PasswordOTP = () => {
                 const login = await Api.account.login(userPhone, password);
                 await Utils.wait(300);
                 if (login.result == Api.ResultCode.SUCCESS) {
+                    const cookie = login.headers["set-cookie"] ?? "";
+                    Utils.data["cookie"] = String(cookie);
                     dispatch(setAccount(login.data.data));
                     try {
-                        await AsyncStorage.setItem("account", JSON.stringify(login.data.data))
+                        await AsyncStorage.setItem("account", JSON.stringify(login.data.data));
+                        await AsyncStorage.setItem("cookie", String(cookie));
                     } catch (error) { }
                     Utils.hideLoading();
                     navigation.dispatch(StackActions.replace("Home"))
@@ -155,10 +158,12 @@ const PasswordOTP = () => {
             const login = await Api.account.login(userPhone, passwordOrOTP);
             await Utils.wait(300);
             if (login.result == Api.ResultCode.SUCCESS) {
+                const cookie = login.headers["set-cookie"] ?? "";
                 dispatch(setAccount(login.data.data));
-                Utils.data["cookie"] = login.headers["set-cookie"] ?? null;
+                Utils.data["cookie"] = String(cookie);
                 try {
-                    await AsyncStorage.setItem("account", JSON.stringify(login.data.data))
+                    await AsyncStorage.setItem("account", JSON.stringify(login.data.data));
+                    await AsyncStorage.setItem("cookie", String(cookie));
                 } catch (error) { }
                 Utils.hideLoading();
                 navigation.dispatch(StackActions.replace("Home"))

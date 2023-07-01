@@ -30,8 +30,20 @@ const Splash = () => {
                 return null;
             }
         })();
+        const cookie = await (async () => {
+            try {
+                const data = await AsyncStorage.getItem("cookie");
+                return data;
+            } catch (error) {
+                return null;
+            }
+        })();
         await Utils.wait(300);
         Utils.hideLoading();
+        console.log(cookie);
+        if (cookie) {
+            Utils.data["cookie"] = cookie;
+        }
         if (account) {
             dispatch(setAccount(JSON.parse(account)))
             navigation.dispatch(StackActions.replace("Home"));
