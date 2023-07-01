@@ -39,9 +39,9 @@ func (s *ServiceImpl) FindTrip(ctx context.Context, params *TripParams) ([]*Trip
 func (s *ServiceImpl) CreateTrip(ctx context.Context, trip *Trip) (*Trip, error) {
 	repo := NewRepo(s.entClient)
 	if trip.Type == entTrip.TypeMotor {
-		trip.Price = 20 * trip.Distance
+		trip.Price = 20 * 1000 * trip.Distance
 	} else {
-		trip.Price = 30 * trip.Distance
+		trip.Price = 30 * 1000 * trip.Distance
 	}
 	return repo.CreateTrip(ctx, trip)
 }

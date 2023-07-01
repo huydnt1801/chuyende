@@ -29,7 +29,7 @@ func NewRepo(client *ent.Client) *RepoImpl {
 }
 
 func (r *RepoImpl) FindTrip(ctx context.Context, params *TripParams) ([]*Trip, error) {
-	q := r.client.Trip.Query()
+	q := r.client.Trip.Query().WithUser().WithDriver()
 	if v := params.TripID; v != nil {
 		q = q.Where(trip.ID(*v))
 	}
