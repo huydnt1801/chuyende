@@ -12,48 +12,51 @@ import { useTranslation } from "react-i18next";
 import className from "./className";
 import ButtonRow from "./ButtonRow";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faFingerprint, faFlagUsa, faKeyboard, faLanguage, faPowerOff, } from "@fortawesome/free-solid-svg-icons";
+import { faCheck } from "@fortawesome/free-solid-svg-icons";
 import Utils from "../../share/Utils";
 
 const Language = () => {
 
     const dispatch = useDispatch();
     const navigation = useNavigation();
+    const { i18n } = useTranslation();
+    const language = i18n.language;
     const { t } = useTranslation();
     return (
         <View className={className.container}>
             <View >
                 <Header
-                    title={t("SelectLanguage")} />
+                    title={t("SelectLanguage")}
+                    onPressBack={()=> navigation.goBack()} />
             </View>
             <ScrollView>
 
                 <ButtonRow
                     classNames={`mt-2`}
                     title={t("English")}
-                    onPress={() => Utils.toast("Coming Soon!")}
-                    // iconLeft={
-                    //     <FontAwesomeIcon
-                    //         icon={faFlagUsa}
-                    //         size={18}
-                    //         style={{
-                    //             color: "rgb(107 114 128)",
-                    //             marginRight: 8
-                    //         }} />}
+                    onPress={() => i18n.changeLanguage("en")}
+                    iconRight={
+                        <FontAwesomeIcon
+                            icon={faCheck}
+                            size={18}
+                            style={{
+                                color: language == "en" ? "rgb(234 179 8)" : "white",
+                                marginRight: 8
+                            }} />}
 
                 />
                 <ButtonRow
                     classNames={`mt-2`}
                     title={t("Vietnamese")}
-                    onPress={() => Utils.toast("Coming Soon!")}
-                    // iconLeft={
-                    //     <FontAwesomeIcon
-                    //         icon={faLanguage}
-                    //         size={18}
-                    //         style={{
-                    //             color: "rgb(107 114 128)",
-                    //             marginRight: 8
-                    //         }} />}
+                    onPress={() => i18n.changeLanguage("vi")}
+                    iconRight={
+                        <FontAwesomeIcon
+                            icon={faCheck}
+                            size={18}
+                            style={{
+                                color: language == "vi" ? "rgb(234 179 8)" : "white",
+                                marginRight: 8
+                            }} />}
                 />
 
             </ScrollView>
