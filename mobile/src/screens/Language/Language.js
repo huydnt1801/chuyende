@@ -1,23 +1,17 @@
-import { Button } from "react-native";
-import { Text, View } from "react-native";
-import { useDispatch } from "react-redux";
-import { setAccount } from "../../slices/Account";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { StackActions, useNavigation } from "@react-navigation/native";
-import {
-    ScrollView,
-} from "react-native";
-import Header from "../../components/Header";
 import { useTranslation } from "react-i18next";
-import className from "./className";
-import ButtonRow from "./ButtonRow";
+import { useNavigation } from "@react-navigation/native";
+import {
+    ScrollView, View
+} from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
-import Utils from "../../share/Utils";
+
+import Header from "../../components/Header";
+import className from "./className";
+import ButtonRow from "./ButtonRow";
 
 const Language = () => {
 
-    const dispatch = useDispatch();
     const navigation = useNavigation();
     const { i18n } = useTranslation();
     const language = i18n.language;
@@ -27,7 +21,7 @@ const Language = () => {
             <View >
                 <Header
                     title={t("SelectLanguage")}
-                    onPressBack={()=> navigation.goBack()} />
+                    onPressBack={() => navigation.goBack()} />
             </View>
             <ScrollView>
 

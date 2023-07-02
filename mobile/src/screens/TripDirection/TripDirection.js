@@ -1,18 +1,16 @@
-import { Text, View, Button, StyleSheet, TouchableOpacity, TextInput } from "react-native";
-import MapView, { Marker, Callout } from "react-native-maps"
+import { Text, View, StyleSheet, TouchableOpacity } from "react-native";
+import MapView, { Marker } from "react-native-maps"
 import className from "./className"
 import { useTranslation } from "react-i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faHeart, faL, faPersonFalling } from "@fortawesome/free-solid-svg-icons";
+import { faHeart, faPersonFalling } from "@fortawesome/free-solid-svg-icons";
 import MapViewDirections from "react-native-maps-directions";
 import { useSelector } from "react-redux";
 import { useState } from "react";
-import { useRef } from "react";
 import BottomSheet from "./components/BottomSheet";
 import Api from "../../api";
 import Utils from "../../share/Utils";
 import ModalFinding from "./components/ModalFinding";
-import { memo } from "react";
 import { useEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
 

@@ -7,21 +7,21 @@ import {
     TextInput
 } from "react-native";
 import { useTranslation } from "react-i18next";
+import { useEffect } from "react";
 import { useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faFacebook, faGoogle } from "@fortawesome/free-brands-svg-icons";
 import { StackActions, useNavigation } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useDispatch } from "react-redux";
 
 import { flagVietnam } from "../../components/Image";
 import className from "./className";
 import Utils from "../../share/Utils";
 import Api from "../../api";
 import { types } from "../PasswordOTP"
-import { useEffect } from "react";
 import InputPasswordOTP from "../../components/UI/InputPasswordOTP/InputPasswordOTP";
-import { useDispatch } from "react-redux";
 import { setAccount, setIsDriver } from "../../slices/Account";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 /**
  * A text component can be clickable
  * @typedef props
