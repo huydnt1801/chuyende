@@ -713,32 +713,12 @@ func TestUpdateStatusTrip(t *testing.T) {
 	// Mock mysql data
 	mockUsers := mockUsers(client, 2)
 	mockDrivers := mockDrivers(client, 2)
-	mockTrips := mockTrips(client, mockUsers[0].ID, mockDrivers[0].ID, 1)
+	mockTrips := mockTrips(client, mockUsers[0].ID, mockDrivers[0].ID, 3)
 
 	tests := []struct {
 		name string
 		info *TestUpdateStatusTripInfo
 	}{
-		{
-			name: "[UpdateStatusTrip][Success] Return 200 - user update status waiting success",
-			info: &TestUpdateStatusTripInfo{
-				authInfo: &auth.AuthInfo{
-					UserID: mockUsers[0].ID,
-				},
-				urlParams: map[string]int{
-					"tripId": mockTrips[0].ID,
-				},
-				body: map[string]interface{}{
-					"status": "waiting",
-				},
-				output: &UpdateStatusTripResponse{
-					Code: http.StatusOK,
-					Data: &trip.Trip{
-						Status: "waiting",
-					},
-				},
-			},
-		},
 		{
 			name: "[UpdateStatusTrip][Success] Return 200 - user update status cancel success",
 			info: &TestUpdateStatusTripInfo{
@@ -760,13 +740,30 @@ func TestUpdateStatusTrip(t *testing.T) {
 			},
 		},
 		{
-			name: "[UpdateStatusTrip][Success] Return 200 - driver update status accept success",
+			name: "[UpdateStatusTrip][Fail] Return 400 - trip canceled",
 			info: &TestUpdateStatusTripInfo{
 				authInfo: &auth.AuthInfo{
 					DriverID: mockDrivers[0].ID,
 				},
 				urlParams: map[string]int{
 					"tripId": mockTrips[0].ID,
+				},
+				body: map[string]interface{}{
+					"status": "done",
+				},
+				output: &UpdateStatusTripResponse{
+					Code: http.StatusBadRequest,
+				},
+			},
+		},
+		{
+			name: "[UpdateStatusTrip][Success] Return 200 - driver update status accept success",
+			info: &TestUpdateStatusTripInfo{
+				authInfo: &auth.AuthInfo{
+					DriverID: mockDrivers[0].ID,
+				},
+				urlParams: map[string]int{
+					"tripId": mockTrips[1].ID,
 				},
 				body: map[string]interface{}{
 					"status": "accept",
@@ -787,7 +784,7 @@ func TestUpdateStatusTrip(t *testing.T) {
 					DriverID: mockDrivers[0].ID,
 				},
 				urlParams: map[string]int{
-					"tripId": mockTrips[0].ID,
+					"tripId": mockTrips[1].ID,
 				},
 				body: map[string]interface{}{
 					"status": "done",
@@ -802,13 +799,30 @@ func TestUpdateStatusTrip(t *testing.T) {
 			},
 		},
 		{
+			name: "[UpdateStatusTrip][Fail] Return 400 - trip done",
+			info: &TestUpdateStatusTripInfo{
+				authInfo: &auth.AuthInfo{
+					UserID: mockUsers[0].ID,
+				},
+				urlParams: map[string]int{
+					"tripId": mockTrips[1].ID,
+				},
+				body: map[string]interface{}{
+					"status": "cancel",
+				},
+				output: &UpdateStatusTripResponse{
+					Code: http.StatusBadRequest,
+				},
+			},
+		},
+		{
 			name: "[UpdateStatusTrip][Fail] Return 400 - missing require field",
 			info: &TestUpdateStatusTripInfo{
 				authInfo: &auth.AuthInfo{
 					DriverID: mockDrivers[0].ID,
 				},
 				urlParams: map[string]int{
-					"tripId": mockTrips[0].ID,
+					"tripId": mockTrips[2].ID,
 				},
 				body: map[string]interface{}{},
 				output: &UpdateStatusTripResponse{
@@ -823,7 +837,7 @@ func TestUpdateStatusTrip(t *testing.T) {
 					DriverID: mockDrivers[1].ID,
 				},
 				urlParams: map[string]int{
-					"tripId": mockTrips[0].ID,
+					"tripId": mockTrips[2].ID,
 				},
 				body: map[string]interface{}{
 					"status": "done",
@@ -840,10 +854,10 @@ func TestUpdateStatusTrip(t *testing.T) {
 					UserID: mockUsers[1].ID,
 				},
 				urlParams: map[string]int{
-					"tripId": mockTrips[0].ID,
+					"tripId": mockTrips[2].ID,
 				},
 				body: map[string]interface{}{
-					"status": "waiting",
+					"status": "cancel",
 				},
 				output: &UpdateStatusTripResponse{
 					Code: http.StatusForbidden,
@@ -857,7 +871,7 @@ func TestUpdateStatusTrip(t *testing.T) {
 					UserID: mockUsers[0].ID,
 				},
 				urlParams: map[string]int{
-					"tripId": mockTrips[0].ID,
+					"tripId": mockTrips[2].ID,
 				},
 				body: map[string]interface{}{
 					"status": "done",
@@ -874,7 +888,7 @@ func TestUpdateStatusTrip(t *testing.T) {
 					UserID: mockUsers[0].ID,
 				},
 				urlParams: map[string]int{
-					"tripId": mockTrips[0].ID,
+					"tripId": mockTrips[2].ID,
 				},
 				body: map[string]interface{}{
 					"status": "accept",
@@ -891,7 +905,7 @@ func TestUpdateStatusTrip(t *testing.T) {
 					UserID: mockUsers[0].ID,
 				},
 				urlParams: map[string]int{
-					"tripId": mockTrips[0].ID,
+					"tripId": mockTrips[2].ID,
 				},
 				body: map[string]interface{}{
 					"status": "test",
@@ -902,13 +916,13 @@ func TestUpdateStatusTrip(t *testing.T) {
 			},
 		},
 		{
-			name: "[UpdateStatusTrip][Fail] Return 400 - user can not update waiting",
+			name: "[UpdateStatusTrip][Fail] Return 400 - driver can not update waiting",
 			info: &TestUpdateStatusTripInfo{
 				authInfo: &auth.AuthInfo{
 					DriverID: mockDrivers[0].ID,
 				},
 				urlParams: map[string]int{
-					"tripId": mockTrips[0].ID,
+					"tripId": mockTrips[2].ID,
 				},
 				body: map[string]interface{}{
 					"status": "waiting",
@@ -919,13 +933,13 @@ func TestUpdateStatusTrip(t *testing.T) {
 			},
 		},
 		{
-			name: "[UpdateStatusTrip][Fail] Return 400 - user can not update cancel",
+			name: "[UpdateStatusTrip][Fail] Return 400 - driver can not update cancel",
 			info: &TestUpdateStatusTripInfo{
 				authInfo: &auth.AuthInfo{
 					DriverID: mockDrivers[0].ID,
 				},
 				urlParams: map[string]int{
-					"tripId": mockTrips[0].ID,
+					"tripId": mockTrips[2].ID,
 				},
 				body: map[string]interface{}{
 					"status": "cancel",
@@ -936,13 +950,13 @@ func TestUpdateStatusTrip(t *testing.T) {
 			},
 		},
 		{
-			name: "[UpdateStatusTrip][Fail] Return 400 - user can not update strange status",
+			name: "[UpdateStatusTrip][Fail] Return 400 - driver can not update strange status",
 			info: &TestUpdateStatusTripInfo{
 				authInfo: &auth.AuthInfo{
 					DriverID: mockDrivers[0].ID,
 				},
 				urlParams: map[string]int{
-					"tripId": mockTrips[0].ID,
+					"tripId": mockTrips[2].ID,
 				},
 				body: map[string]interface{}{
 					"status": "test",

@@ -213,8 +213,8 @@ func (s *AccountServer) UpdateInfo(c echo.Context) error {
 	if err := c.Validate(data); err != nil {
 		return err
 	}
-	authInfo, loggedIn := auth.GetAuthInfo(c)
-	if loggedIn && authInfo.UserID != data.UserID {
+	authInfo, _ := auth.GetAuthInfo(c)
+	if authInfo.UserID != data.UserID {
 		return echo.NewHTTPError(http.StatusForbidden, "Bạn không có quyền chỉnh sửa")
 	}
 	usr, err := s.userSvc.UpdateUser(ctx, &user.UserUpdate{
@@ -279,9 +279,6 @@ func (s *AccountServer) CheckPhone(c echo.Context) error {
 	}
 	if err := c.Validate(data); err != nil {
 		return err
-	}
-	if data.PhoneNumber == "" {
-		return echo.NewHTTPError(http.StatusBadRequest, "Số điện thoại không hợp lệ")
 	}
 	usr, err := s.userSvc.FindUser(ctx, &user.UserParams{PhoneNumber: data.PhoneNumber})
 	if user.IsUserNotFound(err) {

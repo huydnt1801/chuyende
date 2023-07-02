@@ -83,17 +83,11 @@ func (s *ServiceImpl) UpdateUser(ctx context.Context, params *UserUpdate) (*User
 	if err != nil {
 		return nil, err
 	}
-	err = repo.UpdateUser(ctx, user, params)
+	usr, err := repo.UpdateUser(ctx, user, params)
 	if err != nil {
 		return nil, err
 	}
-	if params.FullName != "" {
-		user.FullName = params.FullName
-	}
-	if params.ImageURL != "" {
-		user.FullName = params.ImageURL
-	}
-	return user, nil
+	return usr, nil
 }
 
 func (s *ServiceImpl) Authenticate(ctx context.Context, phoneNumber, password string) (*User, error) {
@@ -138,7 +132,7 @@ func (s *ServiceImpl) Confirm(ctx context.Context, usr *User, otp string) error 
 	}
 
 	confirmed := true
-	err = repo.UpdateUser(ctx, usr, &UserUpdate{
+	_, err = repo.UpdateUser(ctx, usr, &UserUpdate{
 		Confirmed: &confirmed,
 	})
 	if err != nil {
@@ -149,6 +143,11 @@ func (s *ServiceImpl) Confirm(ctx context.Context, usr *User, otp string) error 
 
 func (s *ServiceImpl) FindUser(ctx context.Context, params *UserParams) (*User, error) {
 	repo := NewRepo(s.entClient)
+	if params.PhoneNumber != "" {
+		if !isValidPhoneNumber(params.PhoneNumber) {
+			return nil, InvalidPhoneError{}
+		}
+	}
 	user, err := repo.FindUser(ctx, params)
 	if err != nil {
 		return nil, err
