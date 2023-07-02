@@ -23,6 +23,8 @@ func Middleware(db *sql.DB) echo.MiddlewareFunc {
 			r := c.Request()
 
 			if strings.HasPrefix(r.URL.Path, "/api/v1/accounts/register") ||
+				strings.HasPrefix(r.URL.Path, "/healthz/liveness") ||
+				strings.HasPrefix(r.URL.Path, "/healthz/ready") ||
 				strings.HasPrefix(r.URL.Path, "/api/v1/accounts/login") ||
 				strings.HasPrefix(r.URL.Path, "/api/v1/accounts/confirm") ||
 				strings.HasPrefix(r.URL.Path, "/api/v1/accounts/resend") ||
