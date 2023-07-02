@@ -1,12 +1,13 @@
 import { View } from "react-native"
-import Header from "../../components/Header"
+import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next"
-import { ButtonRow } from "../../components/UI";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { CommonActions, StackActions, useNavigation } from "@react-navigation/native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faPowerOff } from "@fortawesome/free-solid-svg-icons";
-import { useDispatch, useSelector } from "react-redux";
+import { CommonActions, useNavigation } from "@react-navigation/native";
+
+import Header from "../../components/Header"
+import { ButtonRow } from "../../components/UI";
 import { setAccount } from "../../slices/Account";
 import Api from "../../api";
 

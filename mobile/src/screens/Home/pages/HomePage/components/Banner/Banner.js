@@ -1,7 +1,6 @@
-import { ImageBackground, Pressable, TextInput, View, StyleSheet } from "react-native"
+import { ImageBackground, Pressable, TextInput, View } from "react-native"
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 
-import { banhmique } from "../../../../../../components/Image";
 import className from "./className"
 import { faLocationDot } from "@fortawesome/free-solid-svg-icons";
 import bebanner from "../../../../../../assets/images/bebanner.png";
@@ -14,7 +13,6 @@ const Banner = ({ onPress }) => {
     return (
         <ImageBackground
             source={bebanner}
-            // style={StyleSheet.absoluteFillObject}
             className={className.wrapper}>
             <Pressable
                 className={className.border}>

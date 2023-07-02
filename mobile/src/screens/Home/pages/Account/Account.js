@@ -2,12 +2,12 @@ import { ScrollView, Text, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useTranslation } from "react-i18next"
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import { useSelector } from "react-redux";
 import { faAngleRight, faCar, faEnvelope, faGear, faGem, faHeadphones, faLink, faMoneyBill, faShareNodes, faShieldAlt } from "@fortawesome/free-solid-svg-icons";
 
 import Avatar from "./components/Avatar";
 import ButtonRow from "./components/ButtonRow";
 import className from "./className";
-import { useSelector } from "react-redux";
 
 const Account = () => {
 
@@ -34,12 +34,6 @@ const Account = () => {
                                 color: "rgb(107 114 128)",
                                 marginRight: 8
                             }} />}
-                // iconRight={
-                //     <FontAwesomeIcon
-                //         icon={faAngleRight}
-                //         size={16}
-                //         style={{ color: "rgb(107 114 128)" }} />
-                // }
                 />
                 <ButtonRow
                     classNames={`mt-2`}

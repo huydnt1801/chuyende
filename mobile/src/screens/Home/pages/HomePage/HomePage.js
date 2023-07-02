@@ -1,20 +1,22 @@
 import { useNavigation } from "@react-navigation/native";
-import { Text, View, StatusBar, Pressable, Button, ScrollView, Image, StyleSheet } from "react-native";
+import { Text, View, Pressable, ScrollView, Image } from "react-native";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import { faMotorcycle, faPerson } from "@fortawesome/free-solid-svg-icons";
+import { useTranslation } from "react-i18next";
+import { useSelector } from "react-redux";
 
 import className from "./className";
 import Banner from "./components/Banner/Banner";
-import { bebanner, bevoucher, blitzcrank } from "../../../../components/Image";
-import { useSelector } from "react-redux";
+import { bevoucher } from "../../../../components/Image";
 import { locationTypes } from "../../../SelectLocation";
 
-import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faCheck, faDriversLicense, faMotorcycle, faPerson } from "@fortawesome/free-solid-svg-icons";
-import { useTranslation } from "react-i18next";
+
 const HomePage = () => {
 
     const navigation = useNavigation();
     const { t } = useTranslation()
     const { account } = useSelector(state => state.account);
+
     return (
         <View className={className.container}>
             <View className={className.header}>
@@ -34,9 +36,6 @@ const HomePage = () => {
                                 color: "rgb(234 179 8)",
                                 marginRight: 8
                             }} />
-                        {/* <Image
-                            className={className.imageButton}
-                            source={blitzcrank} /> */}
                         <Text className={className.textButton}>{t("FindCar")}</Text>
                     </Pressable>
                     <Pressable className={className.button}>

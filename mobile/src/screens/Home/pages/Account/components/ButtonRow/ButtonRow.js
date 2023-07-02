@@ -1,6 +1,5 @@
 import { Pressable, Text, View } from "react-native";
-import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import _ from "lodash"
+import _ from "lodash";
 
 import className from "./className";
 

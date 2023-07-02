@@ -1,29 +1,21 @@
+import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigation } from "@react-navigation/native";
-import { View } from "react-native";
+import { View, Image, Pressable, TouchableOpacity, RefreshControl, FlatList, Text } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faClock, faClockRotateLeft, faGear, faGift, faHeart, faHome, faPersonFalling, faUser } from "@fortawesome/free-solid-svg-icons";
+import { useDispatch, useSelector } from "react-redux";
 
 import HomePage from "./pages/HomePage";
 import Account from "./pages/Account";
 import History from "./pages/History";
 import Reward from "./pages/Reward";
-import { useDispatch, useSelector } from "react-redux";
 import Utils from "../../share/Utils";
-import { Text } from "react-native";
 import Api from "../../api";
 import Avatar from "./pages/Account/components/Avatar";
-import { FlatList } from "react-native";
-import { useState } from "react";
 import className from "./className";
-import { Image } from "react-native";
 import { iconCarActive, iconMotorActive } from "../../components/Icon";
-import { Pressable } from "react-native";
-import { useTranslation } from "react-i18next";
-import { RefreshControl } from "react-native";
-import { TouchableOpacity } from "react-native";
-import { useEffect } from "react";
-import { Button } from "react-native";
 import { thunkGetListTrip } from "../../slices/Trip";
 
 const Tab = createBottomTabNavigator();
