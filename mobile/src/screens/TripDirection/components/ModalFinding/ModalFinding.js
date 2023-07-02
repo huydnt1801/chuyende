@@ -1,7 +1,10 @@
+import { useTranslation } from "react-i18next"
 import { ActivityIndicator, Modal, Text, TouchableOpacity, View } from "react-native"
 
 
 const ModalFinding = ({ show, onPressCancel }) => {
+
+    const { t } = useTranslation()
 
     return (
         <Modal
@@ -19,7 +22,7 @@ const ModalFinding = ({ show, onPressCancel }) => {
                         activeOpacity={0.7}
                         onPress={onPressCancel}>
                         <Text className="font-semibold text-white">
-                            Hủy
+                            {t("Cancel")}
                         </Text>
                     </TouchableOpacity>
                 </View>

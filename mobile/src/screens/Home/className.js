@@ -10,7 +10,7 @@ const className = {
     place: `ml-3 flex-1`,
     time: `flex-row items-center mb-[2px]`,
     information: `flex-row items-center`,
-    divide: `mx-2 w-[2px] h-[14px] rounded-full bg-black`,
+    divide: `mx-2 w-[1px] h-[14px] rounded-full bg-black`,
     bold: `font-semibold`,
     button: `mt-2 w-full items-center justify-center py-3 bg-yellow-400 rounded mb-2`,
     accept: `font-semibold text-white`,

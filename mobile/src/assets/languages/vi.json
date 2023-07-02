@@ -105,5 +105,9 @@
     "WhereDoWantToGo": "Bạn muốn đi đâu?",
     "FindCar": "Tìm xe",
     "HireDriver": "Thuê tài xế",
-    "Reward": "Ưu đãi của tôi"
+    "Reward": "Ưu đãi của tôi",
+    "AreYouSureToCancelThisTrip": "Bạn có chắc chắn hủy tìm chuyến?",
+    "CancelTrip": "Hủy chuyến",
+    "CanNotCancelTrip": "Chuyến đi đã hoàn thành, không thể hủy!",
+    "CancelSuccess": "Hủy thành công!"
 }

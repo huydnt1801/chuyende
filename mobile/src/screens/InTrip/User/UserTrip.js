@@ -72,6 +72,41 @@ const UserTrip = ({ tripId }) => {
                         <Text className="flex-[2]">{t("Price")}:</Text>
                         <Text className="font-semibold text-right">{trip?.price?.toLocaleString()} VND</Text>
                     </View>
+                    <TouchableOpacity
+                        className="items-center py-3 mx-8 bg-yellow-400 mt-3"
+                        activeOpacity={0.7}
+                        onPress={() => {
+                            Utils.showConfirmDialog({
+                                message: t("AreYouSureToCancelThisTrip"),
+                                onConfirm: async () => {
+                                    const result = await Api.trip.getTripInformation(tripId);
+                                    if (result.result == Api.ResultCode.SUCCESS) {
+                                        if (result.data?.data[0]?.status == "done") {
+                                            Utils.hideConfirmDialog();
+                                            Utils.showMessageDialog({
+                                                message: t("CanNotCancelTrip"),
+                                                onConfirm: () => navigation.dispatch(CommonActions.reset({
+                                                    index: 0,
+                                                    routes: [{ name: "Home" }]
+                                                }))
+                                            });
+                                        }
+                                        else {
+                                            await Api.trip.updateStatus(tripId, "cancel");
+                                            Utils.showMessageDialog({
+                                                message: t("CancelSuccess"),
+                                                onConfirm: () => navigation.dispatch(CommonActions.reset({
+                                                    index: 0,
+                                                    routes: [{ name: "Home" }]
+                                                }))
+                                            });
+                                        }
+                                    }
+                                }
+                            })
+                        }}>
+                        <Text className="font-semibold text-white">{t("CancelTrip")}</Text>
+                    </TouchableOpacity>
                     <Text className="font-semibold my-2">{t("Detail")}:</Text>
                     <MessageRow
                         day={"20/06/2022"}
