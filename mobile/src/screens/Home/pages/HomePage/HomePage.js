@@ -9,28 +9,24 @@ import { locationTypes } from "../../../SelectLocation";
 
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faCheck, faDriversLicense, faMotorcycle, faPerson } from "@fortawesome/free-solid-svg-icons";
+import { useTranslation } from "react-i18next";
 const HomePage = () => {
 
     const navigation = useNavigation();
-    const { account } = useSelector(state => state.account)
+    const { t } = useTranslation()
+    const { account } = useSelector(state => state.account);
     return (
         <View className={className.container}>
             <View className={className.header}>
                 <Text className={className.welcome}>
-                    {`Chào ${account?.fullName}!`}
+                    {`${t("Wellcome")} ${account?.fullName}!`}
                 </Text>
-                <Pressable>
-
-                </Pressable>
-
             </View>
-            <View>
-
+            <ScrollView>
                 <Banner
                     onPress={() => navigation.navigate("SelectLocation", { type: locationTypes.SELECT_DESTINATION })} />
                 <View className={className.action}>
                     <Pressable className={className.button}>
-
                         <FontAwesomeIcon
                             icon={faMotorcycle}
                             size={40}
@@ -41,7 +37,7 @@ const HomePage = () => {
                         {/* <Image
                             className={className.imageButton}
                             source={blitzcrank} /> */}
-                        <Text className={className.textButton}>{"Tìm xe"}</Text>
+                        <Text className={className.textButton}>{t("FindCar")}</Text>
                     </Pressable>
                     <Pressable className={className.button}>
                         <FontAwesomeIcon
@@ -54,7 +50,7 @@ const HomePage = () => {
                         {/* <Image
                             className={className.imageButton}
                             source={blitzcrank} /> */}
-                        <Text className={className.textButton}>{"Thuê tài xế"}</Text>
+                        <Text className={className.textButton}>{t("HireDriver")}</Text>
                     </Pressable>
                 </View>
                 <View>
@@ -68,7 +64,7 @@ const HomePage = () => {
                         source={bevoucher} />
                 </View>
 
-            </View>
+            </ScrollView>
             {/* <Image
                 style={{
                     resizeMode: 'center',

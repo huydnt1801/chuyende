@@ -4,9 +4,9 @@ import className from "./className";
 import { blitzcrank } from "../../../../../../components/Image";
 import { beuseravatar } from "../../../../../../components/Image";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faStar } from "@fortawesome/free-solid-svg-icons";
+import { faCarSide, faMotorcycle, faStar } from "@fortawesome/free-solid-svg-icons";
 
-const Avatar = ({ name, phone, rate, onPress, classNames }) => {
+const Avatar = ({ name, phone, rate, onPress, classNames, type }) => {
 
     return (
         <Pressable
@@ -27,6 +27,14 @@ const Avatar = ({ name, phone, rate, onPress, classNames }) => {
                 </View>
                 <Text className={className.devide}>{"・"}</Text>
                 <Text className={className.phone}>{phone}</Text>
+                {type && <>
+                    <Text className={className.devide}>{"・"}</Text>
+                    <FontAwesomeIcon
+                        size={22}
+                        transform={{ flipX: true }}
+                        icon={type == "motor" ? faMotorcycle : faCarSide}
+                        style={{ color: "rgb(250 204 21)" }} />
+                </>}
             </View>
         </Pressable>
     )

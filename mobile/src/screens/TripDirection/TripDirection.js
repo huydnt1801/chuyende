@@ -1,5 +1,5 @@
 import { Text, View, Button, StyleSheet, TouchableOpacity, TextInput } from "react-native";
-import MapView, { Marker } from "react-native-maps"
+import MapView, { Marker, Callout } from "react-native-maps"
 import className from "./className"
 import { useTranslation } from "react-i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
@@ -14,6 +14,7 @@ import Utils from "../../share/Utils";
 import ModalFinding from "./components/ModalFinding";
 import { memo } from "react";
 import { useEffect } from "react";
+import { useNavigation } from "@react-navigation/native";
 
 const MarkerType = {
     START: 1,
@@ -23,7 +24,6 @@ const MarkerType = {
 const CustomMarker = ({ type = MarkerType.START, place }) => {
     return (
         <View className={className.wrapper}>
-            <Text>{place}</Text>
             <View
                 className={className.top}>
                 {type == MarkerType.START && (
@@ -50,25 +50,10 @@ const CustomMarker = ({ type = MarkerType.START, place }) => {
     );
 }
 
-const Direction = memo(({ source, destination }) => {
-
-    console.log("re-render");
-
-    return (
-        <MapViewDirections
-            origin={source}
-            destination={destination}
-            apikey={"AIzaSyBt5Cp2LUkwqb8wq-wgDDjIN1KZTeHebY4"}
-            strokeWidth={4}
-            strokeColor="#111111"
-        />
-    )
-});
-
-
 const TripDirection = () => {
 
     const { t } = useTranslation();
+    const navigation = useNavigation();
     const { source, destination } = useSelector(state => state.trip)
 
     const defaultPosition = {
@@ -81,7 +66,11 @@ const TripDirection = () => {
     const [price, setPrice] = useState({
         motor: 50,
         car: 50
-    })
+    });
+
+    const [distance, setDistance] = useState(0);
+
+    const [methodPayment, setMethodPayment] = useState(true);
 
     const handleClickOrder = async () => {
         Utils.showLoading();
@@ -92,24 +81,35 @@ const TripDirection = () => {
             endX: destination.latitude,
             endY: destination.latitude,
             endLocation: destination.description,
-            distance: 10,
-            type: vehicle
+            distance: distance,
+            type: vehicle,
+            price: price[vehicle]
         });
         await Utils.wait(500);
         Utils.hideLoading();
         console.log(result);
         await Utils.wait(1000);
         setShowModalFinding(true);
+        let status = await Api.trip.getTripInformation(result.data.data.id);
+        while (status.data.data[0].status == "waiting") {
+            await Utils.wait(3000);
+            status = await Api.trip.getTripInformation(result.data.data.id);
+        }
+        setShowModalFinding(false);
+        navigation.navigate("InTrip", { tripId: result.data.data.id })
     }
 
     useEffect(() => {
         const getPrice = async () => {
-            const result = await Api.trip.checkPrice(20);
+
+            const distance = await Api.google.checkDistance(source.description, destination.description);
+            setDistance(distance);
+            const result = await Api.trip.checkPrice(distance);
             if (result.result == Api.ResultCode.SUCCESS) {
                 setPrice(result.data.data)
             }
         }
-        getPrice()
+        getPrice();
     }, [])
 
     return (
@@ -133,7 +133,7 @@ const TripDirection = () => {
                 </Marker>
                 <Marker
                     coordinate={destination}
-                    la>
+                >
                     <CustomMarker
                         type={MarkerType.DESTINATION}
                         place={destination.place}
@@ -150,6 +150,11 @@ const TripDirection = () => {
             <BottomSheet
                 vehicle={vehicle}
                 onChangeVehicle={vehicle => setVehicle(vehicle)}
+                methodPayment={methodPayment}
+                source={source}
+                destination={destination}
+                distance={distance}
+                onChangePayment={e => setMethodPayment(e)}
                 price={price} />
             <View className={className.bottom}>
                 <TouchableOpacity

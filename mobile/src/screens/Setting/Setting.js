@@ -3,7 +3,7 @@ import { Text, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { setAccount } from "../../slices/Account";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { StackActions, useNavigation } from "@react-navigation/native";
+import { CommonActions, StackActions, useNavigation } from "@react-navigation/native";
 import {
     ScrollView,
 } from "react-native";
@@ -27,9 +27,9 @@ const Setting = () => {
         <View className={className.container}>
             <View >
                 <Header
-                    title={t("Setting")} 
+                    title={t("Setting")}
                     onPressBack={() => navigation.goBack()}
-                    />
+                />
             </View>
             <ScrollView>
 
@@ -97,7 +97,10 @@ const Setting = () => {
                             await AsyncStorage.removeItem("isDriver");
                         } catch (error) {
                         }
-                        navigation.dispatch(StackActions.replace("Splash"));
+                        navigation.dispatch(CommonActions.reset({
+                            index: 0,
+                            routes: [{ name: "Splash" }]
+                        }));
                     }}
                 />
 

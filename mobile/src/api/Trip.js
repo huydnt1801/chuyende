@@ -54,7 +54,7 @@ const checkPrice = (distance) => {
 }
 
 const rate = (tripId, star) => {
-    const url = `trips/${tripId}/rate`;
+    const url = `/trips/${tripId}/rate`;
     const param = {
         rate: star
     }
@@ -67,7 +67,7 @@ const rate = (tripId, star) => {
 }
 
 const updateStatus = (tripId, status) => {
-    const url = `trips/${tripId}/status`;
+    const url = `/trips/${tripId}/status`;
     const param = {
         status: status
     }
@@ -79,12 +79,26 @@ const updateStatus = (tripId, status) => {
     });
 }
 
+const getTripInformation = (tripId) => {
+    const url = "/trips";
+    const params = {
+        tripId: tripId
+    }
+    return baseApi.get(url, {
+        params,
+        headers: {
+            cookie: Utils.global.cookie
+        }
+    })
+}
+
 const tripApi = {
     getList,
     createTrip,
     checkPrice,
     rate,
-    updateStatus
+    updateStatus,
+    getTripInformation
 }
 
 export default tripApi

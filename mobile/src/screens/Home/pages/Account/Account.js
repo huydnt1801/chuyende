@@ -25,7 +25,7 @@ const Account = () => {
                     onPress={() => 1} />
                 <ButtonRow
                     className={``}
-                    title={t("Liên Kết Tài Khoản")}
+                    title={t("LinkAccount")}
                     iconLeft={
                         <FontAwesomeIcon
                             icon={faLink}
@@ -43,7 +43,7 @@ const Account = () => {
                 />
                 <ButtonRow
                     classNames={`mt-2`}
-                    title={t("Cài đặt chuyến đi")}
+                    title={t("TripSetting")}
                     onPress={() => navigation.navigate("TripSetting")}
                     iconLeft={
                         <FontAwesomeIcon
@@ -62,7 +62,7 @@ const Account = () => {
                 />
                 <ButtonRow
                     classNames={`mt-2`}
-                    title={t("Bảo hiểm chuyến đi")}
+                    title={t("TripInsurance")}
                     iconLeft={
                         <FontAwesomeIcon
                             icon={faShieldAlt}
@@ -74,7 +74,7 @@ const Account = () => {
                 />
                 <ButtonRow
                     classNames={`mt-2`}
-                    title={t("Khuyến mãi")}
+                    title={t("Promotion")}
                     iconLeft={
                         <FontAwesomeIcon
                             icon={faShieldAlt}
@@ -86,7 +86,7 @@ const Account = () => {
                 />
                 <ButtonRow
                     classNames={`mt-[1px]`}
-                    title={t("Gói tiết kiệm")}
+                    title={t("SavingPackage")}
                     iconLeft={
                         <FontAwesomeIcon
                             icon={faGem}
@@ -98,7 +98,7 @@ const Account = () => {
                 />
                 <ButtonRow
                     classNames={`mt-[1px]`}
-                    title={t("Giới thiệu & Nhận ưu đãi")}
+                    title={t("ReferAndGetDeals")}
                     iconLeft={
                         <FontAwesomeIcon
                             icon={faShareNodes}
@@ -110,7 +110,7 @@ const Account = () => {
                 />
                 <ButtonRow
                     classNames={`mt-[1px]`}
-                    title={t("Thanh toán")}
+                    title={t("Payment")}
                     onPress={() => navigation.navigate("Payment")}
                     iconLeft={
                         <FontAwesomeIcon
@@ -123,7 +123,7 @@ const Account = () => {
                 />
                 <ButtonRow
                     classNames={`mt-2`}
-                    title={t("Hộp thư")}
+                    title={t("Mail")}
                     iconLeft={
                         <FontAwesomeIcon
                             icon={faEnvelope}
@@ -135,7 +135,7 @@ const Account = () => {
                 />
                 <ButtonRow
                     classNames={`mt-[1px]`}
-                    title={t("Hỗ trợ")}
+                    title={t("Support")}
                     iconLeft={
                         <FontAwesomeIcon
                             icon={faHeadphones}
@@ -153,7 +153,7 @@ const Account = () => {
                 />
                 <ButtonRow
                     classNames={`mt-[1px]`}
-                    title={t("Cài đặt")}
+                    title={t("Setting")}
                     iconLeft={
                         <FontAwesomeIcon
                             icon={faGear}

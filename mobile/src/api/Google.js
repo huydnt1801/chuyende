@@ -4,6 +4,7 @@ import env from "../../env.json";
 import suggest from "../../suggest.json";
 import location1 from "../../location1.json";
 import locationByLatAndLong from "../../locationbylatandlong1.json";
+import distance from "../../distance.json";
 
 const getSuggestPlace = async (query) => {
     if (!query) {
@@ -63,10 +64,19 @@ const getPositionByLatAndLong = async (latitude, longitude) => {
     return axios.get(url, { params });
 }
 
+const checkDistance = (x, y) => {
+    try {
+        return distance[x][y]
+    } catch (error) {
+        return 5.0
+    }
+}
+
 const google = {
     getSuggestPlace,
     getPosition,
-    getPositionByLatAndLong
+    getPositionByLatAndLong,
+    checkDistance
 }
 
 export default google

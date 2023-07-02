@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-
 	"github.com/huydnt1801/chuyende/api/server"
 	"github.com/huydnt1801/chuyende/internal/config"
 	"github.com/urfave/cli/v2"

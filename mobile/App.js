@@ -21,6 +21,7 @@ import TestScreen from "./src/screens/TestScreen";
 import Language from "./src/screens/Language";
 import DriverSetting from "./src/screens/DriverSetting";
 import ChangePassword from "./src/screens/ChangePassword";
+import InTrip from "./src/screens/InTrip";
 
 const Stack = createNativeStackNavigator();
 
@@ -39,6 +40,7 @@ const screens = [
     { name: "DriverSetting", component: DriverSetting },
     { name: "Language", component: Language },
     { name: "ChangePassword", component: ChangePassword },
+    { name: "InTrip", component: InTrip },
 
 ]
 

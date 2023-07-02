@@ -4,7 +4,10 @@
         "fortawesome",
         "gorhom",
         "latlng",
+        "nativewind",
         "Pressable",
+        "reduxjs",
+        "tailwindcss",
         "Xmark"
     ]
 }

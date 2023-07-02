@@ -3,7 +3,7 @@ import Header from "../../components/Header"
 import { useTranslation } from "react-i18next"
 import { ButtonRow } from "../../components/UI";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { StackActions, useNavigation } from "@react-navigation/native";
+import { CommonActions, StackActions, useNavigation } from "@react-navigation/native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faPowerOff } from "@fortawesome/free-solid-svg-icons";
 import { useDispatch, useSelector } from "react-redux";
@@ -45,7 +45,10 @@ const DriverSetting = () => {
                         await AsyncStorage.removeItem("cookie");
                         await AsyncStorage.removeItem("isDriver");
                     } catch (error) { };
-                    navigation.dispatch(StackActions.replace("Splash"));
+                    navigation.dispatch(CommonActions.reset({
+                        index: 0,
+                        routes: [{ name: "Splash" }]
+                    }));
                 }} />
         </View>
     )

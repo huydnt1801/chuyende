@@ -1,0 +1,44 @@
+{
+    "130 Phố Lê Thanh Nghị, Bách Khoa, Hai Bà Trưng, Hà Nội": {
+        "282 Phố Xã Đàn, Phương Liên, Đống Đa, Hà Nội": 1.9,
+        "120 Đường Cầu Giấy, Quan Hoa, Cầu Giấy, Hà Nội": 6.9,
+        "72 Phố Chùa Bộc, Quang Trung, Đống Đa, Hà Nội": 2.6,
+        "300 Phố Bạch Mai, Bạch Mai, Hai Bà Trưng, Hà Nội": 0.75,
+        "800 Đường Trường Chinh, Đống Đa, Hà Nội": 3.2
+    },
+    "282 Phố Xã Đàn, Phương Liên, Đống Đa, Hà Nội": {
+        "130 Phố Lê Thanh Nghị, Bách Khoa, Hai Bà Trưng, Hà Nội": 2.4,
+        "120 Đường Cầu Giấy, Quan Hoa, Cầu Giấy, Hà Nội": 4.9,
+        "72 Phố Chùa Bộc, Quang Trung, Đống Đa, Hà Nội": 2.1,
+        "300 Phố Bạch Mai, Bạch Mai, Hai Bà Trưng, Hà Nội": 3.1,
+        "800 Đường Trường Chinh, Đống Đa, Hà Nội": 4.4
+    },
+    "120 Đường Cầu Giấy, Quan Hoa, Cầu Giấy, Hà Nội": {
+        "130 Phố Lê Thanh Nghị, Bách Khoa, Hai Bà Trưng, Hà Nội": 8.7,
+        "282 Phố Xã Đàn, Phương Liên, Đống Đa, Hà Nội": 8.1,
+        "72 Phố Chùa Bộc, Quang Trung, Đống Đa, Hà Nội": 6.2,
+        "300 Phố Bạch Mai, Bạch Mai, Hai Bà Trưng, Hà Nội": 9.4,
+        "800 Đường Trường Chinh, Đống Đa, Hà Nội": 7.0
+    },
+    "72 Phố Chùa Bộc, Quang Trung, Đống Đa, Hà Nội": {
+        "130 Phố Lê Thanh Nghị, Bách Khoa, Hai Bà Trưng, Hà Nội": 4.0,
+        "282 Phố Xã Đàn, Phương Liên, Đống Đa, Hà Nội": 2.3,
+        "120 Đường Cầu Giấy, Quan Hoa, Cầu Giấy, Hà Nội": 4.4,
+        "300 Phố Bạch Mai, Bạch Mai, Hai Bà Trưng, Hà Nội": 4.7,
+        "800 Đường Trường Chinh, Đống Đa, Hà Nội": 2.4
+    },
+    "300 Phố Bạch Mai, Bạch Mai, Hai Bà Trưng, Hà Nội": {
+        "130 Phố Lê Thanh Nghị, Bách Khoa, Hai Bà Trưng, Hà Nội": 0.8,
+        "282 Phố Xã Đàn, Phương Liên, Đống Đa, Hà Nội": 2.7,
+        "120 Đường Cầu Giấy, Quan Hoa, Cầu Giấy, Hà Nội": 7.6,
+        "72 Phố Chùa Bộc, Quang Trung, Đống Đa, Hà Nội": 3.9,
+        "800 Đường Trường Chinh, Đống Đa, Hà Nội": 3.7
+    },
+    "800 Đường Trường Chinh, Đống Đa, Hà Nội": {
+        "130 Phố Lê Thanh Nghị, Bách Khoa, Hai Bà Trưng, Hà Nội": 3.9,
+        "282 Phố Xã Đàn, Phương Liên, Đống Đa, Hà Nội": 2.7,
+        "120 Đường Cầu Giấy, Quan Hoa, Cầu Giấy, Hà Nội": 5.0,
+        "72 Phố Chùa Bộc, Quang Trung, Đống Đa, Hà Nội": 1.9,
+        "300 Phố Bạch Mai, Bạch Mai, Hai Bà Trưng, Hà Nội": 4.9
+    }
+}

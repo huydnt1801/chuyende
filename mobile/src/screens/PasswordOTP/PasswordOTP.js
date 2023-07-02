@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { Text, View, Pressable, TextInput } from "react-native"
 import { useTranslation } from "react-i18next";
-import { StackActions, useNavigation, useRoute } from "@react-navigation/native";
+import { CommonActions, StackActions, useNavigation, useRoute } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useDispatch } from "react-redux";
 
@@ -145,7 +145,10 @@ const PasswordOTP = () => {
                         await AsyncStorage.setItem("isDriver", String(0));
                     } catch (error) { }
                     Utils.hideLoading();
-                    navigation.dispatch(StackActions.replace("Home"))
+                    navigation.dispatch(CommonActions.reset({
+                        index: 0,
+                        routes: [{ name: "Home" }]
+                    }));
                 }
             }
             else {
@@ -172,7 +175,10 @@ const PasswordOTP = () => {
                     await AsyncStorage.setItem("isDriver", String(0));
                 } catch (error) { }
                 Utils.hideLoading();
-                navigation.dispatch(StackActions.replace("Home"))
+                navigation.dispatch(CommonActions.reset({
+                    index: 0,
+                    routes: [{ name: "Home" }]
+                }));
             }
             else {
                 if (login.data.code == 401) {

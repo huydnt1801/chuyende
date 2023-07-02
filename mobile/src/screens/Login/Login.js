@@ -81,7 +81,6 @@ const Login = () => {
             const result = await Api.account.loginDriver(_phone, password);
             await Utils.wait(500);
             Utils.hideLoading();
-            console.log(result);
             if (result.result == Api.ResultCode.SUCCESS) {
                 dispatch(setAccount(result.data.data));
                 dispatch(setIsDriver(true));

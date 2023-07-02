@@ -8,7 +8,7 @@ import HomePage from "./pages/HomePage";
 import Account from "./pages/Account";
 import History from "./pages/History";
 import Reward from "./pages/Reward";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Utils from "../../share/Utils";
 import { Text } from "react-native";
 import Api from "../../api";
@@ -23,6 +23,8 @@ import { useTranslation } from "react-i18next";
 import { RefreshControl } from "react-native";
 import { TouchableOpacity } from "react-native";
 import { useEffect } from "react";
+import { Button } from "react-native";
+import { thunkGetListTrip } from "../../slices/Trip";
 
 const Tab = createBottomTabNavigator();
 
@@ -56,6 +58,23 @@ const pages = [
 const TripItem = ({ vehicle, startLocation, endLocation, distance, price, time, onPressAccept }) => {
 
     const { t } = useTranslation();
+    const today = new Date()
+    const publishTime = new Date(time)
+    const a = (today - publishTime)
+    let b = ''
+    if (a < 60000) {
+        b = `${Math.floor(a / 1000)} ${t("SecondAgo")}`;
+    } else if (a < 3600000) {
+        b = `${Math.floor(a / 60000)} ${t("MinuteAgo")}`;
+    } else if (a < 86400000) {
+        b = `${Math.floor(a / 3600000)} ${t("HourAgo")}`;
+    } else if (a < 2592000000) {
+        b = `${Math.floor(a / 86400000)} ${t("DayAgo")}`;
+    } else if (a < 31104000000) {
+        b = `${Math.floor(a / 2592000000)} ${t("MonthAgo")}`;
+    } else if (a > 31104000000) {
+        b = `${Math.floor(a / 31104000000)} ${t("YearAgo")}`;
+    }
 
     return (
         <Pressable className={className.wrapper}>
@@ -68,7 +87,7 @@ const TripItem = ({ vehicle, startLocation, endLocation, distance, price, time, 
                         <FontAwesomeIcon
                             icon={faClock}
                             style={{ color: "rgb(156 163 175)", marginRight: 6 }} />
-                        <Text>{"3 phút trước"}</Text>
+                        <Text>{b}</Text>
                     </View>
                     <View className={className.information}>
                         <Text className={className.bold}>{t("Distance")}: </Text>
@@ -122,31 +141,25 @@ const Home = () => {
 
     const navigation = useNavigation();
     const { t } = useTranslation();
+    const dispatch = useDispatch()
 
     const { account, isDriver } = useSelector(state => state.account);
+    const { listTrip } = useSelector(state => state.trip);
+    const trips = listTrip.filter(i => i.type == account?.license)
 
-    const [trips, setTrips] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
-
-    const getTrips = async () => {
-        const result = await Api.trip.getList();
-        if (result.result = Api.ResultCode.SUCCESS) {
-            setTrips(result.data.data);
-        }
-        else {
-
-        }
-    }
 
     const handleRefresh = async () => {
         setIsLoading(true);
-        await getTrips();
+        dispatch(thunkGetListTrip());
         setIsLoading(false);
     }
 
+    console.log(account);
+
     useEffect(() => {
         if (isDriver) {
-            getTrips();
+            dispatch(thunkGetListTrip());
         }
     }, [])
 
@@ -166,7 +179,11 @@ const Home = () => {
                     phone={`+84 ${account?.phoneNumber?.slice(1)}`}
                     rate={4.8}
                     classNames={"pb-4"}
+                    type={account?.license}
                     onPress={() => 1} />
+                {/* <Button
+                    title="hello"
+                    onPress={() => navigation.navigate("InTrip", { tripId: 5 })} /> */}
                 <Text className="ml-4 font-semibold">{t("ListTrip")}:</Text>
                 <FlatList
                     data={trips}
@@ -176,8 +193,8 @@ const Home = () => {
                         paddingBottom: 20
                     }}
                     ListEmptyComponent={
-                        <View>
-                            <Text>Hien tai khong co chuyen di nao</Text>
+                        <View className="items-center justify-center py-3">
+                            <Text className="font-semibold">{t("NowThereAreNoTrip")}</Text>
                         </View>
                     }
                     refreshControl={
@@ -193,12 +210,19 @@ const Home = () => {
                             endLocation={item.endLocation}
                             distance={item.distance}
                             price={item.price}
-                            time={item.c}
+                            time={item.createdAt}
                             onPressAccept={() => {
                                 Utils.showConfirmDialog({
                                     message: t("AreYouSureAcceptThisTrip"),
                                     onConfirm: async () => {
-
+                                        Utils.hideConfirmDialog();
+                                        Utils.showLoading();
+                                        const result = await Api.trip.updateStatus(item.id, "accept");
+                                        await Utils.wait(500);
+                                        Utils.hideLoading();
+                                        if (result.result == Api.ResultCode.SUCCESS) {
+                                            navigation.navigate("InTrip", { tripId: item.id })
+                                        }
                                     }
                                 })
                             }}

@@ -34,7 +34,7 @@ const SelectLocation = () => {
 
     const [suggestPlaces, setSuggestPlaces] = useState([]);
     const [searchInput, setSearchInput] = useState("");
-    const debounce = useDebounce(searchInput, 500);
+    const debounce = useDebounce(searchInput, 300);
 
     const getSuggestPlace = async () => {
         const result = await Api.google.getSuggestPlace(debounce);
@@ -94,7 +94,7 @@ const SelectLocation = () => {
                 )}
             </View>
             <View className={className.placeSuggest}>
-                {suggestPlaces.slice(0, 5).map((item, index) => (
+                {suggestPlaces.map((item, index) => (
                     <Pressable
                         key={item.id ?? index}
                         className={className.item}
@@ -102,8 +102,9 @@ const SelectLocation = () => {
                             if (type_ == locationTypes.SELECT_DESTINATION) {
                                 setSearchInput(item.structured_formatting?.main_text ?? item.description ?? "");
                                 dispatch(setDestination({
-                                    latitude: 21.002178970284543,
-                                    longitude: 105.84377304072133,
+                                    latitude: item.latitude,
+                                    longitude: item.longitude,
+                                    id: item.id,
                                     place: item.structured_formatting?.main_text ?? "",
                                     description: item.description
                                 }));
@@ -112,10 +113,11 @@ const SelectLocation = () => {
                             else {
                                 setSearchInput(item.structured_formatting?.main_text ?? item.description ?? "");
                                 dispatch(setSource({
-                                    latitude: 21.00327882088842,
-                                    longitude: 105.83546909839254,
-                                    place: "121 Phương Mai",
-                                    description: "121 Phương Mai, Phương Đình, Đống Đa, Hà Nội, Việt Nam"
+                                    latitude: item.latitude,
+                                    longitude: item.longitude,
+                                    id: item.id,
+                                    place: item.structured_formatting?.main_text ?? "",
+                                    description: item.description
                                 }));
                                 navigation.push("TripDirection");
                             }
