@@ -1,6 +1,5 @@
 import { useNavigation } from "@react-navigation/native";
 import { Button, View, Text, ScrollView } from "react-native"
-import { StatusBar } from "react-native";
 
 
 const TestScreen = () => {
@@ -9,7 +8,6 @@ const TestScreen = () => {
 
     return (
         <View className="flex-1 flex-col pt-4">
-            <StatusBar />
             <Text className="text-center mb-4 font-semibold">TestScreen</Text>
             <ScrollView>
                 <Button

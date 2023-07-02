@@ -1,0 +1,75 @@
+{
+    "html_attributions": [],
+    "result": {
+        "address_components": [
+            {
+                "long_name": "192",
+                "short_name": "192",
+                "types": [
+                    "street_number"
+                ]
+            },
+            {
+                "long_name": "Phố Lê Thanh Nghị",
+                "short_name": "P. Lê Thanh Nghị",
+                "types": [
+                    "route"
+                ]
+            },
+            {
+                "long_name": "Hai Bà Trưng",
+                "short_name": "Hai Bà Trưng",
+                "types": [
+                    "administrative_area_level_2",
+                    "political"
+                ]
+            },
+            {
+                "long_name": "Hà Nội",
+                "short_name": "Hà Nội",
+                "types": [
+                    "administrative_area_level_1",
+                    "political"
+                ]
+            },
+            {
+                "long_name": "Vietnam",
+                "short_name": "VN",
+                "types": [
+                    "country",
+                    "political"
+                ]
+            }
+        ],
+        "adr_address": "<span class=\"street-address\">192 P. Lê Thanh Nghị</span>, <span class=\"extended-address\">Đồng Tâm</span>, <span class=\"locality\">Hai Bà Trưng</span>, <span class=\"region\">Hà Nội</span>, <span class=\"country-name\">Vietnam</span>",
+        "formatted_address": "192 P. Lê Thanh Nghị, Đồng Tâm, Hai Bà Trưng, Hà Nội, Vietnam",
+        "geometry": {
+            "location": {
+                "lat": 21.0019987,
+                "lng": 105.8437194
+            },
+            "viewport": {
+                "northeast": {
+                    "lat": 21.00326933029151,
+                    "lng": 105.8450686802915
+                },
+                "southwest": {
+                    "lat": 21.0005713697085,
+                    "lng": 105.8423707197085
+                }
+            }
+        },
+        "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/geocode-71.png",
+        "icon_background_color": "#7B9EB0",
+        "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/generic_pinlet",
+        "name": "192 P. Lê Thanh Nghị",
+        "place_id": "ChIJf8sJKnGsNTERy5eWGiJ4dRE",
+        "reference": "ChIJf8sJKnGsNTERy5eWGiJ4dRE",
+        "types": [
+            "premise"
+        ],
+        "url": "https://maps.google.com/?q=192+P.+L%C3%AA+Thanh+Ngh%E1%BB%8B,+%C4%90%E1%BB%93ng+T%C3%A2m,+Hai+B%C3%A0+Tr%C6%B0ng,+H%C3%A0+N%E1%BB%99i,+Vietnam&ftid=0x3135ac712a09cb7f:0x117578221a9697cb",
+        "utc_offset": 420
+    },
+    "status": "OK"
+}

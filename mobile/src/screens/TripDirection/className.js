@@ -10,7 +10,13 @@ const className = {
         w-7 h-7 items-center justify-center 
         bg-yellow-400 rounded-full border-[1.5px] border-white`,
     line: `w-[2px] h-[10px] bg-black`,
-    shadow: `w-[4px] h-[3px] scale-x-[2.0] bg-gray-700 rounded-full`
+    shadow: `w-[4px] h-[3px] scale-x-[2.0] bg-gray-700 rounded-full`,
+    bottom: `absolute bottom-0 w-full bg-white h-11`,
+    buttonOrder: `
+        flex-1 items-center justify-center py-3 w-full
+        bg-yellow-400
+    `,
+    buttonText: `font-semibold text-white`
 }
 
 export default className

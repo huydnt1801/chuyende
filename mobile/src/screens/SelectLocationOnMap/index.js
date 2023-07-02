@@ -1,1 +1,1 @@
-export { default } from "./SelectLocationOnMap"
+export { default, mapTypes } from "./SelectLocationOnMap"

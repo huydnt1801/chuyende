@@ -11,7 +11,7 @@ import (
 type Trip struct {
 	ID            int            `json:"id"`
 	User          *user.User     `json:"user"`
-	Drive         *driver.Driver `json:"drive,omitempty"`
+	Drive         *driver.Driver `json:"driver,omitempty"`
 	UserID        int            `json:"userId"`
 	DriveID       int            `json:"driverId,omitempty" mapstructure:"driverId,omitempty"`
 	StartX        float64        `json:"startX"`

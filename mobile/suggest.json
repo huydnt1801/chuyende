@@ -1,0 +1,71 @@
+{
+    "predictions": [
+        {
+            "description": "130 Phố Lê Thanh Nghị, Bách Khoa, Hai Bà Trưng, Hà Nội",
+            "place_id": 0,
+            "reference": 0,
+            "structured_formatting": {
+                "main_text": "130 Phố Lê Thanh Nghi",
+                "secondary_text": "Bách Khoa, Hai Bà Trưng, Hà Nội"
+            },
+            "latitude": 21.0019728127313,
+            "longitude": 105.84552857789674
+        },
+        {
+            "description": "282 Phố Xã Đàn, Phương Liên, Đống Đa, Hà Nội",
+            "place_id": 1,
+            "reference": 1,
+            "structured_formatting": {
+                "main_text": "282 Phố Xã Đàn",
+                "secondary_text": "Phương Liên, Đống Đa, Hà Nội"
+            },
+            "latitude": 21.012908997588294,
+            "longitude": 105.8355009463707
+        },
+        {
+            "description": "120 Đường Cầu Giấy, Quan Hoa, Cầu Giấy, Hà Nội",
+            "place_id": 2,
+            "reference": 2,
+            "structured_formatting": {
+                "main_text": "120 Đường Cầu Giấy",
+                "secondary_text": "Quan Hoa, Cầu Giấy, Hà Nội"
+            },
+            "latitude": 21.032323990708203,
+            "longitude": 105.79923153094217
+        },
+        {
+            "description": "72 Phố Chùa Bộc, Quang Trung, Đống Đa, Hà Nội",
+            "place_id": 3,
+            "reference": 3,
+            "structured_formatting": {
+                "main_text": "72 Phố Chùa Bộc",
+                "secondary_text": "Quang Trung, Đống Đa, Hà Nội"
+            },
+            "latitude": 21.008802089143327,
+            "longitude": 105.82580712365592
+        },
+        {
+            "description": "300 Phố Bạch Mai, Bạch Mai, Hai Bà Trưng, Hà Nội",
+            "place_id": 4,
+            "reference": 4,
+            "structured_formatting": {
+                "main_text": "300 Phố Bạch Mai",
+                "secondary_text": "Bạch Mai, Hai Bà Trưng, Hà Nội"
+            },
+            "latitude": 21.001885833687236,
+            "longitude": 105.85066804321379
+        },
+        {
+            "description": "800 Đường Trường Chinh, Đống Đa, Hà Nội",
+            "place_id": 5,
+            "reference": 5,
+            "structured_formatting": {
+                "main_text": "800 Đường Trường Chinh",
+                "secondary_text": "Đống Đa, Hà Nội"
+            },
+            "latitude": 21.00279842695569,
+            "longitude": 105.82180801791016
+        }
+    ],
+    "status": "OK"
+}

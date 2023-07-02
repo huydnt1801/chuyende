@@ -12,7 +12,8 @@ const baseApi = axios.create({
     baseURL: `${env.API_BASE_URL}/api/v1`,
     headers: {
         "content-type": "application/json",
-    },
+        // cookie: Utils.data["cookie"]
+    }
 });
 
 baseApi.interceptors.request.use(async (config) => {
@@ -43,6 +44,7 @@ baseApi.interceptors.response.use(
         // console.log("==========================");
         if (!error.response) {
             Utils.showCheckNetwork();
+            Utils.hideLoading();
             return {
                 result: Result.FAIL,
                 data: error.response.data

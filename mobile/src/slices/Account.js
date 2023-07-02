@@ -1,7 +1,8 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-    account: null
+    account: null,
+    isDriver: false
 }
 
 const accountSlice = createSlice({
@@ -11,12 +12,15 @@ const accountSlice = createSlice({
         setAccount(state, { payload }) {
             state.account = payload
         },
+        setIsDriver(state, { payload }) {
+            state.isDriver = payload
+        }
     },
     extraReducers: (builder) => { }
 });
 
 const { reducer: accountReducer, actions } = accountSlice;
-const { setAccount } = actions;
+const { setAccount, setIsDriver } = actions;
 
 export default accountReducer
-export { setAccount }
+export { setAccount, setIsDriver }

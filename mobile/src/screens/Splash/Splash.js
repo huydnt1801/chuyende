@@ -5,7 +5,7 @@ import { useDispatch } from "react-redux";
 import { useNavigation, StackActions } from "@react-navigation/native";
 
 import { docker } from "../../components/Image";
-import { setAccount } from "../../slices/Account";
+import { setAccount, setIsDriver } from "../../slices/Account";
 import Utils from "../../share/Utils";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -20,7 +20,7 @@ const Splash = () => {
     }));
 
     const rememberLogin = async () => {
-        await Utils.wait(1000);
+        await Utils.wait(2000);
         Utils.showLoading();
         const account = await (async () => {
             try {
@@ -30,10 +30,35 @@ const Splash = () => {
                 return null;
             }
         })();
-        await Utils.wait(300);
+        const cookie = await (async () => {
+            try {
+                const data = await AsyncStorage.getItem("cookie");
+                return data;
+            } catch (error) {
+                return null;
+            }
+        })();
+        const _isDriver = await (async () => {
+            try {
+                const data = await AsyncStorage.getItem("isDriver");
+                return data;
+            } catch (error) {
+                return null;
+            }
+        })();
+        const isDriver = _isDriver ? (_isDriver == "1") : false;
+        await Utils.wait(500);
         Utils.hideLoading();
+        // console.log("cookie", cookie);
+        // console.log("isDriver", isDriver);
+        // console.log("account", account);
+        Utils.global.isDriver = isDriver;
+        if (cookie) {
+            Utils.global.cookie = cookie;
+        }
         if (account) {
-            dispatch(setAccount(JSON.parse(account)))
+            dispatch(setAccount(JSON.parse(account)));
+            dispatch(setIsDriver(isDriver));
             navigation.dispatch(StackActions.replace("Home"));
         }
         else {
@@ -57,7 +82,7 @@ const Splash = () => {
                 <Image
                     source={docker}
                     resizeMode={"contain"}
-                    style={{ width: "60%", marginBottom: 50 }}
+                    style={{ width: "60%", marginBottom: 150 }}
                 />
             </animated.View>
         </View>

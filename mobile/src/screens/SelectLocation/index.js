@@ -1,1 +1,1 @@
-export { default } from "./SelectLocation"
+export { default, locationTypes } from "./SelectLocation"

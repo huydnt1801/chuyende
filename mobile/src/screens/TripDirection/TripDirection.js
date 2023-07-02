@@ -1,18 +1,25 @@
-import { Text, View, Button, StyleSheet, TouchableOpacity, TextInput } from "react-native";
+import { Text, View, StyleSheet, TouchableOpacity } from "react-native";
 import MapView, { Marker } from "react-native-maps"
 import className from "./className"
 import { useTranslation } from "react-i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faHeart, faL, faPersonFalling } from "@fortawesome/free-solid-svg-icons";
+import { faHeart, faPersonFalling } from "@fortawesome/free-solid-svg-icons";
 import MapViewDirections from "react-native-maps-directions";
+import { useSelector } from "react-redux";
+import { useState } from "react";
+import BottomSheet from "./components/BottomSheet";
+import Api from "../../api";
+import Utils from "../../share/Utils";
+import ModalFinding from "./components/ModalFinding";
+import { useEffect } from "react";
+import { useNavigation } from "@react-navigation/native";
 
 const MarkerType = {
     START: 1,
     DESTINATION: 2
 }
 
-const CustomMarker = ({ type = MarkerType.START }) => {
-
+const CustomMarker = ({ type = MarkerType.START, place }) => {
     return (
         <View className={className.wrapper}>
             <View
@@ -41,28 +48,67 @@ const CustomMarker = ({ type = MarkerType.START }) => {
     );
 }
 
-
 const TripDirection = () => {
 
+    const { t } = useTranslation();
+    const navigation = useNavigation();
+    const { source, destination } = useSelector(state => state.trip)
+
     const defaultPosition = {
-        latitude: 21.0285,
-        longitude: 105.8542
+        latitude: (source.latitude + destination.latitude) / 2,
+        longitude: (source.longitude + destination.longitude) / 2
     };
 
-    const start = {
-        latitude: 21.03429931508327,
-        longitude: 105.8507011685404
-    }
-    const end = {
-        latitude: 21.01826747575612,
-        longitude: 105.85388186669118
+    const [vehicle, setVehicle] = useState("motor");
+    const [showModalFinding, setShowModalFinding] = useState(false);
+    const [price, setPrice] = useState({
+        motor: 50,
+        car: 50
+    });
+
+    const [distance, setDistance] = useState(0);
+
+    const [methodPayment, setMethodPayment] = useState(true);
+
+    const handleClickOrder = async () => {
+        Utils.showLoading();
+        const result = await Api.trip.createTrip({
+            startX: source.latitude,
+            startY: source.latitude,
+            startLocation: source.description,
+            endX: destination.latitude,
+            endY: destination.latitude,
+            endLocation: destination.description,
+            distance: distance,
+            type: vehicle,
+            price: price[vehicle]
+        });
+        await Utils.wait(500);
+        Utils.hideLoading();
+        console.log(result);
+        await Utils.wait(1000);
+        setShowModalFinding(true);
+        let status = await Api.trip.getTripInformation(result.data.data.id);
+        while (status.data.data[0].status == "waiting") {
+            await Utils.wait(3000);
+            status = await Api.trip.getTripInformation(result.data.data.id);
+        }
+        setShowModalFinding(false);
+        navigation.navigate("InTrip", { tripId: result.data.data.id })
     }
 
-    const x = [1, 2, 3]
-    console.log(x);
-    console.log(x.slice(2, 5));
+    useEffect(() => {
+        const getPrice = async () => {
 
-    const { t } = useTranslation();
+            const distance = await Api.google.checkDistance(source.description, destination.description);
+            setDistance(distance);
+            const result = await Api.trip.checkPrice(distance);
+            if (result.result == Api.ResultCode.SUCCESS) {
+                setPrice(result.data.data)
+            }
+        }
+        getPrice();
+    }, [])
 
     return (
         <View className={className.container}>
@@ -73,29 +119,52 @@ const TripDirection = () => {
                 initialRegion={{
                     latitude: defaultPosition.latitude,
                     longitude: defaultPosition.longitude,
-                    latitudeDelta: 0.0522,
-                    longitudeDelta: 0.0221
+                    latitudeDelta: Math.abs(source.latitude - destination.latitude) + 0.005,
+                    longitudeDelta: Math.abs(source.longitude - destination.longitude) + 0.005,
                 }}>
                 <Marker
-                    coordinate={start}>
+                    coordinate={source}>
                     <CustomMarker
                         type={MarkerType.START}
+                        place={source.place}
                     />
                 </Marker>
                 <Marker
-                    coordinate={end}>
+                    coordinate={destination}
+                >
                     <CustomMarker
                         type={MarkerType.DESTINATION}
+                        place={destination.place}
                     />
                 </Marker>
                 <MapViewDirections
-                    origin={start}
-                    destination={end}
-                    // apikey={"AIzaSyCGpPAmjL0KRuTzBNmCeuk8V_20SwLvVV8"}
+                    origin={source}
+                    destination={destination}
+                    // apikey={"AIzaSyBt5Cp2LUkwqb8wq-wgDDjIN1KZTeHebY4"}
                     strokeWidth={4}
                     strokeColor="#111111"
                 />
             </MapView>
+            <BottomSheet
+                vehicle={vehicle}
+                onChangeVehicle={vehicle => setVehicle(vehicle)}
+                methodPayment={methodPayment}
+                source={source}
+                destination={destination}
+                distance={distance}
+                onChangePayment={e => setMethodPayment(e)}
+                price={price} />
+            <View className={className.bottom}>
+                <TouchableOpacity
+                    activeOpacity={0.7}
+                    className={className.buttonOrder}
+                    onPress={handleClickOrder}>
+                    <Text className={className.buttonText}>{"Tìm tài xế"}</Text>
+                </TouchableOpacity>
+            </View>
+            <ModalFinding
+                show={showModalFinding}
+                onPressCancel={() => setShowModalFinding(false)} />
         </View>
     )
 }

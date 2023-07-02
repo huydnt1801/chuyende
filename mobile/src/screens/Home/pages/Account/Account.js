@@ -1,13 +1,13 @@
-import { ScrollView, StatusBar, Text, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useTranslation } from "react-i18next"
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import { useSelector } from "react-redux";
 import { faAngleRight, faCar, faEnvelope, faGear, faGem, faHeadphones, faLink, faMoneyBill, faShareNodes, faShieldAlt } from "@fortawesome/free-solid-svg-icons";
 
 import Avatar from "./components/Avatar";
 import ButtonRow from "./components/ButtonRow";
 import className from "./className";
-import { useSelector } from "react-redux";
 
 const Account = () => {
 
@@ -19,13 +19,13 @@ const Account = () => {
         <View className={className.container}>
             <ScrollView>
                 <Avatar
-                    name={account?.full_name}
-                    phone={`+84 ${account?.phone_number?.slice(1)}`}
+                    name={account?.fullName}
+                    phone={`+84 ${account?.phoneNumber?.slice(1)}`}
                     rate={4.8}
                     onPress={() => 1} />
                 <ButtonRow
                     className={``}
-                    title={t("Liên Kết Tài Khoản")}
+                    title={t("LinkAccount")}
                     iconLeft={
                         <FontAwesomeIcon
                             icon={faLink}
@@ -34,16 +34,10 @@ const Account = () => {
                                 color: "rgb(107 114 128)",
                                 marginRight: 8
                             }} />}
-                // iconRight={
-                //     <FontAwesomeIcon
-                //         icon={faAngleRight}
-                //         size={16}
-                //         style={{ color: "rgb(107 114 128)" }} />
-                // }
                 />
                 <ButtonRow
                     classNames={`mt-2`}
-                    title={t("Cài đặt chuyến đi")}
+                    title={t("TripSetting")}
                     onPress={() => navigation.navigate("TripSetting")}
                     iconLeft={
                         <FontAwesomeIcon
@@ -62,7 +56,7 @@ const Account = () => {
                 />
                 <ButtonRow
                     classNames={`mt-2`}
-                    title={t("Bảo hiểm chuyến đi")}
+                    title={t("TripInsurance")}
                     iconLeft={
                         <FontAwesomeIcon
                             icon={faShieldAlt}
@@ -74,7 +68,7 @@ const Account = () => {
                 />
                 <ButtonRow
                     classNames={`mt-2`}
-                    title={t("Khuyến mãi")}
+                    title={t("Promotion")}
                     iconLeft={
                         <FontAwesomeIcon
                             icon={faShieldAlt}
@@ -86,7 +80,7 @@ const Account = () => {
                 />
                 <ButtonRow
                     classNames={`mt-[1px]`}
-                    title={t("Gói tiết kiệm")}
+                    title={t("SavingPackage")}
                     iconLeft={
                         <FontAwesomeIcon
                             icon={faGem}
@@ -98,7 +92,7 @@ const Account = () => {
                 />
                 <ButtonRow
                     classNames={`mt-[1px]`}
-                    title={t("Giới thiệu & Nhận ưu đãi")}
+                    title={t("ReferAndGetDeals")}
                     iconLeft={
                         <FontAwesomeIcon
                             icon={faShareNodes}
@@ -110,7 +104,7 @@ const Account = () => {
                 />
                 <ButtonRow
                     classNames={`mt-[1px]`}
-                    title={t("Thanh toán")}
+                    title={t("Payment")}
                     onPress={() => navigation.navigate("Payment")}
                     iconLeft={
                         <FontAwesomeIcon
@@ -123,7 +117,7 @@ const Account = () => {
                 />
                 <ButtonRow
                     classNames={`mt-2`}
-                    title={t("Hộp thư")}
+                    title={t("Mail")}
                     iconLeft={
                         <FontAwesomeIcon
                             icon={faEnvelope}
@@ -135,7 +129,7 @@ const Account = () => {
                 />
                 <ButtonRow
                     classNames={`mt-[1px]`}
-                    title={t("Hỗ trợ")}
+                    title={t("Support")}
                     iconLeft={
                         <FontAwesomeIcon
                             icon={faHeadphones}
@@ -153,7 +147,7 @@ const Account = () => {
                 />
                 <ButtonRow
                     classNames={`mt-[1px]`}
-                    title={t("Cài đặt")}
+                    title={t("Setting")}
                     iconLeft={
                         <FontAwesomeIcon
                             icon={faGear}

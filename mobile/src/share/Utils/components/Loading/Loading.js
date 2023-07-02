@@ -22,15 +22,10 @@ const Loading = () => {
         <Modal
             visible={show}
             transparent={true}
-        // statusBarTranslucent={true}
-        >
-            <View className={`
-                flex-1 bg-black/30 items-center justify-center px-6
-            `}>
+            statusBarTranslucent={true}>
+            <View className="flex-1 bg-black/30 items-center justify-center px-6">
                 <View className={'scale-[2]'}>
-                    <ActivityIndicator
-                        color={"rgb(234,179,8)"}
-                    />
+                    <ActivityIndicator color={"rgb(234,179,8)"} />
                 </View>
             </View>
         </Modal>

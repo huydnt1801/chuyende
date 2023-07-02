@@ -1,4 +1,5 @@
 import CheckNetwork, { checkNetworkRef } from "./components/CheckNetwork";
+import ConfirmDialog, { confirmDialogRef } from "./components/ConfirmDialog";
 import Loading, { loadingRef } from "./components/Loading";
 import MessageDialog, { messageDialogRef } from "./components/MessageDialog";
 import Toast, { toastRef } from "./components/Toast";
@@ -7,6 +8,12 @@ const wait = (ms) => new Promise(e => setTimeout(e, ms));
 
 const Utils = {
     data: {},
+    global: {
+        cookie: "",
+        accessToken: "",
+        isDriver: false,
+        token: null,
+    },
     /**
      * Show a toast to screen
      * @param {String} message: message of toast
@@ -46,6 +53,23 @@ const Utils = {
         loadingRef.current.hide();
     },
     /**
+     * Show confirm dialog
+     * @typedef configs
+     * @property {String | undefined} message
+     * @property {() => void | undefined} onConfirm
+     * @property {() => void | undefined} onCancel
+     * @property {String | undefined} buttonTextLeft
+     * @property {String | undefined} buttonTextRight
+     * @param {configs} config 
+     */
+    showConfirmDialog: (config = {}) => {
+        confirmDialogRef.current.hide();
+        confirmDialogRef.current.show(config);
+    },
+    hideConfirmDialog: () => {
+        confirmDialogRef.current.hide();
+    },
+    /**
      * wait ms before next action
      * @param {Number} ms 
      */
@@ -62,6 +86,7 @@ const UtilComponents = () => {
             <MessageDialog />
             <CheckNetwork />
             <Loading />
+            <ConfirmDialog />
         </>
     );
 }

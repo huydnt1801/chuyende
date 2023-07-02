@@ -22,3 +22,5 @@
 
 # mysql data
 /data/mysql
+/data
+docker-compose.yaml

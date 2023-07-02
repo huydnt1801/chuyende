@@ -9,80 +9,65 @@ import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faArrowLeftLong, faCircleXmark, faLocationDot } from "@fortawesome/free-solid-svg-icons";
 
 import className from "./className";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { TextInput } from "react-native";
 import { useState, useEffect } from "react";
 import { useDebounce } from "../../hooks";
-import axios from "axios";
-import queryString from "query-string"
 import Header from "../../components/Header";
+import Api from "../../api";
+import { mapTypes } from "../SelectLocationOnMap";
+import { useDispatch } from "react-redux";
+import { setDestination, setSource } from "../../slices/Trip";
 
-const data_ = [
-    {
-        id: 1,
-        text: '121 Lê Lợi',
-        value: "121 Lê Lợi, Nguyễn Trãi, Hà Đông, Hà Nội",
-        distance: "5.9KM"
-    },
-    {
-        id: 2,
-        text: '121 Lê Lợi',
-        value: "121 Lê Lợi, Nguyễn Trãi, Hà Đông, Hà Nội",
-        distance: "5.9KM"
-    },
-    {
-        id: 3,
-        text: '121 Lê Lợi',
-        value: "121 Lê Lợi, Nguyễn Trãi, Hà Đông, Hà Nội 12312  2123 2",
-        distance: "5.9KM"
-    },
-    {
-        id: 4,
-        text: '121 Lê Lợi',
-        value: "121 Lê Lợi, Nguyễn Trãi, Hà Đông, Hà Nội sadasdsadsad",
-        distance: "5.9KM"
-    },
-    {
-        id: 5,
-        text: '121 Lê Lợi',
-        value: "121 Lê Lợi, Nguyễn Trãi, Hà Đông, Hà Nội",
-        distance: "5.9KM"
-    },
-]
-
-const API_KEY = 'AIzaSyBuExS3x9vzjyXhmDFxc8ZNWtcXHf5Kulg'
-
+const locationTypes = {
+    SELECT_SOURCE: 1,
+    SELECT_DESTINATION: 2
+}
 
 const SelectLocation = () => {
 
     const { t } = useTranslation();
     const navigation = useNavigation();
+    const dispatch = useDispatch();
 
-    const [data, setData] = useState([
-        ...data_
-    ])
+    const { type: type_ } = useRoute().params ?? { type: 1 };
 
+    const [suggestPlaces, setSuggestPlaces] = useState([]);
     const [searchInput, setSearchInput] = useState("");
-    const debounce = useDebounce(searchInput, 500);
+    const debounce = useDebounce(searchInput, 300);
 
-    const getData = async () => {
-        const result = await fetch(`https://maps.googleapis.com/maps/api/place/autocomplete/json?key=${API_KEY}&components=country:VN&input=${queryString.stringify(debounce)}`).then(i => i.json());
-        console.log(JSON.stringify(result));
+    const getSuggestPlace = async () => {
+        const result = await Api.google.getSuggestPlace(debounce);
+        if (result.status == "OK") {
+            setSuggestPlaces(result.predictions);
+        }
     }
 
     useEffect(() => {
-        // getData()
-    }, [debounce])
-
+        if (debounce.trim()) {
+            getSuggestPlace();
+        }
+        else {
+            setSuggestPlaces([]);
+        }
+    }, [debounce]);
 
     return (
         <View className={className.container}>
             <Header
-                title={t("Destination")}
+                title={type_ == locationTypes.SELECT_SOURCE ? t("Source") : t("Destination")}
                 onPressBack={() => navigation.goBack()}
                 componentRight={
                     <TouchableOpacity
-                        activeOpacity={0.5}>
+                        activeOpacity={0.5}
+                        onPress={() => {
+                            if (type_ == locationTypes.SELECT_DESTINATION) {
+                                navigation.navigate("SelectLocationOnMap", { type: mapTypes.SELECT_DESTINATION })
+                            }
+                            else {
+                                navigation.navigate("SelectLocationOnMap", { type: mapTypes.SELECT_SOURCE })
+                            }
+                        }}>
                         <Text className={className.map}>{t("SelectFromMap")}</Text>
                     </TouchableOpacity>
                 } />
@@ -94,7 +79,7 @@ const SelectLocation = () => {
                 <TextInput
                     className={className.input}
                     value={searchInput}
-                    placeholder={t("EnterDestination")}
+                    placeholder={type_ == locationTypes.SELECT_SOURCE ? t("EnterSource") : t("EnterDestination")}
                     onChangeText={text => setSearchInput(text)} />
                 {searchInput.length > 0 && (
                     <TouchableOpacity
@@ -109,27 +94,51 @@ const SelectLocation = () => {
                 )}
             </View>
             <View className={className.placeSuggest}>
-                {data.map((item, index) => (
+                {suggestPlaces.map((item, index) => (
                     <Pressable
                         key={item.id ?? index}
-                        className={className.item}>
+                        className={className.item}
+                        onPress={() => {
+                            if (type_ == locationTypes.SELECT_DESTINATION) {
+                                setSearchInput(item.structured_formatting?.main_text ?? item.description ?? "");
+                                dispatch(setDestination({
+                                    latitude: item.latitude,
+                                    longitude: item.longitude,
+                                    id: item.id,
+                                    place: item.structured_formatting?.main_text ?? "",
+                                    description: item.description
+                                }));
+                                navigation.push("SelectLocation", { type: locationTypes.SELECT_SOURCE });
+                            }
+                            else {
+                                setSearchInput(item.structured_formatting?.main_text ?? item.description ?? "");
+                                dispatch(setSource({
+                                    latitude: item.latitude,
+                                    longitude: item.longitude,
+                                    id: item.id,
+                                    place: item.structured_formatting?.main_text ?? "",
+                                    description: item.description
+                                }));
+                                navigation.push("TripDirection");
+                            }
+                        }}>
                         <View className={className.iconBorder}>
                             <FontAwesomeIcon
                                 icon={faLocationDot} />
                         </View>
                         <View className={className.center}>
                             <Text className={className.textBold}>
-                                {item.text}
+                                {item.structured_formatting?.main_text}
                             </Text>
                             <Text
                                 className={className.textLight}
                                 numberOfLines={1}
                                 lineBreakMode={"tail"}>
-                                {item.value}
+                                {item.description}
                             </Text>
                         </View>
                         <Text className={className.distance}>
-                            {item.distance}
+                            {item.distance ?? `${(Math.random() * 10).toString().slice(0, 3)}KM`}
                         </Text>
                     </Pressable>
                 ))}
@@ -139,3 +148,4 @@ const SelectLocation = () => {
 }
 
 export default SelectLocation
+export { locationTypes }

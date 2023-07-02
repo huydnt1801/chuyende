@@ -1,9 +1,11 @@
 import { configureStore, applyMiddleware, compose } from "@reduxjs/toolkit";
 
 import accountReducer from "../slices/Account";
+import tripReducer from "../slices/Trip";
 
 const reducer = {
-    account: accountReducer
+    account: accountReducer,
+    trip: tripReducer
 }
 
 const logger = (_store) => (next) => (action) => {

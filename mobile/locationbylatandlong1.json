@@ -1,0 +1,808 @@
+{
+    "plus_code": {
+        "compound_code": "2R6V+2JR Hai Bà Trưng, Hà Nội, Việt Nam",
+        "global_code": "7PH72R6V+2JR"
+    },
+    "results": [
+        {
+            "address_components": [
+                {
+                    "long_name": "31",
+                    "short_name": "31",
+                    "types": [
+                        "street_number"
+                    ]
+                },
+                {
+                    "long_name": "Phố Nguyễn Đình Chiểu",
+                    "short_name": "P. Nguyễn Đình Chiểu",
+                    "types": [
+                        "route"
+                    ]
+                },
+                {
+                    "long_name": "Hai Bà Trưng",
+                    "short_name": "Hai Bà Trưng",
+                    "types": [
+                        "administrative_area_level_2",
+                        "political"
+                    ]
+                },
+                {
+                    "long_name": "Hà Nội",
+                    "short_name": "Hà Nội",
+                    "types": [
+                        "administrative_area_level_1",
+                        "political"
+                    ]
+                },
+                {
+                    "long_name": "Việt Nam",
+                    "short_name": "VN",
+                    "types": [
+                        "country",
+                        "political"
+                    ]
+                }
+            ],
+            "formatted_address": "31 P. Nguyễn Đình Chiểu, Lê Đại Hành, Hai Bà Trưng, Hà Nội, Việt Nam",
+            "geometry": {
+                "location": {
+                    "lat": 21.010193,
+                    "lng": 105.845272
+                },
+                "location_type": "ROOFTOP",
+                "viewport": {
+                    "northeast": {
+                        "lat": 21.0115419802915,
+                        "lng": 105.8466209802915
+                    },
+                    "southwest": {
+                        "lat": 21.00884401970849,
+                        "lng": 105.8439230197085
+                    }
+                }
+            },
+            "place_id": "ChIJmQ5iOaGrNTERRflE3BtvmwE",
+            "plus_code": {
+                "compound_code": "2R6W+34 Hai Bà Trưng, Hà Nội, Việt Nam",
+                "global_code": "7PH72R6W+34"
+            },
+            "types": [
+                "cafe",
+                "establishment",
+                "food",
+                "point_of_interest",
+                "store"
+            ]
+        },
+        {
+            "address_components": [
+                {
+                    "long_name": "2R6V+2J",
+                    "short_name": "2R6V+2J",
+                    "types": [
+                        "plus_code"
+                    ]
+                },
+                {
+                    "long_name": "Hai Bà Trưng",
+                    "short_name": "Hai Bà Trưng",
+                    "types": [
+                        "administrative_area_level_2",
+                        "political"
+                    ]
+                },
+                {
+                    "long_name": "Hà Nội",
+                    "short_name": "Hà Nội",
+                    "types": [
+                        "administrative_area_level_1",
+                        "political"
+                    ]
+                },
+                {
+                    "long_name": "Việt Nam",
+                    "short_name": "VN",
+                    "types": [
+                        "country",
+                        "political"
+                    ]
+                }
+            ],
+            "formatted_address": "2R6V+2J Hai Bà Trưng, Hà Nội, Việt Nam",
+            "geometry": {
+                "bounds": {
+                    "northeast": {
+                        "lat": 21.010125,
+                        "lng": 105.844125
+                    },
+                    "southwest": {
+                        "lat": 21.01,
+                        "lng": 105.844
+                    }
+                },
+                "location": {
+                    "lat": 21.0101198,
+                    "lng": 105.8440136
+                },
+                "location_type": "GEOMETRIC_CENTER",
+                "viewport": {
+                    "northeast": {
+                        "lat": 21.0114114802915,
+                        "lng": 105.8454114802915
+                    },
+                    "southwest": {
+                        "lat": 21.00871351970849,
+                        "lng": 105.8427135197085
+                    }
+                }
+            },
+            "place_id": "GhIJxAoSNpcCNUARRVieUQR2WkA",
+            "plus_code": {
+                "compound_code": "2R6V+2J Hai Bà Trưng, Hà Nội, Việt Nam",
+                "global_code": "7PH72R6V+2J"
+            },
+            "types": [
+                "plus_code"
+            ]
+        },
+        {
+            "address_components": [
+                {
+                    "long_name": "2",
+                    "short_name": "2",
+                    "types": [
+                        "street_number"
+                    ]
+                },
+                {
+                    "long_name": "Ngõ 4",
+                    "short_name": "Ngõ 4",
+                    "types": [
+                        "route"
+                    ]
+                },
+                {
+                    "long_name": "Vân Hồ 2",
+                    "short_name": "Vân Hồ 2",
+                    "types": [
+                        "route"
+                    ]
+                },
+                {
+                    "long_name": "Tổ Dân Phố 10b+Tổ Dân Phố 10c",
+                    "short_name": "Tổ Dân Phố 10b+Tổ Dân Phố 10c",
+                    "types": [
+                        "neighborhood",
+                        "political"
+                    ]
+                },
+                {
+                    "long_name": "Hai Bà Trưng",
+                    "short_name": "Hai Bà Trưng",
+                    "types": [
+                        "administrative_area_level_2",
+                        "political"
+                    ]
+                },
+                {
+                    "long_name": "Hà Nội",
+                    "short_name": "Hà Nội",
+                    "types": [
+                        "administrative_area_level_1",
+                        "political"
+                    ]
+                },
+                {
+                    "long_name": "Việt Nam",
+                    "short_name": "VN",
+                    "types": [
+                        "country",
+                        "political"
+                    ]
+                }
+            ],
+            "formatted_address": "4/2 Vân Hồ 2, Tổ Dân Phố 10b+Tổ Dân Phố 10c, Hai Bà Trưng, Hà Nội, Việt Nam",
+            "geometry": {
+                "location": {
+                    "lat": 21.0100885,
+                    "lng": 105.8456934
+                },
+                "location_type": "ROOFTOP",
+                "viewport": {
+                    "northeast": {
+                        "lat": 21.0114374802915,
+                        "lng": 105.8470423802915
+                    },
+                    "southwest": {
+                        "lat": 21.0087395197085,
+                        "lng": 105.8443444197085
+                    }
+                }
+            },
+            "place_id": "ChIJNRZ4momrNTERSNm5E7BLm1c",
+            "plus_code": {
+                "compound_code": "2R6W+27 Hai Bà Trưng, Hà Nội, Việt Nam",
+                "global_code": "7PH72R6W+27"
+            },
+            "types": [
+                "street_address"
+            ]
+        },
+        {
+            "address_components": [
+                {
+                    "long_name": "25",
+                    "short_name": "25",
+                    "types": [
+                        "street_number"
+                    ]
+                },
+                {
+                    "long_name": "Phố Nguyễn Đình Chiểu",
+                    "short_name": "P. Nguyễn Đình Chiểu",
+                    "types": [
+                        "route"
+                    ]
+                },
+                {
+                    "long_name": "Hai Bà Trưng",
+                    "short_name": "Hai Bà Trưng",
+                    "types": [
+                        "administrative_area_level_2",
+                        "political"
+                    ]
+                },
+                {
+                    "long_name": "Hà Nội",
+                    "short_name": "Hà Nội",
+                    "types": [
+                        "administrative_area_level_1",
+                        "political"
+                    ]
+                },
+                {
+                    "long_name": "Việt Nam",
+                    "short_name": "VN",
+                    "types": [
+                        "country",
+                        "political"
+                    ]
+                }
+            ],
+            "formatted_address": "25 P. Nguyễn Đình Chiểu, Lê Đại Hành, Hai Bà Trưng, Hà Nội, Việt Nam",
+            "geometry": {
+                "bounds": {
+                    "northeast": {
+                        "lat": 21.0100656,
+                        "lng": 105.8457696
+                    },
+                    "southwest": {
+                        "lat": 21.009966,
+                        "lng": 105.845642
+                    }
+                },
+                "location": {
+                    "lat": 21.010016,
+                    "lng": 105.8457034
+                },
+                "location_type": "ROOFTOP",
+                "viewport": {
+                    "northeast": {
+                        "lat": 21.0113647802915,
+                        "lng": 105.8470547802915
+                    },
+                    "southwest": {
+                        "lat": 21.0086668197085,
+                        "lng": 105.8443568197085
+                    }
+                }
+            },
+            "place_id": "ChIJbY2LkImrNTERYCxE0upPv2Y",
+            "types": [
+                "premise"
+            ]
+        },
+        {
+            "address_components": [
+                {
+                    "long_name": "130",
+                    "short_name": "130",
+                    "types": [
+                        "street_number"
+                    ]
+                },
+                {
+                    "long_name": "Phố Nguyễn Đình Chiểu",
+                    "short_name": "P. Nguyễn Đình Chiểu",
+                    "types": [
+                        "route"
+                    ]
+                },
+                {
+                    "long_name": "Hai Bà Trưng",
+                    "short_name": "Hai Bà Trưng",
+                    "types": [
+                        "administrative_area_level_2",
+                        "political"
+                    ]
+                },
+                {
+                    "long_name": "Hà Nội",
+                    "short_name": "Hà Nội",
+                    "types": [
+                        "administrative_area_level_1",
+                        "political"
+                    ]
+                },
+                {
+                    "long_name": "Việt Nam",
+                    "short_name": "VN",
+                    "types": [
+                        "country",
+                        "political"
+                    ]
+                }
+            ],
+            "formatted_address": "130 P. Nguyễn Đình Chiểu, Lê Đại Hành, Hai Bà Trưng, Hà Nội, Việt Nam",
+            "geometry": {
+                "location": {
+                    "lat": 21.0101245,
+                    "lng": 105.8456007
+                },
+                "location_type": "RANGE_INTERPOLATED",
+                "viewport": {
+                    "northeast": {
+                        "lat": 21.0114734802915,
+                        "lng": 105.8469496802915
+                    },
+                    "southwest": {
+                        "lat": 21.0087755197085,
+                        "lng": 105.8442517197085
+                    }
+                }
+            },
+            "place_id": "ElQxMzAgUC4gTmd1eeG7hW4gxJDDrG5oIENoaeG7g3UsIEzDqiDEkOG6oWkgSMOgbmgsIEhhaSBCw6AgVHLGsG5nLCBIw6AgTuG7mWksIFZpZXRuYW0iGxIZChQKEgnX_GCSias1MREPsMyyTKJXkBCCAQ",
+            "types": [
+                "street_address"
+            ]
+        },
+        {
+            "address_components": [
+                {
+                    "long_name": "Phố Nguyễn Đình Chiểu",
+                    "short_name": "P. Nguyễn Đình Chiểu",
+                    "types": [
+                        "route"
+                    ]
+                },
+                {
+                    "long_name": "Hai Bà Trưng",
+                    "short_name": "Hai Bà Trưng",
+                    "types": [
+                        "administrative_area_level_2",
+                        "political"
+                    ]
+                },
+                {
+                    "long_name": "Hà Nội",
+                    "short_name": "Hà Nội",
+                    "types": [
+                        "administrative_area_level_1",
+                        "political"
+                    ]
+                },
+                {
+                    "long_name": "Việt Nam",
+                    "short_name": "VN",
+                    "types": [
+                        "country",
+                        "political"
+                    ]
+                }
+            ],
+            "formatted_address": "P. Nguyễn Đình Chiểu, Lê Đại Hành, Hai Bà Trưng, Hà Nội, Việt Nam",
+            "geometry": {
+                "bounds": {
+                    "northeast": {
+                        "lat": 21.0107532,
+                        "lng": 105.8460414
+                    },
+                    "southwest": {
+                        "lat": 21.0083091,
+                        "lng": 105.845594
+                    }
+                },
+                "location": {
+                    "lat": 21.0095287,
+                    "lng": 105.8457239
+                },
+                "location_type": "GEOMETRIC_CENTER",
+                "viewport": {
+                    "northeast": {
+                        "lat": 21.0108801302915,
+                        "lng": 105.8471666802915
+                    },
+                    "southwest": {
+                        "lat": 21.00818216970849,
+                        "lng": 105.8444687197085
+                    }
+                }
+            },
+            "place_id": "ChIJ1_xgkomrNTERDrDMskyiV5A",
+            "types": [
+                "route"
+            ]
+        },
+        {
+            "address_components": [
+                {
+                    "long_name": "Lê Đại Hành",
+                    "short_name": "Lê Đại Hành",
+                    "types": [
+                        "political",
+                        "sublocality",
+                        "sublocality_level_1"
+                    ]
+                },
+                {
+                    "long_name": "Hai Bà Trưng",
+                    "short_name": "Hai Bà Trưng",
+                    "types": [
+                        "administrative_area_level_2",
+                        "political"
+                    ]
+                },
+                {
+                    "long_name": "Hà Nội",
+                    "short_name": "Hà Nội",
+                    "types": [
+                        "administrative_area_level_1",
+                        "political"
+                    ]
+                },
+                {
+                    "long_name": "Việt Nam",
+                    "short_name": "VN",
+                    "types": [
+                        "country",
+                        "political"
+                    ]
+                }
+            ],
+            "formatted_address": "Lê Đại Hành, Hai Bà Trưng, Hà Nội, Việt Nam",
+            "geometry": {
+                "bounds": {
+                    "northeast": {
+                        "lat": 21.0172941,
+                        "lng": 105.8512545
+                    },
+                    "southwest": {
+                        "lat": 21.0076794,
+                        "lng": 105.841341
+                    }
+                },
+                "location": {
+                    "lat": 21.0123071,
+                    "lng": 105.8451758
+                },
+                "location_type": "APPROXIMATE",
+                "viewport": {
+                    "northeast": {
+                        "lat": 21.0172941,
+                        "lng": 105.8512545
+                    },
+                    "southwest": {
+                        "lat": 21.0076794,
+                        "lng": 105.841341
+                    }
+                }
+            },
+            "place_id": "ChIJ3yTGXomrNTERjOYMsaZK7p4",
+            "types": [
+                "political",
+                "sublocality",
+                "sublocality_level_1"
+            ]
+        },
+        {
+            "address_components": [
+                {
+                    "long_name": "Lê Đại Hành",
+                    "short_name": "Lê Đại Hành",
+                    "types": [
+                        "administrative_area_level_3",
+                        "political"
+                    ]
+                },
+                {
+                    "long_name": "Hai Bà Trưng",
+                    "short_name": "Hai Bà Trưng",
+                    "types": [
+                        "administrative_area_level_2",
+                        "political"
+                    ]
+                },
+                {
+                    "long_name": "Hà Nội",
+                    "short_name": "Hà Nội",
+                    "types": [
+                        "administrative_area_level_1",
+                        "political"
+                    ]
+                },
+                {
+                    "long_name": "Việt Nam",
+                    "short_name": "VN",
+                    "types": [
+                        "country",
+                        "political"
+                    ]
+                }
+            ],
+            "formatted_address": "Lê Đại Hành, Hai Bà Trưng, Hà Nội, Việt Nam",
+            "geometry": {
+                "bounds": {
+                    "northeast": {
+                        "lat": 21.0174899,
+                        "lng": 105.851745
+                    },
+                    "southwest": {
+                        "lat": 21.007679,
+                        "lng": 105.8413969
+                    }
+                },
+                "location": {
+                    "lat": 21.0123071,
+                    "lng": 105.8451758
+                },
+                "location_type": "APPROXIMATE",
+                "viewport": {
+                    "northeast": {
+                        "lat": 21.0174899,
+                        "lng": 105.851745
+                    },
+                    "southwest": {
+                        "lat": 21.007679,
+                        "lng": 105.8413969
+                    }
+                }
+            },
+            "place_id": "ChIJv-W5WImrNTERjoQwbFrY4cI",
+            "types": [
+                "administrative_area_level_3",
+                "political"
+            ]
+        },
+        {
+            "address_components": [
+                {
+                    "long_name": "Hai Bà Trưng",
+                    "short_name": "Hai Bà Trưng",
+                    "types": [
+                        "administrative_area_level_2",
+                        "political"
+                    ]
+                },
+                {
+                    "long_name": "Hà Nội",
+                    "short_name": "Hà Nội",
+                    "types": [
+                        "administrative_area_level_1",
+                        "political"
+                    ]
+                },
+                {
+                    "long_name": "Việt Nam",
+                    "short_name": "VN",
+                    "types": [
+                        "country",
+                        "political"
+                    ]
+                }
+            ],
+            "formatted_address": "Hai Bà Trưng, Hà Nội, Việt Nam",
+            "geometry": {
+                "bounds": {
+                    "northeast": {
+                        "lat": 21.020663,
+                        "lng": 105.8824741
+                    },
+                    "southwest": {
+                        "lat": 20.9896001,
+                        "lng": 105.841207
+                    }
+                },
+                "location": {
+                    "lat": 21.0090571,
+                    "lng": 105.8607507
+                },
+                "location_type": "APPROXIMATE",
+                "viewport": {
+                    "northeast": {
+                        "lat": 21.020663,
+                        "lng": 105.8824741
+                    },
+                    "southwest": {
+                        "lat": 20.9896001,
+                        "lng": 105.841207
+                    }
+                }
+            },
+            "place_id": "ChIJoXVwsR6sNTERScUSJVkX97E",
+            "types": [
+                "administrative_area_level_2",
+                "political"
+            ]
+        },
+        {
+            "address_components": [
+                {
+                    "long_name": "Hà Nội",
+                    "short_name": "Hà Nội",
+                    "types": [
+                        "locality",
+                        "political"
+                    ]
+                },
+                {
+                    "long_name": "Hoàn Kiếm",
+                    "short_name": "Hoàn Kiếm",
+                    "types": [
+                        "administrative_area_level_2",
+                        "political"
+                    ]
+                },
+                {
+                    "long_name": "Hà Nội",
+                    "short_name": "Hà Nội",
+                    "types": [
+                        "administrative_area_level_1",
+                        "political"
+                    ]
+                },
+                {
+                    "long_name": "Việt Nam",
+                    "short_name": "VN",
+                    "types": [
+                        "country",
+                        "political"
+                    ]
+                }
+            ],
+            "formatted_address": "Hà Nội, Hoàn Kiếm, Hà Nội, Việt Nam",
+            "geometry": {
+                "bounds": {
+                    "northeast": {
+                        "lat": 21.0503801,
+                        "lng": 105.8764459
+                    },
+                    "southwest": {
+                        "lat": 20.9950991,
+                        "lng": 105.7974815
+                    }
+                },
+                "location": {
+                    "lat": 21.0277644,
+                    "lng": 105.8341598
+                },
+                "location_type": "APPROXIMATE",
+                "viewport": {
+                    "northeast": {
+                        "lat": 21.0503801,
+                        "lng": 105.8764459
+                    },
+                    "southwest": {
+                        "lat": 20.9950991,
+                        "lng": 105.7974815
+                    }
+                }
+            },
+            "place_id": "ChIJoRyG2ZurNTERqRfKcnt_iOc",
+            "types": [
+                "locality",
+                "political"
+            ]
+        },
+        {
+            "address_components": [
+                {
+                    "long_name": "Hà Nội",
+                    "short_name": "Hà Nội",
+                    "types": [
+                        "administrative_area_level_1",
+                        "political"
+                    ]
+                },
+                {
+                    "long_name": "Việt Nam",
+                    "short_name": "VN",
+                    "types": [
+                        "country",
+                        "political"
+                    ]
+                }
+            ],
+            "formatted_address": "Hà Nội, Việt Nam",
+            "geometry": {
+                "bounds": {
+                    "northeast": {
+                        "lat": 21.3850271,
+                        "lng": 106.0198859
+                    },
+                    "southwest": {
+                        "lat": 20.5623231,
+                        "lng": 105.2854659
+                    }
+                },
+                "location": {
+                    "lat": 21.0031177,
+                    "lng": 105.8201408
+                },
+                "location_type": "APPROXIMATE",
+                "viewport": {
+                    "northeast": {
+                        "lat": 21.3850271,
+                        "lng": 106.0198859
+                    },
+                    "southwest": {
+                        "lat": 20.5623231,
+                        "lng": 105.2854659
+                    }
+                }
+            },
+            "place_id": "ChIJKQqAE44ANTERDbkQYkF-mAI",
+            "types": [
+                "administrative_area_level_1",
+                "political"
+            ]
+        },
+        {
+            "address_components": [
+                {
+                    "long_name": "Việt Nam",
+                    "short_name": "VN",
+                    "types": [
+                        "country",
+                        "political"
+                    ]
+                }
+            ],
+            "formatted_address": "Việt Nam",
+            "geometry": {
+                "bounds": {
+                    "northeast": {
+                        "lat": 23.3926504,
+                        "lng": 109.6765
+                    },
+                    "southwest": {
+                        "lat": 8.195200099999999,
+                        "lng": 102.1440178
+                    }
+                },
+                "location": {
+                    "lat": 14.058324,
+                    "lng": 108.277199
+                },
+                "location_type": "APPROXIMATE",
+                "viewport": {
+                    "northeast": {
+                        "lat": 23.3926504,
+                        "lng": 109.6765
+                    },
+                    "southwest": {
+                        "lat": 8.195200099999999,
+                        "lng": 102.1440178
+                    }
+                }
+            },
+            "place_id": "ChIJXx5qc016FTERvmL-4smwO7A",
+            "types": [
+                "country",
+                "political"
+            ]
+        }
+    ],
+    "status": "OK"
+}

@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
-import { Text, View, Pressable, TextInput, StatusBar } from "react-native"
+import { Text, View, Pressable, TextInput } from "react-native"
 import { useTranslation } from "react-i18next";
-import { StackActions, useNavigation, useRoute } from "@react-navigation/native";
+import { CommonActions, StackActions, useNavigation, useRoute } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useDispatch } from "react-redux";
 
@@ -9,7 +9,8 @@ import className from "./className";
 import Header from "../../components/Header";
 import Utils from "../../share/Utils";
 import Api from "../../api";
-import { setAccount } from "../../slices/Account";
+import { setAccount, setCookie, setIsDriver } from "../../slices/Account";
+import { useEffect } from "react";
 
 const types = {
     ONLY_PASSWORD: 1,
@@ -21,7 +22,7 @@ const types = {
 /**
  * @typedef prop
  * @property {String | undefined} value
- * @property {() => void | undefined} onChangText
+ * @property {((Number) => void) | undefined} onChangText
  * @param {prop} param
  * @returns 
  */
@@ -34,6 +35,11 @@ const InputRow = ({ value, onChangText, ref }) => {
     }
 
     const _ref = ref ?? useRef(null);
+
+    useEffect(() => {
+        _ref.current?.blur()
+        _ref.current?.focus()
+    }, []);
 
     return (
         <View className={className.inputWrapper}>
@@ -116,25 +122,33 @@ const PasswordOTP = () => {
             const result = await Api.account.register(userPhone, username, password);
             Utils.hideLoading();
             if (result.data) {
-                Utils.data["token"] = null;
-                Utils.data["token"] = result.data.data;
+                Utils.global.token = null;
+                Utils.global.token = result.data.data;
                 setType(types.ONLY_OPT);
             }
         }
         if (type == types.ONLY_OPT) {
             Utils.showLoading();
-            const result = await Api.account.confirmOTP(Utils.data.token, passwordOrOTP);
+            const result = await Api.account.confirmOTP(Utils.global.token, passwordOrOTP);
             await Utils.wait(300);
             if (result.result == Api.ResultCode.SUCCESS) {
                 const login = await Api.account.login(userPhone, password);
                 await Utils.wait(300);
                 if (login.result == Api.ResultCode.SUCCESS) {
+                    const cookie = String(login.headers["set-cookie"] ?? "");
+                    Utils.global.cookie = cookie;
                     dispatch(setAccount(login.data.data));
+                    dispatch(setIsDriver(false));
                     try {
-                        await AsyncStorage.setItem("account", JSON.stringify(login.data.data))
+                        await AsyncStorage.setItem("account", JSON.stringify(login.data.data));
+                        await AsyncStorage.setItem("cookie", cookie);
+                        await AsyncStorage.setItem("isDriver", String(0));
                     } catch (error) { }
                     Utils.hideLoading();
-                    navigation.dispatch(StackActions.replace("Home"))
+                    navigation.dispatch(CommonActions.reset({
+                        index: 0,
+                        routes: [{ name: "Home" }]
+                    }));
                 }
             }
             else {
@@ -147,20 +161,46 @@ const PasswordOTP = () => {
         if (type == types.ONLY_PASSWORD) {
             Utils.showLoading();
             const login = await Api.account.login(userPhone, passwordOrOTP);
-            await Utils.wait(300);
+            console.log(login);
+            await Utils.wait(500);
+            Utils.hideLoading();
             if (login.result == Api.ResultCode.SUCCESS) {
+                const cookie = String(login.headers["set-cookie"] ?? "");
+                Utils.global.cookie = cookie;
                 dispatch(setAccount(login.data.data));
+                dispatch(setIsDriver(false));
                 try {
-                    await AsyncStorage.setItem("account", JSON.stringify(login.data.data))
+                    await AsyncStorage.setItem("account", JSON.stringify(login.data.data));
+                    await AsyncStorage.setItem("cookie", cookie);
+                    await AsyncStorage.setItem("isDriver", String(0));
                 } catch (error) { }
                 Utils.hideLoading();
-                navigation.dispatch(StackActions.replace("Home"))
+                navigation.dispatch(CommonActions.reset({
+                    index: 0,
+                    routes: [{ name: "Home" }]
+                }));
             }
             else {
-                Utils.hideLoading();
-                Utils.showMessageDialog({
-                    message: t("WrongPassword")
-                });
+                if (login.data.code == 401) {
+                    const otp = await Api.account.resendOTP(userPhone);
+                    console.log(otp);
+                    if (otp.data) {
+                        Utils.global.token = null;
+                        Utils.global.token = otp.data.data;
+                        setType(types.ONLY_OPT);
+                        setPasswordOrOTP("");
+                    }
+                    else {
+                        setType(types.ONLY_OPT);
+                        setPasswordOrOTP("");
+                    }
+                }
+                else {
+                    Utils.hideLoading();
+                    Utils.showMessageDialog({
+                        message: t("WrongPassword")
+                    });
+                }
             }
             Utils.hideLoading();
         }
@@ -168,7 +208,6 @@ const PasswordOTP = () => {
 
     return (
         <View className={className.container}>
-            <StatusBar />
             <Header
                 border={false}
                 onPressBack={() => navigation.goBack()} />
@@ -181,6 +220,7 @@ const PasswordOTP = () => {
                         <InputRow
                             value={passwordOrOTP}
                             onChangText={e => {
+                                e
                                 setPasswordOrOTP(
                                     e.replace(",", "")
                                         .replace(" ", "")

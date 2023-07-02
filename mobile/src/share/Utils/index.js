@@ -1,1 +1,4 @@
-export { default, UtilComponents } from "./Utils"
+export { UtilComponents } from "./Utils";
+import Utils from "./Utils";
+
+export default Utils
