@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+
 	"github.com/huydnt1801/chuyende/api/server"
 	"github.com/huydnt1801/chuyende/internal/config"
 	"github.com/urfave/cli/v2"
@@ -11,12 +12,6 @@ import (
 )
 
 func main() {
-	os.Setenv("SECRET_KEY", "something-very-secret-that-you-cannot-know")
-	os.Setenv("MYSQL_HOST", "127.0.0.1")
-	os.Setenv("MYSQL_PORT", "3306")
-	os.Setenv("MYSQL_USERNAME", "chuyende")
-	os.Setenv("MYSQL_PASSWORD", "password")
-	os.Setenv("MYSQL_DATABASE", "chuyende")
 	app := &cli.App{
 		Name:  "Chuyen de",
 		Usage: "",

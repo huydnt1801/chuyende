@@ -86,7 +86,7 @@ func (s *TripServer) ListTrip(c echo.Context) error {
 	if authInfo.DriverID != 0 {
 		if params.TripID != nil {
 			params = &trip.TripParams{
-				TripID: params.TripID,
+				TripID:  params.TripID,
 				DriveID: &authInfo.DriverID,
 			}
 		} else {
