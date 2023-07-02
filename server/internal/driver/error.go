@@ -7,7 +7,7 @@ import (
 )
 
 type InvalidPhoneError struct {
-	http.NotFoundError
+	http.BadRequestError
 }
 
 func (InvalidPhoneError) Error() string {
@@ -35,7 +35,7 @@ func IsDriverNotFound(err error) bool {
 }
 
 type InvalidPasswordError struct {
-	http.UnauthorizedError
+	http.BadRequestError
 }
 
 func (InvalidPasswordError) Error() string {

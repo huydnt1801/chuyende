@@ -47,11 +47,8 @@ func (r *RepoImpl) CreateUser(ctx context.Context, user *User) (*User, error) {
 	return user, nil
 }
 
-func (r *RepoImpl) UpdateUser(ctx context.Context, u *User, updated *UserUpdate) error {
-	q := r.client.User.Update()
-	if u.ID != 0 {
-		q = q.Where(user.ID(u.ID))
-	}
+func (r *RepoImpl) UpdateUser(ctx context.Context, u *User, updated *UserUpdate) (*User, error) {
+	q := r.client.User.UpdateOneID(u.ID)
 	if v := updated.FullName; v != "" {
 		q.SetFullName(v)
 	}
@@ -64,11 +61,11 @@ func (r *RepoImpl) UpdateUser(ctx context.Context, u *User, updated *UserUpdate)
 	if v := updated.Confirmed; v != nil {
 		q.SetConfirmed(*v)
 	}
-	_, err := q.Save(ctx)
-	if ent.IsNotFound(err) {
-		return UserNotFoundError{}
+	user, err := q.Save(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed updating user: %w", err)
 	}
-	return err
+	return DecodeUser(user)
 }
 
 func (r *RepoImpl) FindUser(ctx context.Context, params *UserParams) (*User, error) {
