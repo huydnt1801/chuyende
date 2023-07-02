@@ -1,5 +1,5 @@
 import { useNavigation } from "@react-navigation/native";
-import { Text, View, Pressable, ScrollView, Image } from "react-native";
+import { Text, View, Pressable, ScrollView, Image, useWindowDimensions } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faMotorcycle, faPerson } from "@fortawesome/free-solid-svg-icons";
 import { useTranslation } from "react-i18next";
@@ -16,7 +16,8 @@ const HomePage = () => {
     const navigation = useNavigation();
     const { t } = useTranslation()
     const { account } = useSelector(state => state.account);
-
+    const size = useWindowDimensions();
+    const widthv = size.width;
     return (
         <View className={className.container}>
             <View className={className.header}>
@@ -55,10 +56,10 @@ const HomePage = () => {
                 <View>
                     <Image
                         style={{
-                            resizeMode: 'repeat',
-                            // height: 100,
-                            // width: 200,
-                            // display: 'flex'
+                            // resizeMode: 'repeat',
+                            width: widthv,
+                            resizeMode: 'contain',
+                            height:500
                         }}
                         source={bevoucher} />
                 </View>
