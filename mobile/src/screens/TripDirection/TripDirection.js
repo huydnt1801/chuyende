@@ -140,7 +140,7 @@ const TripDirection = () => {
                 <MapViewDirections
                     origin={source}
                     destination={destination}
-                    // apikey={"AIzaSyBt5Cp2LUkwqb8wq-wgDDjIN1KZTeHebY4"}
+                    apikey={"AIzaSyBt5Cp2LUkwqb8wq-wgDDjIN1KZTeHebY4"}
                     strokeWidth={4}
                     strokeColor="#111111"
                 />

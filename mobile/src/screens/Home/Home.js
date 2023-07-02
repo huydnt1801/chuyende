@@ -133,7 +133,7 @@ const Home = () => {
 
     const navigation = useNavigation();
     const { t } = useTranslation();
-    const dispatch = useDispatch()
+    const dispatch = useDispatch();
 
     const { account, isDriver } = useSelector(state => state.account);
     const { listTrip } = useSelector(state => state.trip);
