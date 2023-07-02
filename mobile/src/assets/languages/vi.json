@@ -61,5 +61,8 @@
     "ChangePassword": "Đổi mật khẩu",
     "EnterOldPassword": "Nhập mật khẩu cũ",
     "EnterANewPassword": "Nhập mật khẩu mới",
-    "EnterYourNewPassword": "Nhập lại mật khẩu mới"
+    "EnterYourNewPassword": "Nhập lại mật khẩu mới",
+    "Accept": "Đồng ý",
+    "Cancel": "Hủy",
+    "AreYouSureAcceptThisTrip": "Bạn có chắc chắc nhận chuyến đi này?"
 }

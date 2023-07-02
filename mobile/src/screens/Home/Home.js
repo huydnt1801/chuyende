@@ -11,7 +11,6 @@ import Reward from "./pages/Reward";
 import { useSelector } from "react-redux";
 import Utils from "../../share/Utils";
 import { Text } from "react-native";
-import { Button } from "react-native";
 import Api from "../../api";
 import Avatar from "./pages/Account/components/Avatar";
 import { FlatList } from "react-native";
@@ -131,7 +130,12 @@ const Home = () => {
 
     const getTrips = async () => {
         const result = await Api.trip.getList();
-        setTrips(result.data.data)
+        if (result.result = Api.ResultCode.SUCCESS) {
+            setTrips(result.data.data);
+        }
+        else {
+
+        }
     }
 
     const handleRefresh = async () => {
@@ -171,6 +175,11 @@ const Home = () => {
                         paddingTop: 4,
                         paddingBottom: 20
                     }}
+                    ListEmptyComponent={
+                        <View>
+                            <Text>Hien tai khong co chuyen di nao</Text>
+                        </View>
+                    }
                     refreshControl={
                         <RefreshControl
                             tintColor={"#C4C7C8"}
@@ -185,6 +194,14 @@ const Home = () => {
                             distance={item.distance}
                             price={item.price}
                             time={item.c}
+                            onPressAccept={() => {
+                                Utils.showConfirmDialog({
+                                    message: t("AreYouSureAcceptThisTrip"),
+                                    onConfirm: async () => {
+
+                                    }
+                                })
+                            }}
                         />
                     )} />
             </View>

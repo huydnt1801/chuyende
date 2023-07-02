@@ -1,4 +1,5 @@
 import CheckNetwork, { checkNetworkRef } from "./components/CheckNetwork";
+import ConfirmDialog, { confirmDialogRef } from "./components/ConfirmDialog";
 import Loading, { loadingRef } from "./components/Loading";
 import MessageDialog, { messageDialogRef } from "./components/MessageDialog";
 import Toast, { toastRef } from "./components/Toast";
@@ -52,6 +53,23 @@ const Utils = {
         loadingRef.current.hide();
     },
     /**
+     * Show confirm dialog
+     * @typedef configs
+     * @property {String | undefined} message
+     * @property {() => void | undefined} onConfirm
+     * @property {() => void | undefined} onCancel
+     * @property {String | undefined} buttonTextLeft
+     * @property {String | undefined} buttonTextRight
+     * @param {configs} config 
+     */
+    showConfirmDialog: (config = {}) => {
+        confirmDialogRef.current.hide();
+        confirmDialogRef.current.show(config);
+    },
+    hideConfirmDialog: () => {
+        confirmDialogRef.current.hide();
+    },
+    /**
      * wait ms before next action
      * @param {Number} ms 
      */
@@ -68,6 +86,7 @@ const UtilComponents = () => {
             <MessageDialog />
             <CheckNetwork />
             <Loading />
+            <ConfirmDialog />
         </>
     );
 }
