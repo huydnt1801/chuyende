@@ -68,7 +68,10 @@ func LogoutUser(c echo.Context) {
 func getSession(c echo.Context) *sessions.Session {
 	sess, err := session.Get("auth", c)
 	if err != nil {
-		return &sessions.Session{}
+		return &sessions.Session{
+			Values:  map[interface{}]interface{}{},
+			Options: &sessions.Options{},
+		}
 	}
 	return sess
 }
@@ -83,7 +86,10 @@ func saveSession(c echo.Context) {
 		sess.Options.HttpOnly = true
 		sess.Options.Secure = true
 		sess.Options.SameSite = http.SameSiteNoneMode
-		sess.Save(c.Request(), c.Response())
+		// Support testing
+		if sess.Name() == "auth" {
+			sess.Save(c.Request(), c.Response())
+		}
 	})
 	c.Set(sessionSaveHookAdded, true)
 

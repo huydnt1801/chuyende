@@ -3,7 +3,6 @@ package driver
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"regexp"
 
 	"github.com/go-logr/logr"
@@ -38,12 +37,7 @@ func (s *ServiceImpl) Authenticate(ctx context.Context, phoneNumber, password st
 	}
 	driver, err := repo.FindDriver(ctx, phoneNumber)
 	if err != nil {
-		if IsDriverNotFound(err) {
-			return nil, DriverNotFoundError{}
-		} else {
-			return nil, fmt.Errorf("failed querying driver from DB: %w", err)
-		}
-
+		return nil, err
 	}
 
 	if password != driver.Password {

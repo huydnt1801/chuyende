@@ -175,7 +175,7 @@ func (s *TripServer) UpdateStatusTrip(c echo.Context) error {
 		TripID: &data.TripID,
 	}
 	if authInfo.UserID != 0 {
-		if *updateParams.Status != entTrip.StatusWaiting && *updateParams.Status != entTrip.StatusCancel {
+		if *updateParams.Status != entTrip.StatusCancel {
 			return echo.NewHTTPError(http.StatusBadRequest, "Trạng thái không hợp lệ")
 		}
 		tripParams.UserID = &authInfo.UserID
@@ -190,6 +190,12 @@ func (s *TripServer) UpdateStatusTrip(c echo.Context) error {
 	}
 	if len(tripFounds) != 1 {
 		return echo.NewHTTPError(http.StatusForbidden, "Bạn không có quyền chỉnh sửa")
+	}
+	if tripFounds[0].Status == entTrip.StatusCancel {
+		return echo.NewHTTPError(http.StatusBadRequest, "Chuyến xe đã bị hủy")
+	}
+	if *updateParams.Status == entTrip.StatusCancel && tripFounds[0].Status == entTrip.StatusDone {
+		return echo.NewHTTPError(http.StatusBadRequest, "Chuyến xe đã hoàn thành")
 	}
 	if authInfo.DriverID != 0 {
 		if tripFounds[0].DriveID != 0 && authInfo.DriverID != tripFounds[0].DriveID {
