@@ -56,5 +56,10 @@
     "Distance": "Khoảng cách",
     "Price": "Giá",
     "AcceptTrip": "Nhận chuyến",
-    "ListTrip": "Danh sách chuyến đi"
+    "ListTrip": "Danh sách chuyến đi",
+    "TripHistory": "Lịch sử chuyến đi",
+    "ChangePassword": "Đổi mật khẩu",
+    "EnterOldPassword": "Nhập mật khẩu cũ",
+    "EnterANewPassword": "Nhập mật khẩu mới",
+    "EnterYourNewPassword": "Nhập lại mật khẩu mới"
 }

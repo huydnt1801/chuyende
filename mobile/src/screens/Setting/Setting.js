@@ -27,7 +27,9 @@ const Setting = () => {
         <View className={className.container}>
             <View >
                 <Header
-                    title={t("Setting")} />
+                    title={t("Setting")} 
+                    onPressBack={() => navigation.goBack()}
+                    />
             </View>
             <ScrollView>
 
@@ -48,7 +50,7 @@ const Setting = () => {
                 <ButtonRow
                     classNames={`mt-2`}
                     title={t("SetUpUpdatePassword")}
-                    onPress={() => Utils.toast("Coming Soon!")}
+                    onPress={() => navigation.navigate("ChangePassword")}
                     iconLeft={
                         <FontAwesomeIcon
                             icon={faKeyboard}

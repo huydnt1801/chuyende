@@ -18,6 +18,7 @@ const TripSetting = () => {
         <View style={{ flex: 1 }}>
             <View >
                 <Header
+                    onPressBack={() => navigation.goBack()}
                     title={t("TripSetting")} />
                     
             </View>

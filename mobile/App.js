@@ -20,6 +20,7 @@ import { UtilComponents } from "./src/share/Utils";
 import TestScreen from "./src/screens/TestScreen";
 import Language from "./src/screens/Language";
 import DriverSetting from "./src/screens/DriverSetting";
+import ChangePassword from "./src/screens/ChangePassword";
 
 const Stack = createNativeStackNavigator();
 
@@ -35,8 +36,9 @@ const screens = [
     { name: "SelectLocation", component: SelectLocation },
     { name: "SelectLocationOnMap", component: SelectLocationOnMap },
     { name: "TripDirection", component: TripDirection },
-    { name: "Language", component: Language },
     { name: "DriverSetting", component: DriverSetting },
+    { name: "Language", component: Language },
+    { name: "ChangePassword", component: ChangePassword },
 
 ]
 

@@ -44,6 +44,7 @@ const Account = () => {
                 <ButtonRow
                     classNames={`mt-2`}
                     title={t("Cài đặt chuyến đi")}
+                    onPress={() => navigation.navigate("TripSetting")}
                     iconLeft={
                         <FontAwesomeIcon
                             icon={faCar}
@@ -110,6 +111,7 @@ const Account = () => {
                 <ButtonRow
                     classNames={`mt-[1px]`}
                     title={t("Thanh toán")}
+                    onPress={() => navigation.navigate("Payment")}
                     iconLeft={
                         <FontAwesomeIcon
                             icon={faMoneyBill}
