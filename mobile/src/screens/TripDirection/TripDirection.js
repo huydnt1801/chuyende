@@ -13,6 +13,7 @@ import Api from "../../api";
 import Utils from "../../share/Utils";
 import ModalFinding from "./components/ModalFinding";
 import { memo } from "react";
+import { useEffect } from "react";
 
 const MarkerType = {
     START: 1,
@@ -20,7 +21,6 @@ const MarkerType = {
 }
 
 const CustomMarker = ({ type = MarkerType.START, place }) => {
-    console.log(place);
     return (
         <View className={className.wrapper}>
             <Text>{place}</Text>
@@ -78,8 +78,10 @@ const TripDirection = () => {
 
     const [vehicle, setVehicle] = useState("motor");
     const [showModalFinding, setShowModalFinding] = useState(false);
-
-    console.log(Utils.data["cookie"]);
+    const [price, setPrice] = useState({
+        motor: 50,
+        car: 50
+    })
 
     const handleClickOrder = async () => {
         Utils.showLoading();
@@ -99,6 +101,16 @@ const TripDirection = () => {
         await Utils.wait(1000);
         setShowModalFinding(true);
     }
+
+    useEffect(() => {
+        const getPrice = async () => {
+            const result = await Api.trip.checkPrice(20);
+            if (result.result == Api.ResultCode.SUCCESS) {
+                setPrice(result.data.data)
+            }
+        }
+        getPrice()
+    }, [])
 
     return (
         <View className={className.container}>
@@ -130,14 +142,15 @@ const TripDirection = () => {
                 <MapViewDirections
                     origin={source}
                     destination={destination}
-                    apikey={"AIzaSyBt5Cp2LUkwqb8wq-wgDDjIN1KZTeHebY4"}
+                    // apikey={"AIzaSyBt5Cp2LUkwqb8wq-wgDDjIN1KZTeHebY4"}
                     strokeWidth={4}
                     strokeColor="#111111"
                 />
             </MapView>
             <BottomSheet
                 vehicle={vehicle}
-                onChangeVehicle={vehicle => setVehicle(vehicle)} />
+                onChangeVehicle={vehicle => setVehicle(vehicle)}
+                price={price} />
             <View className={className.bottom}>
                 <TouchableOpacity
                     activeOpacity={0.7}

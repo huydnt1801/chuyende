@@ -19,6 +19,7 @@ import i18next from "./src/share/Language";
 import { UtilComponents } from "./src/share/Utils";
 import TestScreen from "./src/screens/TestScreen";
 import Language from "./src/screens/Language";
+import DriverSetting from "./src/screens/DriverSetting";
 
 const Stack = createNativeStackNavigator();
 
@@ -35,6 +36,7 @@ const screens = [
     { name: "SelectLocationOnMap", component: SelectLocationOnMap },
     { name: "TripDirection", component: TripDirection },
     { name: "Language", component: Language },
+    { name: "DriverSetting", component: DriverSetting },
 
 ]
 

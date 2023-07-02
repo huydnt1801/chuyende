@@ -9,7 +9,7 @@ import className from "./className";
 import Header from "../../components/Header";
 import Utils from "../../share/Utils";
 import Api from "../../api";
-import { setAccount, setCookie } from "../../slices/Account";
+import { setAccount, setCookie, setIsDriver } from "../../slices/Account";
 import { useEffect } from "react";
 
 const types = {
@@ -122,25 +122,27 @@ const PasswordOTP = () => {
             const result = await Api.account.register(userPhone, username, password);
             Utils.hideLoading();
             if (result.data) {
-                Utils.data["token"] = null;
-                Utils.data["token"] = result.data.data;
+                Utils.global.token = null;
+                Utils.global.token = result.data.data;
                 setType(types.ONLY_OPT);
             }
         }
         if (type == types.ONLY_OPT) {
             Utils.showLoading();
-            const result = await Api.account.confirmOTP(Utils.data.token, passwordOrOTP);
+            const result = await Api.account.confirmOTP(Utils.global.token, passwordOrOTP);
             await Utils.wait(300);
             if (result.result == Api.ResultCode.SUCCESS) {
                 const login = await Api.account.login(userPhone, password);
                 await Utils.wait(300);
                 if (login.result == Api.ResultCode.SUCCESS) {
-                    const cookie = login.headers["set-cookie"] ?? "";
-                    Utils.data["cookie"] = String(cookie);
+                    const cookie = String(login.headers["set-cookie"] ?? "");
+                    Utils.global.cookie = cookie;
                     dispatch(setAccount(login.data.data));
+                    dispatch(setIsDriver(false));
                     try {
                         await AsyncStorage.setItem("account", JSON.stringify(login.data.data));
-                        await AsyncStorage.setItem("cookie", String(cookie));
+                        await AsyncStorage.setItem("cookie", cookie);
+                        await AsyncStorage.setItem("isDriver", String(0));
                     } catch (error) { }
                     Utils.hideLoading();
                     navigation.dispatch(StackActions.replace("Home"))
@@ -156,23 +158,43 @@ const PasswordOTP = () => {
         if (type == types.ONLY_PASSWORD) {
             Utils.showLoading();
             const login = await Api.account.login(userPhone, passwordOrOTP);
-            await Utils.wait(300);
+            console.log(login);
+            await Utils.wait(500);
+            Utils.hideLoading();
             if (login.result == Api.ResultCode.SUCCESS) {
-                const cookie = login.headers["set-cookie"] ?? "";
+                const cookie = String(login.headers["set-cookie"] ?? "");
+                Utils.global.cookie = cookie;
                 dispatch(setAccount(login.data.data));
-                Utils.data["cookie"] = String(cookie);
+                dispatch(setIsDriver(false));
                 try {
                     await AsyncStorage.setItem("account", JSON.stringify(login.data.data));
-                    await AsyncStorage.setItem("cookie", String(cookie));
+                    await AsyncStorage.setItem("cookie", cookie);
+                    await AsyncStorage.setItem("isDriver", String(0));
                 } catch (error) { }
                 Utils.hideLoading();
                 navigation.dispatch(StackActions.replace("Home"))
             }
             else {
-                Utils.hideLoading();
-                Utils.showMessageDialog({
-                    message: t("WrongPassword")
-                });
+                if (login.data.code == 401) {
+                    const otp = await Api.account.resendOTP(userPhone);
+                    console.log(otp);
+                    if (otp.data) {
+                        Utils.global.token = null;
+                        Utils.global.token = otp.data.data;
+                        setType(types.ONLY_OPT);
+                        setPasswordOrOTP("");
+                    }
+                    else {
+                        setType(types.ONLY_OPT);
+                        setPasswordOrOTP("");
+                    }
+                }
+                else {
+                    Utils.hideLoading();
+                    Utils.showMessageDialog({
+                        message: t("WrongPassword")
+                    });
+                }
             }
             Utils.hideLoading();
         }

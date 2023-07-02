@@ -47,5 +47,14 @@
     "ShopeePay": "ShopeePay",
     "ViettelMoney": "Viettel Money",
     "English": "English",
-    "Vietnamese": "Tiếng Việt"
+    "Vietnamese": "Tiếng Việt",
+    "IAmDriver": "Tôi là tài xế",
+    "IAmUser": "Tôi là khách hàng",
+    "Login": "Đăng nhập",
+    "LoginWithDriverAccount": "Đăng nhập với tài khoản tài xế",
+    "CanNotFindAccount": "Không tìm thấy tài khoản",
+    "Distance": "Khoảng cách",
+    "Price": "Giá",
+    "AcceptTrip": "Nhận chuyến",
+    "ListTrip": "Danh sách chuyến đi"
 }

@@ -7,6 +7,12 @@ const wait = (ms) => new Promise(e => setTimeout(e, ms));
 
 const Utils = {
     data: {},
+    global: {
+        cookie: "",
+        accessToken: "",
+        isDriver: false,
+        token: null,
+    },
     /**
      * Show a toast to screen
      * @param {String} message: message of toast

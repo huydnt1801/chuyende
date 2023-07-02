@@ -1,3 +1,4 @@
+import Utils from "../share/Utils";
 import baseApi from "./baseApi";
 
 const login = (phone, password) => {
@@ -8,12 +9,31 @@ const login = (phone, password) => {
     }
     return baseApi.post(url, param);
 }
+
+const logout = (phone) => {
+    const url = "/accounts/logout";
+    const param = {
+        phoneNumber: phone,
+    }
+    return baseApi.post(url, param, {
+        headers: {
+            cookie: Utils.global.cookie
+        }
+    });
+}
 const confirmOTP = (token, otp) => {
-    const url = "/accounts/register/confirm";
+    const url = "/accounts/confirm";
     const param = {
         token,
         type: "submit-otp",
         otp
+    }
+    return baseApi.post(url, param);
+}
+const resendOTP = (phone) => {
+    const url = "/accounts/resend";
+    const param = {
+        phoneNumber: phone
     }
     return baseApi.post(url, param);
 }
@@ -49,11 +69,25 @@ const checkPhone = (phone) => {
     return baseApi.post(url, param);
 }
 
+const loginDriver = async (phone, password) => {
+    const url = "/accounts/login/driver";
+    const param = {
+        phoneNumber: phone,
+        password: password
+    }
+
+    return baseApi.post(url, param)
+
+}
+
 const accountApi = {
     login,
     checkPhone,
     register,
-    confirmOTP
+    confirmOTP,
+    loginDriver,
+    resendOTP,
+    logout
 }
 
 export default accountApi

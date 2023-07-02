@@ -5,11 +5,11 @@ import { blitzcrank } from "../../../../../../components/Image";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faStar } from "@fortawesome/free-solid-svg-icons";
 
-const Avatar = ({ name, phone, rate, onPress }) => {
+const Avatar = ({ name, phone, rate, onPress, classNames }) => {
 
     return (
         <Pressable
-            className={className.wrapper}
+            className={className.wrapper + " " + classNames}
             onPress={onPress}>
             <View className={className.imageBorder}>
                 <Image

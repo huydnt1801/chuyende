@@ -6,11 +6,9 @@ import Banner from "./components/Banner/Banner";
 import { blitzcrank } from "../../../../components/Image";
 import { useSelector } from "react-redux";
 import { locationTypes } from "../../../SelectLocation";
-import Api from "../../../../api";
 
 const HomePage = () => {
 
-    const name = "Trương Quang Phú";
     const navigation = useNavigation();
     const { account } = useSelector(state => state.account)
 
@@ -41,12 +39,6 @@ const HomePage = () => {
                         <Text className={className.textButton}>{"Thuê tài xế"}</Text>
                     </Pressable>
                 </View>
-                <Button
-                    title="call api"
-                    onPress={async () => {
-                        const result = await Api.trip.getList();
-                        console.log(JSON.stringify(result));
-                    }} />
             </ScrollView>
         </View>
     );

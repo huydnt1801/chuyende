@@ -6,7 +6,7 @@ const getList = () => {
     const url = "/trips";
     return baseApi.get(url, {
         headers: {
-            cookie: Utils.data["cookie"]
+            cookie: Utils.global.cookie
         }
     });
 }
@@ -25,20 +25,66 @@ const getList = () => {
  * @param {params} params
  * @returns 
  */
-const createTrip = async (params) => {
+const createTrip = (params) => {
     const url = "/trips";
     const param = {
         ...params
     }
     return baseApi.post(url, param, {
         headers: {
-            cookie: Utils.data["cookie"]
+            cookie: Utils.global.cookie
         }
     });
 }
+
+
+const checkPrice = (distance) => {
+
+    const url = "/trips/price";
+    const params = {
+        distance: distance
+    }
+
+    return baseApi.get(url, {
+        params,
+        headers: {
+            cookie: Utils.global.cookie
+        }
+    });
+}
+
+const rate = (tripId, star) => {
+    const url = `trips/${tripId}/rate`;
+    const param = {
+        rate: star
+    }
+
+    return baseApi.patch(url, param, {
+        headers: {
+            cookie: Utils.global.cookie
+        }
+    });
+}
+
+const updateStatus = (tripId, status) => {
+    const url = `trips/${tripId}/status`;
+    const param = {
+        status: status
+    }
+
+    return baseApi.patch(url, param, {
+        headers: {
+            cookie: Utils.global.cookie
+        }
+    });
+}
+
 const tripApi = {
     getList,
-    createTrip
+    createTrip,
+    checkPrice,
+    rate,
+    updateStatus
 }
 
 export default tripApi

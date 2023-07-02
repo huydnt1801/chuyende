@@ -7,7 +7,7 @@ import { useState } from "react"
 import { iconCarActive, iconCarInactive, iconMotorActive, iconMotorInactive } from "../../../../components/Icon"
 
 
-const BottomSheet = ({ methodPayment, vehicle, onChangeVehicle }) => {
+const BottomSheet = ({ methodPayment, vehicle, onChangeVehicle, price }) => {
 
     const [show, setShow] = useState(false);
 
@@ -28,7 +28,7 @@ const BottomSheet = ({ methodPayment, vehicle, onChangeVehicle }) => {
                             source={vehicle == "motor" ? iconMotorActive : iconMotorInactive}
                             style={{ width: 60, height: 60, borderWidth: 4, borderColor: "white", borderRadius: 9999 }} />
                     </View>
-                    <Text className={className.money}>{'30K'}</Text>
+                    <Text className={className.money}>{price.motor}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                     activeOpacity={0.8}
@@ -39,7 +39,7 @@ const BottomSheet = ({ methodPayment, vehicle, onChangeVehicle }) => {
                             source={vehicle == "car" ? iconCarActive : iconCarInactive}
                             style={{ width: 60, height: 60, borderWidth: 4, borderColor: "white", borderRadius: 9999 }} />
                     </View>
-                    <Text className={className.money}>{'50K'}</Text>
+                    <Text className={className.money}>{price.motor}</Text>
                 </TouchableOpacity>
             </View>
             <View className={className.payment}>

@@ -1,6 +1,6 @@
 import { Button } from "react-native";
 import { Text, View } from "react-native";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setAccount } from "../../slices/Account";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { StackActions, useNavigation } from "@react-navigation/native";
@@ -14,12 +14,15 @@ import ButtonRow from "./ButtonRow";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faFingerprint, faKeyboard, faLanguage, faPowerOff, } from "@fortawesome/free-solid-svg-icons";
 import Utils from "../../share/Utils";
+import Api from "../../api";
 
 const Setting = () => {
 
     const dispatch = useDispatch();
     const navigation = useNavigation();
     const { t } = useTranslation();
+
+    const { account } = useSelector(state => state.account)
     return (
         <View className={className.container}>
             <View >
@@ -81,9 +84,15 @@ const Setting = () => {
                             }} />}
                     onPress={async () => {
                         dispatch(setAccount(null));
+                        if (account) {
+                            if (account.phoneNumber) {
+                                await Api.account.logout(account.phoneNumber);
+                            }
+                        }
                         try {
                             await AsyncStorage.removeItem("account");
                             await AsyncStorage.removeItem("cookie");
+                            await AsyncStorage.removeItem("isDriver");
                         } catch (error) {
                         }
                         navigation.dispatch(StackActions.replace("Splash"));
