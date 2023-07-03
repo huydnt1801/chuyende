@@ -1,9 +1,7 @@
 import { ScrollView, Text, View, Pressable, Image, useWindowDimensions } from "react-native"
-import Header from "../../../../components/Header";
 import { useTranslation } from "react-i18next";
 import { CommonActions, StackActions, useNavigation } from "@react-navigation/native";
 import className from "./className";
-import ButtonRow from "./ButtonRow/ButtonRow";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faCar } from "@fortawesome/free-solid-svg-icons";
 import { bevoucher1 } from "../../../../components/Image";
@@ -28,9 +26,9 @@ const Reward = () => {
                         className={className.imageButton}
                         source={bevoucher1}
                         style={{
-                            width:widthv,
+                            width: widthv,
                             resizeMode: 'contain',
-                            height:200
+                            height: 200
                         }}
                     />
 
@@ -43,7 +41,7 @@ const Reward = () => {
                         style={{
                             width: widthv,
                             resizeMode: 'contain',
-                            height:200
+                            height: 200
                         }}
                     />
                     <Pressable className={className.button}>
@@ -59,7 +57,7 @@ const Reward = () => {
                         />
 
                     </Pressable>
-                    
+
                 </Pressable>
             </ScrollView>
         </View>

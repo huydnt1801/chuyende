@@ -5,7 +5,7 @@
     "EnterDestination": "Enter destination",
     "Payment": "Payment",
     "History": "History",
-    "GoWithApp": "Go with app!",
+    "GoWithApp": "Go with MyDriver!",
     "LoginRegisterNow": "Login/ Register now!",
     "YourPhone": "Your Phone",
     "Continue": "Continue",
@@ -93,5 +93,11 @@
     "Mail": "Mail",
     "Support": "Support",
     "WhereDoWantToGo": "Where do want to go?",
-    "Reward":"My reward"
+    "FindCar": "Find car",
+    "HireDriver": "Hire driver",
+    "Reward": "My reward",
+    "AreYouSureToCancelThisTrip": "Are you sure to cancel this trip?",
+    "CancelTrip": "Cancel trip",
+    "CanNotCancelTrip": "Trip has been completed, can not cancel trip",
+    "CancelSuccess": "Cancel successful"
 }

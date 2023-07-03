@@ -135,6 +135,10 @@ const DriverTrip = ({ tripId }) => {
                                 dispatch(thunkGetListTrip())
                                 navigation.goBack();
                             }
+                            else {
+                                dispatch(thunkGetListTrip())
+                                navigation.goBack();
+                            }
                         }
                     })
                 }}>

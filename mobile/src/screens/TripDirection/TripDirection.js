@@ -13,6 +13,7 @@ import Utils from "../../share/Utils";
 import ModalFinding from "./components/ModalFinding";
 import { useEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
+import { useRef } from "react";
 
 const MarkerType = {
     START: 1,
@@ -67,6 +68,8 @@ const TripDirection = () => {
     });
 
     const [distance, setDistance] = useState(0);
+    const [tripId, setTripId] = useState(0);
+    const ref = useRef(true);
 
     const [methodPayment, setMethodPayment] = useState(true);
 
@@ -83,18 +86,24 @@ const TripDirection = () => {
             type: vehicle,
             price: price[vehicle]
         });
-        await Utils.wait(500);
-        Utils.hideLoading();
-        console.log(result);
         await Utils.wait(1000);
+        Utils.hideLoading();
+        // await Utils.wait(1000);
         setShowModalFinding(true);
+        setTripId(result.data.data.id)
         let status = await Api.trip.getTripInformation(result.data.data.id);
         while (status.data.data[0].status == "waiting") {
             await Utils.wait(3000);
+            console.log("ref.current", ref.current);
+            if (!ref.current) {
+                break;
+            }
             status = await Api.trip.getTripInformation(result.data.data.id);
         }
         setShowModalFinding(false);
-        navigation.navigate("InTrip", { tripId: result.data.data.id })
+        if (status.data.data[0].status == "accept") {
+            navigation.navigate("InTrip", { tripId: result.data.data.id })
+        }
     }
 
     useEffect(() => {
@@ -164,7 +173,19 @@ const TripDirection = () => {
             </View>
             <ModalFinding
                 show={showModalFinding}
-                onPressCancel={() => setShowModalFinding(false)} />
+                onPressCancel={() => {
+                    Utils.showConfirmDialog({
+                        message: t("AreYouSureToCancelThisTrip"),
+                        onConfirm: async () => {
+                            setShowModalFinding(false);
+                            ref.current = true;
+                            await Api.trip.updateStatus(tripId, "cancel");
+                        },
+                        onCancel: () => {
+                            setShowModalFinding(true);
+                        }
+                    });
+                }} />
         </View>
     )
 }
